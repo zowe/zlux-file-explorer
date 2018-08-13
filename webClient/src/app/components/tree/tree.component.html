@@ -1,0 +1,48 @@
+
+<!-- 
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+  
+  SPDX-License-Identifier: EPL-2.0
+  
+  Copyright Contributors to the Zowe Project.
+-->
+
+<div class="nav-container">
+  <div class="nav-panel">
+    <!-- {{treeData | json}} -->
+    <!-- <p-tree
+      styleClass="rs-com-css-file-navigator"
+      [value]="treeData"
+      <!- - selectionMode="single"
+      [(selection)]="selectedNode"
+      (onNodeSelect)="nodeSelect($event)"
+      (onNodeExpand)="nodeExpand($event)" - ->
+    >
+    </p-tree> -->
+    <p-tree
+      [value]="treeData" 
+      [id]="treeId"
+      selectionMode="single"
+      [(selection)]="selectedNode"
+      (onNodeSelect)="nodeSelect($event)"
+    >
+    </p-tree>
+    <!-- <p-treeTable [value]="fileFolders">
+        <p-column field="name" header="Name"></p-column>
+        <p-column field="type" header="Type"></p-column>
+    </p-treeTable> -->
+    <!-- <h1>{{treeData}}</h1> -->
+  </div>
+</div>
+
+<!-- 
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+  
+  SPDX-License-Identifier: EPL-2.0
+  
+  Copyright Contributors to the Zowe Project.
+-->
