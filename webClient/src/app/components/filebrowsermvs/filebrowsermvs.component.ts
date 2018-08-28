@@ -13,17 +13,19 @@
 
 import {Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy} from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
+//import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
 import {childEvent} from '../../structures/child-event';
 import { PersistentDataService } from '../../services/persistentData.service';
 import {MvsDataObject} from '../../structures/persistantdata';
 
-import {FileBrowserFileSelectedEvent,
+/*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
 } from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
 import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platform/interface/src/registry/capabilities';
-
+*/
+//Commented out to fix compilation errors from zlux-platform changes, does not affect program
+//TODO: Implement new capabilities from zlux-platform
 @Component({
   selector: 'file-browser-mvs',
   templateUrl: 'filebrowsermvs.component.html',
@@ -32,10 +34,10 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
               '../../../../node_modules/carbon-components/css/carbon-components.min.css'],
   providers: [FileService, PersistentDataService]
 })
-export class FileBrowserMVSComponent implements IFileBrowserMVS, OnInit, OnDestroy {
-  componentClass:ComponentClass;
-  fileSelected: Subject<FileBrowserFileSelectedEvent>;
-  capabilities:Array<Capability>;
+export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
+  //componentClass:ComponentClass;
+  //fileSelected: Subject<FileBrowserFileSelectedEvent>;
+  //capabilities:Array<Capability>;
   path:string;
   input_box:string;
   rtClickDisplay:boolean;
@@ -48,8 +50,8 @@ export class FileBrowserMVSComponent implements IFileBrowserMVS, OnInit, OnDestr
   data:any;
   dsData : Observable<any>;
   constructor(private fileService: FileService, private elementRef:ElementRef, private persistantDataService: PersistentDataService) {
-    this.componentClass = ComponentClass.FileBrowser;
-    this.initalizeCapabilities();
+    //this.componentClass = ComponentClass.FileBrowser;
+    //this.initalizeCapabilities();
     this.input_box = "";
     this.rtClickDisplay = false;
   }
@@ -66,17 +68,18 @@ export class FileBrowserMVSComponent implements IFileBrowserMVS, OnInit, OnDestr
     this.intervalId = setInterval(() => {
       this.updateDs();
     }, this.timeVar);
+    this.updateDs();
   }
   ngOnDestroy(){
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
   }
-  initalizeCapabilities(){
+  /*initalizeCapabilities(){
     this.capabilities = new Array<Capability>();
     this.capabilities.push(FileBrowserCapabilities.FileBrowser);
     this.capabilities.push(FileBrowserCapabilities.FileBrowserMVS);
-  }
+  }*/
   getSelectedPath(): string{
     //TODO:how do we want to want to handle caching vs message to app to open said path
     return this.path;
@@ -90,13 +93,13 @@ export class FileBrowserMVSComponent implements IFileBrowserMVS, OnInit, OnDestr
     return this.elementRef.nativeElement;
   }
 
-  getCapabilities(): Capability[]
+  /*getCapabilities(): Capability[]
   {
     return this.capabilities;
-  }
-  clickInEventHandler($event:childEvent):void{
+  }*/
+  clickInEventHandler($event:any):void{
       //TODO:need to assess the Datasets drill in behavior
-      this.input_box = this.input_box  + $event.label + ".";
+      this.input_box = $event.node.label + ".";
       this.updateDs();
   }
   onRightClick($event:any):void{
@@ -118,15 +121,13 @@ export class FileBrowserMVSComponent implements IFileBrowserMVS, OnInit, OnDestr
           //TODO: assuming parent entries come first always??? Need to validate this?
           if (/C|X/.test(ds.datasets[i].csiEntryType)){
             currentNode.children = [];
-            //TODO: styling of the 'folder' could likely be better
             currentNode.data = "Documents Folder";
             currentNode.expandedIcon = "fa-folder-open";
-            currentNode.collapsedIcon = "fa-folder";
+            currentNode.collapsedIcon = "fa-database";
           }
           else {
             currentNode.items = {};
-            //TODO: styling of the 'files' could likely be better
-            currentNode.icon= "fa-file";
+            currentNode.icon= "fa-cube";
           }
           currentNode.label = ds.datasets[i].name.replace(/^\s+|\s+$/, '');
           temp.push(currentNode);
@@ -139,7 +140,7 @@ export class FileBrowserMVSComponent implements IFileBrowserMVS, OnInit, OnDestr
             dataObject = data.contents;
             dataObject.mvsInput = this.input_box;
             dataObject.mvsData = this.data;
-            console.log(JSON.stringify(dataObject));
+            //console.log(JSON.stringify(dataObject));
             this.persistantDataService.setData(dataObject)
               .subscribe((res: any) => { });
           })

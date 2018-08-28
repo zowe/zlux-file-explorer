@@ -29,15 +29,17 @@ import {childEvent} from '../../structures/child-event';
 import {MvsDataObject, UssDataObject} from '../../structures/persistantdata';
 import {FileContents} from '../../structures/filecontents';
 import {tab} from '../../structures/tab';
-import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
+//import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { PersistentDataService } from '../../services/persistentData.service';
-import {FileBrowserFileSelectedEvent,
+/*import {FileBrowserFileSelectedEvent,
   IFileBrowser,
   IFileBrowserMultiSelect,
   IFileBrowserFolderSelect,
   IFileBrowserUSS,
   IFileBrowserMVS
-} from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
+} from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';*/
+//Commented out to fix compilation errors from zlux-platform changes, does not affect program
+//TODO: Implement new capabilities from zlux-platform
 import { FileBrowserMVSComponent } from '../filebrowsermvs/filebrowsermvs.component';
 import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.component';
 
@@ -52,7 +54,7 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
 })
 
 export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
-  componentClass: ComponentClass;
+  //componentClass: ComponentClass;
   selectedItem: string;
   currentIndex: number;
   tabs: Array<tab>;
@@ -64,7 +66,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     private utils: UtilsService, private elemRef: ElementRef,
     private cd: ChangeDetectorRef)
   {
-    this.componentClass = ComponentClass.FileBrowser;
+    //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
     this.tabs = [{ index: 0, name: "USS" }, { index: 1, name: "Datasets" }];
 
