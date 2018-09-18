@@ -31,7 +31,7 @@ export class PersistentDataService {
 
     public setData(params: any): Observable<any> {
 
-        let uri = RocketMVD.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), this.scope, this.resourcePath, this.fileName);
+        let uri = ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), this.scope, this.resourcePath, this.fileName);
         //var stringify = require('../../../../../../random-repos/json-stringify-safe');
 
         if (typeof params === 'object') {
@@ -45,7 +45,7 @@ export class PersistentDataService {
 
     public getData(): Observable<any> {
         
-        let uri = RocketMVD.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), this.scope, this.resourcePath, this.fileName);
+        let uri = ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), this.scope, this.resourcePath, this.fileName);
 
         let headers = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: headers });
