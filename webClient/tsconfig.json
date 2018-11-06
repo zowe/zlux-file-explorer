@@ -1,7 +1,8 @@
 {
   "extends": "../../zlux-app-manager/virtual-desktop/plugin-config/tsconfig.base.json",
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    //"../zlux-platform/interface/src/mvd-hosting.d.ts"
   ],
   "compileOnSave": false,
   "compilerOptions": {
@@ -12,6 +13,7 @@
     "declarationDir": ".",
     "module": "amd",
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
