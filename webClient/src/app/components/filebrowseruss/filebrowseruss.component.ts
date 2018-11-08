@@ -18,11 +18,13 @@ import { Observable, Subject } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 import { PersistentDataService } from '../../services/persistentData.service';
-import { ComponentClass } from '../../../../../../zlux-platform/interface/src/registry/classes';
+/*import { ComponentClass } from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileBrowserFileSelectedEvent, IFileBrowserUSS }
   from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
 import { Capability, FileBrowserCapabilities }
-  from '../../../../../../zlux-platform/interface/src/registry/capabilities';
+  from '../../../../../../zlux-platform/interface/src/registry/capabilities';*/
+//Commented out to fix compilation errors from zlux-platform changes, does not affect program
+//TODO: Implement new capabilities from zlux-platform
 import { FileContents } from '../../structures/filecontents';
 import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
@@ -37,10 +39,10 @@ import 'rxjs/add/operator/toPromise';
   providers: [UssCrudService, PersistentDataService]
 })
 
-export class FileBrowserUSSComponent implements IFileBrowserUSS, OnInit, OnDestroy {
-  componentClass: ComponentClass;
-  fileSelected: Subject<FileBrowserFileSelectedEvent>;
-  capabilities: Array<Capability>;
+export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowserUSS,
+  //componentClass: ComponentClass;
+  //fileSelected: Subject<FileBrowserFileSelectedEvent>;
+  //capabilities: Array<Capability>;
   path: string;
   isFile: boolean;
   errorMessage: String;
@@ -66,7 +68,7 @@ export class FileBrowserUSSComponent implements IFileBrowserUSS, OnInit, OnDestr
 
   constructor(private elementRef: ElementRef, private ussSrv: UssCrudService,
     private utils: UtilsService, private persistanceDataService: PersistentDataService) {
-    this.componentClass = ComponentClass.FileBrowser;
+    //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
     this.rtClickDisplay = false;
     this.addFileDisplay = false;
@@ -114,9 +116,9 @@ export class FileBrowserUSSComponent implements IFileBrowserUSS, OnInit, OnDestr
   }
 
   initalizeCapabilities() {
-    this.capabilities = new Array<Capability>();
-    this.capabilities.push(FileBrowserCapabilities.FileBrowser);
-    this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
+    //this.capabilities = new Array<Capability>();
+    //this.capabilities.push(FileBrowserCapabilities.FileBrowser);
+    //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
   getSelectedPath(): string {
@@ -132,9 +134,9 @@ export class FileBrowserUSSComponent implements IFileBrowserUSS, OnInit, OnDestr
     return this.elementRef.nativeElement;
   }
 
-  getCapabilities(): Capability[] {
+  /*getCapabilities(): Capability[] {
     return this.capabilities;
-  }
+  }*/
   private openFile(fileAddress: string, fileName: string) {
     let currfileContents = this.ussSrv.getFileContents(fileAddress);
     currfileContents.subscribe(

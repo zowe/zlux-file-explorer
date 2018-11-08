@@ -32,7 +32,6 @@ export class PersistentDataService {
     public setData(params: any): Observable<any> {
 
         let uri = ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), this.scope, this.resourcePath, this.fileName);
-        //var stringify = require('../../../../../../random-repos/json-stringify-safe');
 
         if (typeof params === 'object') {
             return this.http.put(uri, this.stringify(params, null, 2, null));
@@ -49,7 +48,13 @@ export class PersistentDataService {
 
         let headers = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: headers });
-        return this.http.get(uri, options).map((res => { return res.json(); }));;
+        return this.http
+        .get(uri, options)
+        .map((res => { return res.json(); }))
+        .catch((err => { 
+          console.log("Data saving file does not exist. Creating one now...");
+          return this.http.put(uri, this.stringify(null, null, 2, null)); 
+        })); 
     }
 
     public stringify(obj, replacer, spaces, cycleReplacer) {
