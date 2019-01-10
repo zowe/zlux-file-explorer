@@ -18,9 +18,6 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class FileService {
-  private datasetMetadata :string= '/datasetMetadata/name/';
-  private datasetContents :string= '/datasetMetadata/name/';
-  private config          :string = '/unixFileContents/u/';
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
     return Observable.throw(error.message || error);
@@ -31,10 +28,10 @@ export class FileService {
     queryDatasets(query:string): Observable<any>  {
         let url:string;
         if (!query.includes('.')){
-          url = this.datasetMetadata + query.toUpperCase( ) + '*';
+          url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ) + '*');
         }
         else{
-          url = this.datasetMetadata + query.toUpperCase( ).replace(/\.$/, '') + '.**?listMembers=true';
+          url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), undefined, undefined, true);
         }
         return this.http.get(url)
         .map(res=>res.json())
@@ -42,33 +39,11 @@ export class FileService {
     }
 
     getDataset(path:string) {
-        let url:string = this.datasetContents + path.trim().toUpperCase() + ".**";
+        let url:string = ZoweZLUX.uriBroker.datasetContentsUri(path.trim().toUpperCase());
         return this.http.get(url)
         .map(res=>res.json())
         .catch(this.handleErrorObservable);
     }
-
-    getConfig(user:string) {
-        let url:string = this.config + user + '/.mvd/codeeditor.json';
-        return this.http.get(url)
-        .map(res=>res.json())
-        .catch(this.handleErrorObservable);
-    }
-
-    //http POSTs
-
-    //TODO:lines type???
-    // writeDataset(path:string, lines) : Observable<any>{
-    //     let url:string = this.datasetContents + path.trim();
-    //     console.log("path", path);
-    //     console.log("lines", lines);
-    //     return this.http.post(url, {records: lines});
-    // }
-    saveConfig(user:string, config:string) : Observable<any>{
-        let url:string = this.config + user + '/.mvd/codeeditor.json';
-        console.warn("DEPRECATED - saving Config : " + url);
-        return this.http.post(url, JSON.stringify(config));
-    };
 }
 
 /*
