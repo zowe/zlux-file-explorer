@@ -15,9 +15,7 @@
     "isSingleWindowApp": false,
     "defaultWindowStyle": {
       "width": 1100,
-      "height": 682,
-      "x": 0,
-      "y": 0
+      "height": 682
     }
   },
   "configurationData": {
