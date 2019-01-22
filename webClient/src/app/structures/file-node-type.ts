@@ -37,7 +37,7 @@ export class FileNodeType {
       const nodeAgent = nodeData as FileNodeAgent;
 
       result = {
-        icon: 'fa-desktop',
+        icon: 'fa fa-desktop',
         label: nodeAgent.name,
         navigatorId: nodeAgent.originNode,
         nodeData: nodeAgent,
@@ -48,7 +48,7 @@ export class FileNodeType {
         const nodeAgentTopLevel = nodeData as FileNodeAgentTopLevel;
 
         result = {
-          icon: 'fa-crosshairs',
+          icon: 'fa fa-crosshairs',
           label: nodeAgentTopLevel.name,
           navigatorId: nodeAgentTopLevel.id,
           nodeData: nodeAgentTopLevel,

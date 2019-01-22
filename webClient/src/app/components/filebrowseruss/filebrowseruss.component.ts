@@ -188,12 +188,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         if (files.entries[i].directory) {
           files.entries[i].children = [];
           files.entries[i].data = "Folder";
-          files.entries[i].collapsedIcon = "fa-folder";
-          files.entries[i].expandedIcon = "fa-folder-open";
+          files.entries[i].collapsedIcon = "fa fa-folder";
+          files.entries[i].expandedIcon = "fa fa-folder-open";
         }
         else {
           files.entries[i].items = {};
-          files.entries[i].icon = "fa-file";
+          files.entries[i].icon = "fa fa-file";
           files.entries[i].data = "File";
         }
         files.entries[i].label = files.entries[i].name;
@@ -234,12 +234,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 //       if (files.entries[i].directory) {
                 //         files.entries[i].children = [];
                 //         files.entries[i].data = "Folder";
-                //         files.entries[i].collapsedIcon = "fa-folder";
-                //         files.entries[i].expandedIcon = "fa-folder-open";
+                //         files.entries[i].collapsedIcon = "fa fa-folder";
+                //         files.entries[i].expandedIcon = "fa fa-folder-open";
                 //       }
                 //       else {
                 //         files.entries[i].items = {};
-                //         files.entries[i].icon = "fa-file";
+                //         files.entries[i].icon = "fa fa-file";
                 //         files.entries[i].data = "File";
                 //       }
                 //       files.entries[i].label = files.entries[i].name;
@@ -288,12 +288,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             //       if (files.entries[i].directory) {
             //         files.entries[i].children = [];
             //         files.entries[i].data = "Folder";
-            //         files.entries[i].collapsedIcon = "fa-folder";
-            //         files.entries[i].expandedIcon = "fa-folder-open";
+            //         files.entries[i].collapsedIcon = "fa fa-folder";
+            //         files.entries[i].expandedIcon = "fa fa-folder-open";
             //       }
             //       else {
             //         files.entries[i].items = {};
-            //         files.entries[i].icon = "fa-file";
+            //         files.entries[i].icon = "fa fa-file";
             //         files.entries[i].data = "File";
             //       }
             //       files.entries[i].label = files.entries[i].name;
@@ -368,12 +368,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             if (files.entries[i].directory) {
               files.entries[i].children = [];
               files.entries[i].data = "Folder";
-              files.entries[i].collapsedIcon = "fa-folder";
-              files.entries[i].expandedIcon = "fa-folder-open";
+              files.entries[i].collapsedIcon = "fa fa-folder";
+              files.entries[i].expandedIcon = "fa fa-folder-open";
             }
             else {
               files.entries[i].items = {};
-              files.entries[i].icon = "fa-file";
+              files.entries[i].icon = "fa fa-file";
               files.entries[i].data = "File";
             }
             files.entries[i].label = files.entries[i].name;
@@ -381,14 +381,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             tempChildren.push(files.entries[i]);
 
           } $event.node.children = tempChildren;
-          $event.node.expandedIcon = "fa-folder-open"; $event.node.collapsedIcon = "fa-folder";
+          $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
           console.log(path + " was populated with " + tempChildren.length + " children.");
 
           while ($event.node.parent !== undefined) {
             let newChild = $event.node.parent;
             newChild.children[$event.node.id] = $event.node;
             newChild.expanded = true;
-            newChild.expandedIcon = "fa-folder-open"; newChild.collapsedIcon = "fa-folder";
+            newChild.expandedIcon = "fa fa-folder-open"; newChild.collapsedIcon = "fa fa-folder";
             $event.node = newChild;
           }
 

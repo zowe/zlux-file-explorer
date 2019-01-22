@@ -122,12 +122,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           if (/C|X/.test(ds.datasets[i].csiEntryType)){
             currentNode.children = [];
             currentNode.data = "Documents Folder";
-            currentNode.expandedIcon = "fa-folder-open";
-            currentNode.collapsedIcon = "fa-database";
+            currentNode.expandedIcon = "fa fa-folder-open";
+            currentNode.collapsedIcon = "fa fa-database";
           }
           else {
             currentNode.items = {};
-            currentNode.icon= "fa-cube";
+            currentNode.icon= "fa fa-cube";
           }
           currentNode.label = ds.datasets[i].name.replace(/^\s+|\s+$/, '');
           temp.push(currentNode);
