@@ -72,7 +72,7 @@ export class TreeComponent {
     //     if (!children || children.length === 0 || (children.length === 1 && !children[0].label)) {
     //       const child: FileNode = {
     //         label: '',
-    //         icon: 'fa-spinner'
+    //         icon: 'fa fa-spinner'
     //       };
     //
     //       node.children = [child]; // fake-ish

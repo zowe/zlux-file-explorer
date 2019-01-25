@@ -38,25 +38,6 @@
   width: fit-content;
 }
 
-:host >>> .rs-com-css-file-navigator {
-  border-radius: 0;
-  width: 100%;
-  background: inherit;
-  border: none;
-  font-size: 20px;
-}
-
-:host >>> .toolbar {
-  background: #c2d8e7;
-  border-radius: 0;
-}
-
-:host >>> .toolbar .ui-button {
-  background: #c2d8e7;
-  border-color: #c2d8e7;
-  color: #5b5b5b;
-}
-
 
 /*
   This program and the accompanying materials are

@@ -18,6 +18,13 @@
   display: inline-block;
 }
 
+p.launchbar-caption.truncate {
+  bottom: 70px;
+}
+
+.bx--tabs{
+  margin-left: 15px;
+}
 
 
 
