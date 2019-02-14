@@ -28,10 +28,9 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
 //TODO: Implement new capabilities from zlux-platform
 @Component({
   selector: 'file-browser-mvs',
-  templateUrl: 'filebrowsermvs.component.html',
+  templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['filebrowsermvs.component.css',
-              '../../../../node_modules/carbon-components/css/carbon-components.min.css'],
+  styleUrls: ['./filebrowsermvs.component.css'],
   providers: [FileService, PersistentDataService]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
@@ -122,12 +121,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           if (/C|X/.test(ds.datasets[i].csiEntryType)){
             currentNode.children = [];
             currentNode.data = "Documents Folder";
-            currentNode.expandedIcon = "fa-folder-open";
-            currentNode.collapsedIcon = "fa-database";
+            currentNode.expandedIcon = "fa fa-folder-open";
+            currentNode.collapsedIcon = "fa fa-database";
           }
           else {
             currentNode.items = {};
-            currentNode.icon= "fa-cube";
+            currentNode.icon= "fa fa-cube";
           }
           currentNode.label = ds.datasets[i].name.replace(/^\s+|\s+$/, '');
           temp.push(currentNode);

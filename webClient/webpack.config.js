@@ -26,7 +26,7 @@ var config = {
     'filename': 'main.js',
   },
   'module': {
-    'loaders': [
+    'rules': [
     ]
   },
   'plugins': [

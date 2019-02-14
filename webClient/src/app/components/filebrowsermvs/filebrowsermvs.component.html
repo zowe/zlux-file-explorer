@@ -11,8 +11,8 @@
 
   <div>
     <svg width="14" height="16" viewBox="0 0 14 16" fill-rule="evenodd" (click)="levelUp()"><path d="M6 3.4V16h2V3.4l4.7 4.9L14 7 7 0 0 7l1.3 1.3z"></path></svg>
-    <div class="inline-button">
-      <input [(ngModel)]="input_box" class="bx--text-input" (change)="updateTree()">
+    <div class="filebrowsermvs-search">
+      <input [(ngModel)]="input_box" class="filebrowsermvs-search-input" (change)="updateTree()">
     </div>
     <div>
       <tree-root [treeData]="data"

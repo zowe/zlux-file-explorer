@@ -1,13 +1,13 @@
 {
-  "identifier": "com.rs.zoe.zlux-file-explorer",
-  "apiVersion": "1.0",
-  "pluginVersion": "1.0",
+  "identifier": "org.zowe.zlux.fileexplorer",
+  "apiVersion": "1.0.0",
+  "pluginVersion": "0.9.4",
   "pluginType": "application",
   "webContent": {
     "framework": "angular2",
     "launchDefinition": {
-      "pluginShortNameKey": "Zlux File Explorer",
-      "pluginShortNameDefault": "Zlux File Explorer",
+      "pluginShortNameKey": "Zowe File Explorer",
+      "pluginShortNameDefault": "Zowe File Explorer",
       "imageSrc": "assets/icon.png"
     },
     "descriptionKey": "zlux-file-explorerDescription",

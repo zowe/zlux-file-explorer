@@ -10,6 +10,22 @@
   Copyright Contributors to the Zowe Project.
 */
 
+.filebrowsermvs-search {
+  width: 80%;
+  margin-left: 10px;
+  display: inline-block;
+  margin-left: 10px;
+  height: 40px;
+}
+
+.filebrowsermvs-search-input{
+  width: 80%;
+  min-height: 30px;
+  font-family: monospace;
+  font-size: 15px;
+  height: 35px;
+}
+
 
 
 /*

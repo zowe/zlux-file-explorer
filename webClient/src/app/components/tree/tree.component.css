@@ -9,19 +9,13 @@
   Copyright Contributors to the Zowe Project.
 */
 
-.nav-container {
-  /* display:flex; */
-  /*flex-direction: column;*/
-  height: 100%;
-  width: 100%;
-  min-width: 300px;
-}
-
-.nav-panel {
+.fileexplorer-tree-panel {
   flex: 1 1 0px;
   overflow: auto;
   background: #efefef;
   min-height: 300px;
+  height: 100%;
+  width: 100%;
 }
 
 .ui-tree-container {
@@ -33,28 +27,10 @@
   min-width: 300px;
   padding: 15px;
   padding-bottom: 15px;
+  font-size: 16px;
 }
 .ui-treenode {
   width: fit-content;
-}
-
-:host >>> .rs-com-css-file-navigator {
-  border-radius: 0;
-  width: 100%;
-  background: inherit;
-  border: none;
-  font-size: 20px;
-}
-
-:host >>> .toolbar {
-  background: #c2d8e7;
-  border-radius: 0;
-}
-
-:host >>> .toolbar .ui-button {
-  background: #c2d8e7;
-  border-color: #c2d8e7;
-  color: #5b5b5b;
 }
 
 

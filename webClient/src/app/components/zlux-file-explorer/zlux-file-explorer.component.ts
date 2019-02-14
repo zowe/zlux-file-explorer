@@ -46,10 +46,9 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
 
 @Component({
   selector: 'zlux-file-explorer',
-  templateUrl: 'zlux-file-explorer.component.html',
+  templateUrl: './zlux-file-explorer.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['zlux-file-explorer.component.css',
-    '../../../../node_modules/carbon-components/css/carbon-components.min.css'],
+  styleUrls: ['./zlux-file-explorer.component.css'],
   providers: [FileService, UtilsService, PersistentDataService]
 })
 
