@@ -10,15 +10,20 @@
   Copyright Contributors to the Zowe Project.
 */
 
-.inline-button {
-  /*border-radius: 0;
-  width: 100%;
-  background: inherit;
-  border: none;
-  font-size: 20px;
-  padding-left: 10px;*/
-  
+.filebrowseruss-search {
   width: 80%;
+  margin-left: 10px;
+  display: inline-block;
+  margin-left: 10px;
+  height: 40px;
+}
+
+.filebrowseruss-search-input{
+  width: 80%;
+  min-height: 30px;
+  font-family: monospace;
+  font-size: 15px;
+  height: 35px;
 }
 
 /*

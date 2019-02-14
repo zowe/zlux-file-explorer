@@ -10,20 +10,19 @@
   Copyright Contributors to the Zowe Project.
 */
 
-.global-ui-file-explorer{
-  /*background-color: #cce6ff;*/
+.fileexplorer-browser-module{
+  margin-left: 10px;
 }
 
-.inline-button{
-  display: inline-block;
+.fileexplorer-global{
+  padding: 10px;
 }
 
-p.launchbar-caption.truncate {
-  bottom: 70px;
-}
-
-.bx--tabs{
+.fileexplorer-tabs{
   margin-left: 15px;
+  font-size: 15px;
+  display: flex;
+  height: 45px;
 }
 
 

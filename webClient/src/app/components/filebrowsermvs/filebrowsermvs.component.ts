@@ -28,10 +28,9 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
 //TODO: Implement new capabilities from zlux-platform
 @Component({
   selector: 'file-browser-mvs',
-  templateUrl: 'filebrowsermvs.component.html',
+  templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['filebrowsermvs.component.css',
-              '../../../../node_modules/carbon-components/css/carbon-components.min.css'],
+  styleUrls: ['./filebrowsermvs.component.css'],
   providers: [FileService, PersistentDataService]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,

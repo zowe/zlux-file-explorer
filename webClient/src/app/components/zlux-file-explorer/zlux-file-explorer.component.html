@@ -9,21 +9,21 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="global-ui-file-explorer">
-<nav data-tabs class="bx--tabs" role="navigation">
-  <div class="bx--tabs-trigger" tabindex="0">
+<div class="fileexplorer-global">
+<nav data-tabs class="fileexplorer-tabs" role="navigation">
+  <div class="fileexplorer-tabs-trigger" tabindex="0">
     <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
     <svg width="10" height="5" viewBox="0 0 10 5" fill-rule="evenodd">
       <path d="M10 0L5 5 0 0z"></path>
     </svg>
   </div>
-  <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
+  <ul class="fileexplorer-tabs-list" role="tablist">
     <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'bx--tabs__nav-item--selected' : ''" (click)="setIndex(tab.index)" id="tab-{{tab.index}}" class="bx--tabs__nav-item" role="presentation">
       <a class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"  aria-selected="false">{{tab.name}}</a>
     </li>
   </ul>
 </nav>
-<div style="padding: 1rem;">
+<div class="fileexplorer-browser-module">
   <file-browser-uss
   *ngIf="currentIndex == 0"
   (fileContents)="onUssFileLoad($event)"

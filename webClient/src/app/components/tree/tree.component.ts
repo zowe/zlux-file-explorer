@@ -26,9 +26,7 @@ import {FileNode} from '../../structures/file-node';
   selector: 'tree-root',
   templateUrl: './tree.component.html',
   encapsulation: ViewEncapsulation.None,
-   styleUrls: [
-    './tree.component.css'
-  ],
+  styleUrls: ['./tree.component.css'],
   providers: []
 })
 /**

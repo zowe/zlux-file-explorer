@@ -9,19 +9,13 @@
   Copyright Contributors to the Zowe Project.
 */
 
-.nav-container {
-  /* display:flex; */
-  /*flex-direction: column;*/
-  height: 100%;
-  width: 100%;
-  min-width: 300px;
-}
-
-.nav-panel {
+.fileexplorer-tree-panel {
   flex: 1 1 0px;
   overflow: auto;
   background: #efefef;
   min-height: 300px;
+  height: 100%;
+  width: 100%;
 }
 
 .ui-tree-container {
@@ -33,6 +27,7 @@
   min-width: 300px;
   padding: 15px;
   padding-bottom: 15px;
+  font-size: 16px;
 }
 .ui-treenode {
   width: fit-content;

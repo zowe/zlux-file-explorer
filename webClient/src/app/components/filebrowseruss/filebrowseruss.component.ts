@@ -32,10 +32,9 @@ import 'rxjs/add/operator/toPromise';
 
 @Component({
   selector: 'file-browser-uss',
-  templateUrl: 'filebrowseruss.component.html',
+  templateUrl: './filebrowseruss.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['filebrowseruss.component.css',
-    '../../../../node_modules/carbon-components/css/carbon-components.min.css'],
+  styleUrls: ['./filebrowseruss.component.css'],
   providers: [UssCrudService, PersistentDataService]
 })
 
