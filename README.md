@@ -21,8 +21,7 @@ Execute ```npm run build``` inside the ```webClient``` folder to compile, or exe
 
 # Widget version (```src-for-widgets``` branch)
 
-You cannot install or build the widget version of the File Explorer. Instead, it can be embedded as an Angular component for
-use in your own application. 
+You don't need to install or build the widget version of the File Explorer. Instead, it can be embedded as an Angular component for use in your own application. 
 
 ## Embedding
 
