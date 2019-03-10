@@ -38,6 +38,10 @@ FileExplorerModule,
 ...,
 ```
 
+Now, in your application's HTML file, given they are within the scope of your module, you can import the File Explorer widget as
+```<zlux-file-explorer (nodeClick)="onNodeClick($event)"></zlux-file-explorer>```
+with an optional (style) input to specify the color, size, or other properties of the main tree container.
+
 
 This program and the accompanying materials are
 made available under the terms of the Eclipse Public License v2.0 which accompanies
