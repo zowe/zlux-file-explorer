@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="fileexplorer-tree-panel">
+<div class="fileexplorer-tree-panel" [ngStyle]="style">
   <!-- {{treeData | json}} -->
   <!-- <p-tree
     styleClass="rs-com-css-file-navigator"
@@ -21,6 +21,7 @@
   >
   </p-tree> -->
   <p-tree
+    class="fileexplorer-p-tree"
     [value]="treeData" 
     [id]="treeId"
     selectionMode="single"

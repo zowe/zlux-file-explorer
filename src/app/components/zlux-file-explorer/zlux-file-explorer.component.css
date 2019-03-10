@@ -12,10 +12,11 @@
 
 .fileexplorer-browser-module{
   margin-left: 10px;
+  margin-top: 10px;
 }
 
 .fileexplorer-global{
-  padding: 10px;
+  /* padding: 10px; */
 }
 
 .fileexplorer-tabs{
@@ -23,6 +24,7 @@
   font-size: 15px;
   display: flex;
   height: 45px;
+  font-weight: bold;
 }
 
 

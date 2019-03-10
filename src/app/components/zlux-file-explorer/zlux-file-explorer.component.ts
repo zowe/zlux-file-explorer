@@ -72,7 +72,9 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   }
 
   @Input() selectPath: string;
+  @Input() style: ZluxFileExplorerStyle = {};
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
 
   setIndex(inputIndex:number){
     this.currentIndex = inputIndex;
@@ -80,6 +82,10 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 
   onUssFileLoad($event:FileContents){
     this.fileOutput.emit($event);
+  }
+  onNodeClick($event:any){
+    //console.log($event);
+    this.nodeClick.emit($event);
   }
   zluxOnMessage(eventContext: any): Promise<any> {
     return new Promise((resolve,reject)=> {
@@ -141,6 +147,9 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   entryComponents: [ZluxFileExplorerComponent]
 })
 export class ZluxFileExplorerModule { }
+
+export interface ZluxFileExplorerStyle { //TODO: We can specify which UI things can/cannot be changed.
+} // For the sake of customizeability, I don't see why there should be restrictions at the moment.
 
 
 /*

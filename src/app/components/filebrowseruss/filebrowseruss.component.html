@@ -9,66 +9,70 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-    <div>
-      <svg width="14" height="16" viewBox="0 0 14 16" fill-rule="evenodd" (click)="levelUp()"><path d="M6 3.4V16h2V3.4l4.7 4.9L14 7 7 0 0 7l1.3 1.3z"></path></svg>
-      <div class="filebrowseruss-search">
-        <input [(ngModel)]="input_box" class="filebrowseruss-search-input" (change)="displayTree(input_box, false)">
-      </div>
-      <div (click)="onClick($event);">
-          <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
-          (contextmenu)="$event.preventDefault(); onRightClick($event);" 
-          ></tree-root>
-      </div>
+<div>
+    <img src="../../../assets/explorer-uparrow.png" (click)="levelUp()" style="width: 20px; height: 20px; filter: brightness(3);">
+    <!-- <svg width="14" height="16" viewBox="0 0 14 16" fill-rule="evenodd" (click)="levelUp()"><path d="M6 3.4V16h2V3.4l4.7 4.9L14 7 7 0 0 7l1.3 1.3z"></path></svg> -->
+    <div class="filebrowseruss-search">
+    <input [(ngModel)]="input_box" placeholder="Enter a directory..." class="filebrowseruss-search-input" (change)="displayTree(input_box, false)">
     </div>
-<p-dialog header="New File" [(visible)]="addFileDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
-    <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
-        <p-footer>
-            <button type="button" pButton (click)="addFileDisplay=false; addFile();" label="Ok">Ok</button>
-            <button type="button" pButton (click)="addFileDisplay=false" label="Cancel">Cancel</button>
-        </p-footer>
-</p-dialog>
-<p-dialog header="New Folder" [(visible)]="addFolderDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
-    <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
-        <p-footer>
-            <button type="button" pButton (click)="addFolderDisplay=false; addFolder();" label="Ok">Ok</button>
-            <button type="button" pButton (click)="addFolderDisplay=false" label="Cancel">Cancel</button>
-        </p-footer>
-</p-dialog>
-<p-dialog header="Copy" [(visible)]="copyDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
-    <span>Copy {{selectedItem}}</span>
-    <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
-        <p-footer>
-            <button type="button" pButton (click)="copyDisplay=false; copy();" label="Ok">Ok</button>
-            <button type="button" pButton (click)="copyDisplay=false" label="Cancel">Cancel</button>
-        </p-footer>
-</p-dialog>
-<p-dialog header="Rename" [(visible)]="renameDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
-    <span>Rename {{selectedItem}}</span>
-    <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
-        <p-footer>
-            <button type="button" pButton (click)="renameDisplay=false; rename();" label="Ok">Ok</button>
-            <button type="button" pButton (click)="renameDisplay=false" label="Cancel">Cancel</button>
-        </p-footer>
-</p-dialog>
-<p-dialog header="" [(visible)]="rtClickDisplay" [modal]="false"
-[responsive]="true" [showHeader]="false" [width]="135" [minWidth]="135" [height]="135" [minHeight]="135"
-        [baseZIndex]="10000" [positionLeft]="popUpMenuX" [positionTop]="popUpMenuY">
-        <div (click)="rtClickDisplay=false; addFileDialog()">
-          New File
-        </div>
-        <div (click)="rtClickDisplay=false; addFolderDialog()">
-          New Folder
-        </div>
-        <div (click)="rtClickDisplay=false;delete($event)">
-          Delete
-        </div>
-        <div (click)="rtClickDisplay=false;copyDialog()">
-          Copy
-        </div>
-        <div (click)="rtClickDisplay=false; renameDialog()">
-          Rename
-        </div>
-</p-dialog>
+    <div (click)="onClick($event);">
+        <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)" [style]="style"
+        (contextmenu)="$event.preventDefault(); onRightClick($event);" 
+        ></tree-root>
+    </div>
+</div>
+
+    <p-dialog header="New File" [(visible)]="addFileDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
+        <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
+            <p-footer>
+                <button type="button" pButton (click)="addFileDisplay=false; addFile();" label="Ok">Ok</button>
+                <button type="button" pButton (click)="addFileDisplay=false" label="Cancel">Cancel</button>
+            </p-footer>
+    </p-dialog>
+    <p-dialog header="New Folder" [(visible)]="addFolderDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
+        <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
+            <p-footer>
+                <button type="button" pButton (click)="addFolderDisplay=false; addFolder();" label="Ok">Ok</button>
+                <button type="button" pButton (click)="addFolderDisplay=false" label="Cancel">Cancel</button>
+            </p-footer>
+    </p-dialog>
+    <p-dialog header="Copy" [(visible)]="copyDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
+        <span>Copy {{selectedItem}}</span>
+        <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
+            <p-footer>
+                <button type="button" pButton (click)="copyDisplay=false; copy();" label="Ok">Ok</button>
+                <button type="button" pButton (click)="copyDisplay=false" label="Cancel">Cancel</button>
+            </p-footer>
+    </p-dialog>
+    <p-dialog header="Rename" [(visible)]="renameDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
+        <span>Rename {{selectedItem}}</span>
+        <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
+            <p-footer>
+                <button type="button" pButton (click)="renameDisplay=false; rename();" label="Ok">Ok</button>
+                <button type="button" pButton (click)="renameDisplay=false" label="Cancel">Cancel</button>
+            </p-footer>
+    </p-dialog>
+<div class="filebrowseruss-dialog-menu">
+    <p-dialog header="" [(visible)]="rtClickDisplay" [modal]="false"
+    [responsive]="true" [showHeader]="false" [width]="auto" [height]="auto"
+            [baseZIndex]="10000" [positionLeft]="popUpMenuX" [positionTop]="popUpMenuY">
+            <div (click)="rtClickDisplay=false; addFileDialog()">
+            New File
+            </div>
+            <div (click)="rtClickDisplay=false; addFolderDialog()">
+            New Folder
+            </div>
+            <div (click)="rtClickDisplay=false;delete($event)">
+            Delete
+            </div>
+            <div (click)="rtClickDisplay=false;copyDialog()">
+            Copy
+            </div>
+            <div (click)="rtClickDisplay=false; renameDialog()">
+            Rename
+            </div>
+    </p-dialog>
+</div>
 
 <!-- 
   This program and the accompanying materials are
