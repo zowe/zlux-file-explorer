@@ -74,11 +74,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.addFolderDisplay = false;
     this.copyDisplay = false;
     this.renameDisplay = false;
-    this.root = "/u";//Replace with /u/ts# ID
+    this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
     this.input_box = this.root;
     this.data = [];
   }
   @Output() fileContents: EventEmitter<FileContents> = new EventEmitter<FileContents>();
+  @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   //TODO:make or hook up interface for file edits
   @Input()
   set fileEdits(input: any) {
@@ -93,6 +94,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
     }
   }
+  @Input() style: any;
   ngOnInit() {
     this.persistanceDataService.getData()
       .subscribe(data => {
@@ -103,9 +105,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         else
         this.displayTree(this.root, false);
       })
-      this.intervalId = setInterval(() => {
-        this.updateUss(this.input_box);
-      }, this.timeVar);
+      // this.intervalId = setInterval(() => {
+      //   this.updateUss(this.input_box);
+      // }, this.timeVar);
   }
 
   ngOnDestroy() {
@@ -167,10 +169,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.input_box = this.input_box.replace(/\/$/, '');
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
+      this.nodeClick.emit($event.node);
     }
     else {
       let fileFolder = $event.node.path;
-      this.openFile(fileFolder, $event.node.label);
+      this.nodeClick.emit($event.node);
+      //this.openFile(fileFolder, $event.node.label);
     }
   }
 

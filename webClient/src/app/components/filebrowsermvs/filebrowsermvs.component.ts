@@ -11,13 +11,13 @@
 */
 
 
-import {Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
-import {childEvent} from '../../structures/child-event';
+import { childEvent } from '../../structures/child-event';
 import { PersistentDataService } from '../../services/persistentData.service';
-import {MvsDataObject} from '../../structures/persistantdata';
+import { MvsDataObject } from '../../structures/persistantdata';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -54,6 +54,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.input_box = "";
     this.rtClickDisplay = false;
   }
+  @Input() style: any;
   ngOnInit() {
 
     this.persistantDataService.getData()

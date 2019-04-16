@@ -11,19 +11,27 @@
 */
 
 .filebrowseruss-search {
-  width: 80%;
-  margin-left: 10px;
+  width: 90%;
+  margin-left: 5px;
   display: inline-block;
-  margin-left: 10px;
   height: 40px;
 }
 
 .filebrowseruss-search-input{
   width: 80%;
   min-height: 30px;
-  font-family: monospace;
+  font-family: sans-serif;
   font-size: 15px;
   height: 35px;
+  background-color: #d2ddf0;
+  padding-left: 5px;
+}
+
+.filebrowseruss-dialog-menu{
+  background: white;
+  padding: 0px;
+  height: auto;
+  width: auto;
 }
 
 /*
