@@ -43,18 +43,21 @@ export class PersistentDataService {
 
 
     public getData(): Observable<any> {
-        
-        let uri = ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), this.scope, this.resourcePath, this.fileName);
+      return null;
+        //TODO: This code no longer functions as intended. This is supposed to introduce persistent data loading
+        //so the File Explorer would re-open a user's previously opened trees/working directory when they close.
 
-        let headers = new Headers({ 'Content-Type': 'application/json' });
-        let options = new RequestOptions({ headers: headers });
-        return this.http
-        .get(uri, options)
-        .map((res => { return res.json(); }))
-        .catch((err => { 
-          console.log("Data saving file does not exist. Creating one now...");
-          return this.http.put(uri, this.stringify(null, null, 2, null)); 
-        })); 
+        // let uri = ZoweZLUX.uriBroker.pluginConfigForScopeUri(this.pluginDefinition.getBasePlugin(), this.scope, this.resourcePath, this.fileName);
+
+        // let headers = new Headers({ 'Content-Type': 'application/json' });
+        // let options = new RequestOptions({ headers: headers });
+        // return this.http
+        // .get(uri, options)
+        // .map((res => { return res.json(); }))
+        // .catch((err => { 
+        //   console.log("Data saving file does not exist. Creating one now...");
+        //   return this.http.put(uri, this.stringify(null, null, 2, null)); 
+        // })); 
     }
 
     public stringify(obj, replacer, spaces, cycleReplacer) {

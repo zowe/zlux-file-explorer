@@ -49,7 +49,6 @@ export class TreeComponent {
  * @return        [void]
  */
   nodeSelect(_event?: any) {
-    console.log("entered nodeSelect")
     if (_event){
         this.clickEvent.emit(_event);
     }
