@@ -25,7 +25,6 @@ import { Capability, FileBrowserCapabilities }
   from '../../../../../../zlux-platform/interface/src/registry/capabilities';*/
 //Commented out to fix compilation errors from zlux-platform changes, does not affect program
 //TODO: Implement new capabilities from zlux-platform
-import { FileContents } from '../../structures/filecontents';
 import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import 'rxjs/add/operator/toPromise';
@@ -78,9 +77,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.input_box = this.root;
     this.data = [];
   }
-  @Output() fileContents: EventEmitter<FileContents> = new EventEmitter<FileContents>();
+
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
-  //TODO:make or hook up interface for file edits
+  @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
+
+  @Input() style: any;
   @Input()
   set fileEdits(input: any) {
     if (input && input.action && input.action === "save-file") {
@@ -94,7 +99,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
     }
   }
-  @Input() style: any;
+
   ngOnInit() {
     this.persistanceDataService.getData()
       .subscribe(data => {
@@ -116,17 +121,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  initalizeCapabilities() {
-    //this.capabilities = new Array<Capability>();
-    //this.capabilities.push(FileBrowserCapabilities.FileBrowser);
-    //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
-  }
-
-  getSelectedPath(): string {
-    //TODO:how do we want to want to handle caching vs message to app to open said path
-    return this.path;
-  }
-
   browsePath(path: string): void {
     this.path = path;
   }
@@ -135,36 +129,46 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     return this.elementRef.nativeElement;
   }
 
-  /*getCapabilities(): Capability[] {
-    return this.capabilities;
-  }*/
-  private openFile(fileAddress: string, fileName: string) {
-    let currfileContents = this.ussSrv.getFileContents(fileAddress);
-    currfileContents.subscribe(
-      response => {
-        //TODO:need to reconsider breaking this up?
-        //TODO:chunked get request doesn't exist, yet, could be problematic for large files
-        let lines: Array<string> = response._body.split(/\n/);
-        let outfile: FileContents = { filePath: fileAddress, fileName: fileName, fileContents: lines };
-        this.fileContents.emit(outfile);
-      },
-      error => this.errorMessage = <any>error
-    );
+  getSelectedPath(): string {
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this.path;
   }
 
-  onRightClick($event: any): void {
-    this.rtClickDisplay = !this.rtClickDisplay;
-    this.popUpMenuX = $event.clientX;
-    this.popUpMenuY = $event.clientY;
-    this.selectedItem = this.input_box + '/' + $event.target.innerText;
-    this.isFile = this.utils.isfile(this.checkPath(this.selectedItem), this.data);
+  initalizeCapabilities() {
+  //   //this.capabilities = new Array<Capability>();
+  //   //this.capabilities.push(FileBrowserCapabilities.FileBrowser);
+  //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
   onClick($event: any): void {
     this.rtClickDisplay = false;
   }
 
+  onCopyClick($event: any): void {
+    this.copyClick.emit($event);
+  }
+
+  onDeleteClick($event: any): void {
+    this.deleteClick.emit($event);
+  }
+
+  onNewFileClick($event: any): void {
+    this.newFileClick.emit($event);
+  }
+
+  onNewFolderClick($event: any): void {
+    this.newFolderClick.emit($event);
+  }
+
   onNodeClick($event: any): void {
+    //console.log("node clicked: " + $event.originalEvent.path[0]);
+    // if ($event.originalEvent.path[0])
+    //console.log($event);
+    if ($event.target) {
+      if ($event.target.className.includes("ui-treenode-icon")) {
+        console.log("Clicked on icon!");
+      }
+    }
     this.rtClickDisplay = false;
     this.input_box = this.input_box.replace(/\/$/, '');
     if ($event.node.data === 'Folder') {
@@ -176,6 +180,18 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.nodeClick.emit($event.node);
       //this.openFile(fileFolder, $event.node.label);
     }
+  }
+
+  onRightClick($event: any): void {
+    this.rtClickDisplay = !this.rtClickDisplay;
+    this.popUpMenuX = $event.clientX;
+    this.popUpMenuY = $event.clientY;
+    this.selectedItem = this.input_box + '/' + $event.target.innerText;
+    this.isFile = this.utils.isfile(this.checkPath(this.selectedItem), this.data);
+  }
+
+  onRenameClick($event: any): void {
+    this.renameClick.emit($event);
   }
 
   //Displays the starting file structure of 'path'
@@ -492,7 +508,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       let parentindex = this.input_box.length - 1;
       while (this.input_box.charAt(parentindex) != '/') { parentindex--; }
       let parent = this.input_box.slice(parentindex + 1, this.input_box.length);
-      console.log(parent);
+      console.log("Going up to: " + parent);
 
       this.displayTree(this.input_box, false);
     } else

@@ -22,7 +22,7 @@
     </div>
 </div>
 
-    <p-dialog header="New File" [(visible)]="addFileDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
+    <!-- <p-dialog header="New File" [(visible)]="addFileDisplay" [modal]="false" [responsive]="true" [width]="350" [minWidth]="200" >
         <input type="text" placeholder="New Name" name="newPath" [(ngModel)]="newPath">
             <p-footer>
                 <button type="button" pButton (click)="addFileDisplay=false; addFile();" label="Ok">Ok</button>
@@ -56,23 +56,23 @@
     <p-dialog header="" [(visible)]="rtClickDisplay" [modal]="false"
     [responsive]="true" [showHeader]="false" [width]="auto" [height]="auto"
             [baseZIndex]="10000" [positionLeft]="popUpMenuX" [positionTop]="popUpMenuY">
-            <div (click)="rtClickDisplay=false; addFileDialog()">
+            <div (click)="rtClickDisplay=false; onNewFileClick()">
             New File
             </div>
-            <div (click)="rtClickDisplay=false; addFolderDialog()">
+            <div (click)="rtClickDisplay=false; onNewFolderClick()">
             New Folder
             </div>
-            <div (click)="rtClickDisplay=false;delete($event)">
+            <div (click)="rtClickDisplay=false; onDeleteClick($event)">
             Delete
             </div>
-            <div (click)="rtClickDisplay=false;copyDialog()">
+            <div (click)="rtClickDisplay=false; onCopyClick($event)">
             Copy
             </div>
-            <div (click)="rtClickDisplay=false; renameDialog()">
+            <div (click)="rtClickDisplay=false; onRenameClick($event)">
             Rename
             </div>
     </p-dialog>
-</div>
+</div> -->
 
 <!-- 
   This program and the accompanying materials are

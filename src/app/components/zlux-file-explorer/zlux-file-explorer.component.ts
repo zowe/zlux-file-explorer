@@ -25,10 +25,10 @@ import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng'
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
-import {childEvent} from '../../structures/child-event';
-import {MvsDataObject, UssDataObject} from '../../structures/persistantdata';
-import {FileContents} from '../../structures/filecontents';
-import {tab} from '../../structures/tab';
+import { childEvent } from '../../structures/child-event';
+import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
+// import {FileContents} from '../../structures/filecontents';
+import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { PersistentDataService } from '../../services/persistentData.service';
 /*import {FileBrowserFileSelectedEvent,
@@ -60,6 +60,9 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   //TODO:make an interface for parentUssEdit, any is not good enough
   parentUssEdit:any;
 
+  @ViewChild(FileBrowserUSSComponent)
+  private ussComponent: FileBrowserUSSComponent;
+
   constructor(private fileService: FileService,
     private persistentDataService: PersistentDataService,
     private utils: UtilsService, private elemRef: ElementRef,
@@ -73,40 +76,14 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 
   @Input() selectPath: string;
   @Input() style: ZluxFileExplorerStyle = {};
+
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
 
-  setIndex(inputIndex:number){
-    this.currentIndex = inputIndex;
-  }
-
-  onUssFileLoad($event:FileContents){
-    this.fileOutput.emit($event);
-  }
-  onNodeClick($event:any){
-    //console.log($event);
-    this.nodeClick.emit($event);
-  }
-  zluxOnMessage(eventContext: any): Promise<any> {
-    return new Promise((resolve,reject)=> {
-
-      if (!eventContext || !eventContext.action){
-        return reject('Event context missing or malformed');
-      }
-      if (eventContext.action === 'save-file'){
-        this.parentUssEdit = eventContext;
-        console.log("parentUssEdit:" + this.parentUssEdit)
-        //TODO:throw this down to FileBrowserUSSComponent
-        resolve();
-      }
-      // else if (eventContext.action === 'open-file'){
-      //   if (!eventContext.filePath || !eventContext.fileName || !eventContext.fileContents) {
-      //     return reject('Event context missing or malformed');
-      //   }
-      //   this.initMonaco(eventContext);
-      // }
-    });
-  }
   ngOnInit() {
     // var obj = {
     //   "ussInput": "",
@@ -131,13 +108,67 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
       })
   }
 
+  onCopyClick($event:any){
+    this.copyClick.emit($event);
+  }
+
+  onDeleteClick($event:any){
+    this.deleteClick.emit($event);
+  }
+
+  onNewFileClick($event:any){
+    this.newFileClick.emit($event);
+  }
+
+  onNewFolderClick($event:any){
+    this.newFolderClick.emit($event);
+  }
+
+  onNodeClick($event:any){
+    //console.log($event);
+    this.nodeClick.emit($event);
+  }
+
+  // onUssFileLoad($event:FileContents){
+  //   this.fileOutput.emit($event);
+  // }
+
   provideZLUXDispatcherCallbacks(): ZLUX.ApplicationCallbacks {
-   return {
-     onMessage: (eventContext: any): Promise<any> => {
-       return this.zluxOnMessage(eventContext);
-     }
-   }
- }
+    return {
+      onMessage: (eventContext: any): Promise<any> => {
+        return this.zluxOnMessage(eventContext);
+      }
+    }
+  }
+
+  setIndex(inputIndex:number){
+    this.currentIndex = inputIndex;
+  }
+
+  updateDirectory(dirName: string) {
+    this.ussComponent.updateUss(dirName);
+  }
+
+  zluxOnMessage(eventContext: any): Promise<any> {
+    return new Promise((resolve,reject)=> {
+
+      if (!eventContext || !eventContext.action){
+        return reject('Event context missing or malformed');
+      }
+      if (eventContext.action === 'save-file'){
+        this.parentUssEdit = eventContext;
+        console.log("parentUssEdit:" + this.parentUssEdit)
+        //TODO:throw this down to FileBrowserUSSComponent
+        resolve();
+      }
+      // else if (eventContext.action === 'open-file'){
+      //   if (!eventContext.filePath || !eventContext.fileName || !eventContext.fileContents) {
+      //     return reject('Event context missing or malformed');
+      //   }
+      //   this.initMonaco(eventContext);
+      // }
+    });
+  }
 }
 
 @NgModule({

@@ -18,13 +18,15 @@
 }
 
 .filebrowseruss-search-input{
-  width: 80%;
+  width: 100%;
   min-height: 30px;
   font-family: sans-serif;
   font-size: 15px;
   height: 35px;
-  background-color: #d2ddf0;
+  background-color: #464646;
+  color: white;
   padding-left: 5px;
+  border: 0px;
 }
 
 .filebrowseruss-dialog-menu{
