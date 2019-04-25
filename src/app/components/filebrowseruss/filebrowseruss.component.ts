@@ -495,6 +495,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         error => this.errorMessage = <any>error
       );
   }
+
+  deleteFile(pathAndName: string): void {
+    this.ussSrv.deleteFile(pathAndName)
+    .subscribe(
+      resp => {
+        this.updateUss(this.input_box);
+      },
+      error => this.errorMessage = <any>error
+    );
+  }
   levelUp(): void {
     //TODO: may want to change this to 'root' depending on mainframe file access security
     //to prevent people from accessing files/folders outside their root dir

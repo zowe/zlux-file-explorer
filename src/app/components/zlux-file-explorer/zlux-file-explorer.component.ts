@@ -108,6 +108,10 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
       })
   }
 
+  deleteFile(pathAndName: string) {
+    this.ussComponent.deleteFile(pathAndName);
+  }
+
   onCopyClick($event:any){
     this.copyClick.emit($event);
   }
