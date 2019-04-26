@@ -11,7 +11,7 @@
 */
 
 
-import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
@@ -37,32 +37,34 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //componentClass:ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities:Array<Capability>;
-  path:string;
-  input_box:string;
-  rtClickDisplay:boolean;
+  public hideExplorer: boolean;
+  path: string;
+  rtClickDisplay: boolean;
   errorMessage: String;
-  intervalId:any;
-  timeVar:number= 15000;
-
-
+  intervalId: any;
+  timeVar: number = 15000;
   //TODO:define interface types for mvs-data/data
-  data:any;
-  dsData : Observable<any>;
+  data: any;
+  dsData: Observable<any>;
+
   constructor(private fileService: FileService, private elementRef:ElementRef, private persistantDataService: PersistentDataService) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
-    this.input_box = "";
+    this.path = "";
     this.rtClickDisplay = false;
+    this.hideExplorer = false;
   }
   @Input() style: any;
+  @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+
   ngOnInit() {
 
     this.persistantDataService.getData()
       .subscribe(data => {
         if(data.contents.mvsInput){
-          this.input_box = data.contents.mvsInput;
+          this.path = data.contents.mvsInput;
         }
-        data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.input_box = data.contents.mvsInput)
+        data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.path = data.contents.mvsInput)
       }
     )
     this.intervalId = setInterval(() => {
@@ -70,20 +72,18 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }, this.timeVar);
     this.updateDs();
   }
+
   ngOnDestroy(){
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
   }
+
   /*initalizeCapabilities(){
     this.capabilities = new Array<Capability>();
     this.capabilities.push(FileBrowserCapabilities.FileBrowser);
     this.capabilities.push(FileBrowserCapabilities.FileBrowserMVS);
   }*/
-  getSelectedPath(): string{
-    //TODO:how do we want to want to handle caching vs message to app to open said path
-    return this.path;
-  }
 
   browsePath(path: string): void{
     this.path = path;
@@ -93,15 +93,22 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return this.elementRef.nativeElement;
   }
 
+  getSelectedPath(): string{
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this.path;
+  }
+
   /*getCapabilities(): Capability[]
   {
     return this.capabilities;
   }*/
+
   clickInEventHandler($event:any):void{
       //TODO:need to assess the Datasets drill in behavior
-      this.input_box = $event.node.label + ".";
+      this.path = $event.node.label + ".";
       this.updateDs();
   }
+
   onRightClick($event:any):void{
       console.log('right click!')
       this.rtClickDisplay =!this.rtClickDisplay;
@@ -109,8 +116,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       console.log('right click CRUD menu not supported for Datasets, yet (MVD-1614)!')
       setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
   }
+
   updateDs():void{
-    this.dsData = this.fileService.queryDatasets(this.input_box);
+    this.dsData = this.fileService.queryDatasets(this.path);
     this.dsData.subscribe(
       ds =>{
         //TODO: move this to a UtilsService
@@ -138,7 +146,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.persistantDataService.getData()
           .subscribe(data => {
             dataObject = data.contents;
-            dataObject.mvsInput = this.input_box;
+            dataObject.mvsInput = this.path;
             dataObject.mvsData = this.data;
             //console.log(JSON.stringify(dataObject));
             this.persistantDataService.setData(dataObject)
@@ -155,18 +163,19 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 * [levelUp: function to ascend up a level in the file/folder tree]
 * @param index [tree index where the 'folder' parent is accessed]
 */
-  levelUp():void{
-      this.input_box = this.input_box.replace(/\.$/, '');
-      if (!this.input_box.includes('.')){
-        this.input_box = '';
+  levelUp(): void {
+      this.path = this.path.replace(/\.$/, '');
+      if (!this.path.includes('.')){
+        this.path = '';
       }
       else{
-        this.input_box = this.input_box.replace(/\.[^\.]+$/, '')
+        this.path = this.path.replace(/\.[^\.]+$/, '')
       }
       this.updateDs();
-    }
-    updateTree():void{
-        this.updateDs();
+  }
+  updateTree(): void {
+      this.pathChanged.emit(this.path);
+      this.updateDs();
     }
   }
 

@@ -25,17 +25,17 @@
 </nav>
 <div class="fileexplorer-browser-module">
   <file-browser-uss #ussComponent
-    *ngIf="currentIndex == 0"
+    [hidden]="currentIndex != 0"
     (nodeClick)="onNodeClick($event)"
     (newFileClick)="onNewFileClick($event)"
     (newFolderClick)="onNewFolderClick($event)"
     (deleteClick)="onDeleteClick($event)"
     (copyClick)="onCopyClick($event)"
-    [fileEdits]="parentUssEdit"
     [style]="style"
   ></file-browser-uss>
-  <file-browser-mvs 
-    *ngIf="currentIndex == 1"
+  <file-browser-mvs #mvsComponent
+    [hidden]="currentIndex != 1"
+    (pathChanged)="onPathChanged($event)"
     [style]="style"
   ></file-browser-mvs>
 </div>

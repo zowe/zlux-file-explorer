@@ -11,7 +11,8 @@
 */
 
 .filebrowseruss-search {
-  width: 90%;
+  width: fit-content;
+  min-width: 250px;
   margin-left: 5px;
   display: inline-block;
   height: 40px;

@@ -11,7 +11,8 @@
 */
 
 .filebrowsermvs-search {
-  width: 90%;
+  width: fit-content;
+  min-width: 250px;
   margin-left: 5px;
   display: inline-block;
   height: 40px;
@@ -27,6 +28,11 @@
   color: white;
   padding-left: 5px;
   border: 0px;
+}
+
+.ui-tree-empty-message {
+  color: transparent;
+  height: 0px;
 }
 
 
