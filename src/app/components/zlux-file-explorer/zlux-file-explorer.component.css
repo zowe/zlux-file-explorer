@@ -10,20 +10,28 @@
   Copyright Contributors to the Zowe Project.
 */
 
-.filebrowsermvs-search {
-  width: 80%;
+.fileexplorer-browser-module{
   margin-left: 10px;
-  display: inline-block;
-  margin-left: 10px;
-  height: 40px;
+  margin-top: 10px;
 }
 
-.filebrowsermvs-search-input{
-  width: 80%;
-  min-height: 30px;
-  font-family: monospace;
+.fileexplorer-global{
+  /* padding: 10px; */
+}
+
+.fileexplorer-tabs{
   font-size: 15px;
-  height: 35px;
+  margin-right: 15px;
+  height: 25px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.fileexplorer-tabs-list {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
+  width: 275px;
 }
 
 

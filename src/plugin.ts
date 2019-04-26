@@ -9,29 +9,7 @@
   Copyright Contributors to the Zowe Project.
 */
 
-.fileexplorer-tree-panel {
-  flex: 1 1 0px;
-  overflow: auto;
-  background: #efefef;
-  min-height: 300px;
-  height: 100%;
-  width: 100%;
-}
-
-.ui-tree-container {
-  padding: 10px
-}
-
-.ui-tree {
-  width: 95%;
-  min-width: 300px;
-  padding: 15px;
-  padding-bottom: 15px;
-  font-size: 16px;
-}
-.ui-treenode {
-  width: fit-content;
-}
+export { ZluxFileExplorerModule as FileExplorerModule, ZluxFileExplorerComponent as FileExplorerComponent  } from './app/components/zlux-file-explorer/zlux-file-explorer.component';
 
 
 /*

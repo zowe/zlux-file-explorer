@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="fileexplorer-tree-panel">
+<div class="fileexplorer-tree-panel" [ngStyle]="style">
   <!-- {{treeData | json}} -->
   <!-- <p-tree
     styleClass="rs-com-css-file-navigator"
@@ -21,12 +21,14 @@
   >
   </p-tree> -->
   <p-tree
+    class="fileexplorer-p-tree"
     [value]="treeData" 
     [id]="treeId"
     selectionMode="single"
     [(selection)]="selectedNode"
     (onNodeSelect)="nodeSelect($event)"
   >
+  <!-- add [filter]="true" with latest prime version (new feature March 2019) -->
   </p-tree>
   <!-- <p-treeTable [value]="fileFolders">
       <p-column field="name" header="Name"></p-column>
