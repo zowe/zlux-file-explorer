@@ -20,11 +20,18 @@
 }
 
 .fileexplorer-tabs{
-  margin-left: 15px;
   font-size: 15px;
-  display: flex;
-  height: 45px;
+  margin-right: 15px;
+  height: 25px;
   font-weight: bold;
+  text-align: center;
+}
+
+.fileexplorer-tabs-list {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
+  width: 275px;
 }
 
 
