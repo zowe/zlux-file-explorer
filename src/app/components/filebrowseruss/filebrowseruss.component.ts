@@ -64,8 +64,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   intervalId: any;
   timeVar: number = 10000;//time represents in ms how fast tree updates changes from mainframe
 
-  constructor(private elementRef: ElementRef, private ussSrv: UssCrudService,
-    private utils: UtilsService, private persistanceDataService: PersistentDataService) {
+  constructor(private elementRef: ElementRef, 
+    private ussSrv: UssCrudService,
+    private utils: UtilsService, 
+    private persistanceDataService: PersistentDataService,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
     this.rtClickDisplay = false;
@@ -94,7 +97,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.ussSrv.saveFile(input.fileAddress, input.data)
       .subscribe(
         response =>{
-          console.log('no errs')
+          this.log.debug("No errors");
         },
         error => this.errorMessage = <any>error
       );
@@ -162,12 +165,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void {
-    //console.log("node clicked: " + $event.originalEvent.path[0]);
-    // if ($event.originalEvent.path[0])
-    //console.log($event);
     if ($event.target) {
       if ($event.target.className.includes("ui-treenode-icon")) {
-        console.log("Clicked on icon!");
+        // TODO: Add node deflate feature (icon click --> expands/deflates)
       }
     }
     this.rtClickDisplay = false;
@@ -267,9 +267,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 //       array.push(files.entries[i]);
 
                 //     } networkArray = array; },
-                //     error => console.log("Error: ", error),
+                //     error => this.log.debug("Error: ", error),
                 //    );
-                //    console.log(array);
+                //    this.log.debug(array);
                 //    while (array.length == 0)
                 //    {
                 //      //setTimeout("sleep", 1000);
@@ -321,9 +321,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             //       array.push(files.entries[i]);
 
             //     } networkArray = array; },
-            //     error => console.log("Error: ", error), );
+            //     error => this.log.debug("Error: ", error), );
                 
-            //     console.log(array);
+            //     this.log.debug(array);
             //     while (array.length == 0)
             //       {
             //         //setTimeout("sleep", 1000);
@@ -341,7 +341,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         }
       }
 
-      console.log("Tree has been updated.");
+      this.log.debug("Tree has been updated.");
       this.data = tempChildren;  
       this.path = path;
 
@@ -402,7 +402,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
           } $event.node.children = tempChildren;
           $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
-          console.log(path + " was populated with " + tempChildren.length + " children.");
+          this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
           while ($event.node.parent !== undefined) {
             let newChild = $event.node.parent;
@@ -431,7 +431,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             
           }
           else
-            console.log("failed to find index");
+            this.log.debug("failed to find index");
         }); 
     }
   }
@@ -441,7 +441,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   addFile(): void {
-    console.log('add:' + this.selectedItem);
+    this.log.debug('add:' + this.selectedItem);
     this.ussSrv.saveFile(this.checkPath(this.newPath), '')
       .subscribe(
         resp => {
@@ -453,7 +453,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   addFolder(): void {
-    console.log('add:' + this.selectedItem);
+    this.log.debug('add:' + this.selectedItem);
     this.ussSrv.addFolder(this.checkPath(this.newPath))
       .subscribe(
         resp => {
@@ -465,7 +465,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   copy(): void {
-    console.log('copy:' + this.selectedItem);
+    this.log.debug('copy:' + this.selectedItem);
     this.ussSrv.copyFile(this.selectedItem, this.checkPath(this.newPath))
       .subscribe(
         resp => {
@@ -476,7 +476,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   rename(): void {
-    console.log('rename:' + this.selectedItem);
+    this.log.debug('rename:' + this.selectedItem);
     this.ussSrv.renameFile(this.selectedItem, this.checkPath(this.newPath))
       .subscribe(
         resp => {
@@ -487,7 +487,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   delete(e: EventTarget): void {
-    console.log('delete:' + this.selectedItem);
+    this.log.debug('delete:' + this.selectedItem);
     this.ussSrv.deleteFile(this.selectedItem)
       .subscribe(
         resp => {
@@ -519,7 +519,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       let parentindex = this.path.length - 1;
       while (this.path.charAt(parentindex) != '/') { parentindex--; }
       let parent = this.path.slice(parentindex + 1, this.path.length);
-      console.log("Going up to: " + parent);
+      this.log.debug("Going up to: " + parent);
 
       this.displayTree(this.path, false);
     } else

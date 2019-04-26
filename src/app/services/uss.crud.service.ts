@@ -69,8 +69,6 @@ export class UssCrudService {
       .catch(this.handleErrorObservable);
   }
   saveFile(path:string, fileContents:string, targetEncoding?: string, forceOverwrite?: boolean): Observable<any>{
-      console.log("Saving file");
-      //targetEncoding = "UTF-8";
       let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', path, "UTF-8", targetEncoding, undefined, forceOverwrite, undefined, true);
       return this.http.put(url,fileContents)
       .map(res=>{

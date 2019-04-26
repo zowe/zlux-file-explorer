@@ -47,7 +47,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   data: any;
   dsData: Observable<any>;
 
-  constructor(private fileService: FileService, private elementRef:ElementRef, private persistantDataService: PersistentDataService) {
+  constructor(private fileService: FileService, 
+    private elementRef:ElementRef, 
+    private persistantDataService: PersistentDataService,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
     this.path = "";
@@ -110,10 +113,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onRightClick($event:any):void{
-      console.log('right click!')
+      this.log.debug('right click!')
       this.rtClickDisplay =!this.rtClickDisplay;
       //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
-      console.log('right click CRUD menu not supported for Datasets, yet (MVD-1614)!')
+      this.log.debug('right click CRUD menu not supported for Datasets, yet (MVD-1614)!')
       setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
   }
 
@@ -148,7 +151,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
             dataObject = data.contents;
             dataObject.mvsInput = this.path;
             dataObject.mvsData = this.data;
-            //console.log(JSON.stringify(dataObject));
+            //this.log.debug(JSON.stringify(dataObject));
             this.persistantDataService.setData(dataObject)
               .subscribe((res: any) => { });
           })
