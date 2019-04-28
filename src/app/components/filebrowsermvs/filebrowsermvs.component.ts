@@ -11,13 +11,14 @@
 */
 
 
-import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
 import { childEvent } from '../../structures/child-event';
 import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
+import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS

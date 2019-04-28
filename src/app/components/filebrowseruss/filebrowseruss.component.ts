@@ -12,7 +12,7 @@
 
 import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
-  Output, ViewEncapsulation
+  Output, ViewEncapsulation, Inject
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
@@ -27,6 +27,7 @@ import { Capability, FileBrowserCapabilities }
 //TODO: Implement new capabilities from zlux-platform
 import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
+import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 
 @Component({
