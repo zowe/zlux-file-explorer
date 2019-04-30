@@ -18,8 +18,8 @@
     </svg> -->
   </div>
   <ul class="fileexplorer-tabs-list" role="tablist">
-    <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'bx--tabs__nav-item--selected' : ''" (click)="setIndex(tab.index)" id="tab-{{tab.index}}" class="bx--tabs__nav-item" role="presentation">
-      <a class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"  aria-selected="false">{{tab.name}}</a>
+    <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'fileexplorer-tab-selected' : 'fileexplorer-tab'" (click)="setIndex(tab.index)" id="tab-{{tab.index}}" class="bx--tabs__nav-item" role="presentation">
+      <a class="fileexplorer-tabs-text" href="javascript:void(0)" role="tab"  aria-selected="false">{{tab.name}}</a>
     </li>
   </ul>
 </nav>
