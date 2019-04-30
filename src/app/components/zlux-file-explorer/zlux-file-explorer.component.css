@@ -20,18 +20,30 @@
 }
 
 .fileexplorer-tabs{
+  height: 25px;
+  text-align: center;
+}
+
+.fileexplorer-tab {
   font-size: 15px;
-  margin-right: 15px;
+  height: 25px;
+  padding-top: 3px;
+}
+
+.fileexplorer-tab-selected {
+  font-size: 15px;
   height: 25px;
   font-weight: bold;
-  text-align: center;
+  padding-top: 3px;
+  background-color: #d4d4d4;  
 }
 
 .fileexplorer-tabs-list {
   -webkit-column-count: 2;
   -moz-column-count: 2;
   column-count: 2;
-  width: 275px;
+  width: 100%;
+  background-color: #464646;
 }
 
 
