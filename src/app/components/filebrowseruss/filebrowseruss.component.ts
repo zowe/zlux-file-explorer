@@ -343,7 +343,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
 
       this.log.debug("Tree has been updated.");
-      this.data = tempChildren;  
+      tempChildren.sort((a: any, b: any) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
+      this.log.debug(tempChildren);
+      this.data = tempChildren;
       this.path = path;
 
       this.persistanceDataService.getData()
@@ -354,7 +356,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               this.persistanceDataService.setData(this.dataObject)
                 .subscribe((res: any) => { });
             })
-
         },
         error => this.errorMessage = <any>error
       );
@@ -401,7 +402,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             files.entries[i].id = i;
             tempChildren.push(files.entries[i]);
 
-          } $event.node.children = tempChildren;
+          }
+          tempChildren.sort((a: any, b: any) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
+          $event.node.children = tempChildren;
           $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
           this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
