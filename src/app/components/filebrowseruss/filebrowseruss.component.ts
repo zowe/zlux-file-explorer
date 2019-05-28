@@ -196,6 +196,22 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.renameClick.emit($event);
   }
 
+  sortFn(a: any, b: any) {
+    if (a.directory !== b.directory) {
+      if (a.directory === true) {
+        return -1;
+      } else {
+        return 1;
+      }
+    } else {
+      if (a.name.toLowerCase() < b.name.toLowerCase()) {
+        return -1;
+      } else {
+        return 1;
+      }
+    }
+  }
+
   //Displays the starting file structure of 'path'
   private displayTree(path: string, update: boolean): void {
     if (path === undefined || path == '') {
@@ -204,7 +220,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.ussData = this.ussSrv.getFile(path); 
     this.ussData.subscribe(
     files => {
-    let tempChildren: TreeNode[] = [];
+      files.entries.sort(this.sortFn);
+      const tempChildren: TreeNode[] = [];
       for (let i: number = 0; i < files.entries.length; i++) {
         if (files.entries[i].directory) {
           files.entries[i].children = [];
@@ -236,46 +253,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           if (indexArray[indexArray.length-1] == dataArray.length)
           {
             indexArray.pop();
-            
+
             if (parentNode !== undefined && parentNode.parent !== undefined)
               {
                 parentNode = parentNode.parent;
                 dataArray = parentNode.children;
                 networkArray = dataArray;
-
-                //TODO: Uncomment code to also update data of children, however this will cause
-                //a desync with the async code so you need to add code that waits for the .subscribe(...) method to finish
-                //because the loop cannot move onto a children when the parent data are not finished loading from
-                
-                // this.ussData = this.ussSrv.getFile(parentNode.path);
-                // let array: TreeNode[] = [];
-                // this.ussData.subscribe(
-                //   files => {
-                //     for (let i: number = 0; i < files.entries.length; i++) {
-                //       if (files.entries[i].directory) {
-                //         files.entries[i].children = [];
-                //         files.entries[i].data = "Folder";
-                //         files.entries[i].collapsedIcon = "fa fa-folder";
-                //         files.entries[i].expandedIcon = "fa fa-folder-open";
-                //       }
-                //       else {
-                //         files.entries[i].items = {};
-                //         files.entries[i].icon = "fa fa-file";
-                //         files.entries[i].data = "File";
-                //       }
-                //       files.entries[i].label = files.entries[i].name;
-                //       files.entries[i].id = i;
-                //       array.push(files.entries[i]);
-
-                //     } networkArray = array; },
-                //     error => this.log.debug("Error: ", error),
-                //    );
-                //    this.log.debug(array);
-                //    while (array.length == 0)
-                //    {
-                //      //setTimeout("sleep", 1000);
-                //    }
-
               }
               else{
                 if (parentNode !== undefined)
@@ -286,7 +269,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                     }
                   }
                 }
-                
+
                 dataArray = this.data;
                 networkArray = tempChildren;
               }
@@ -297,40 +280,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             parentNode = dataArray[indexArray[indexArray.length-1]];
             dataArray = parentNode.children;
             networkArray = dataArray;
-
-            //TODO: Uncomment code to also update data of children, however this will cause
-            //a desync with the async code so you need to add code that waits for the .subscribe(...) method to finish
-            // this.ussData = this.ussSrv.getFile(parentNode.path);
-            // let array: TreeNode[] = [];
-            // this.ussData.subscribe(
-            //   files => {
-                
-            //     for (let i: number = 0; i < files.entries.length; i++) {
-            //       if (files.entries[i].directory) {
-            //         files.entries[i].children = [];
-            //         files.entries[i].data = "Folder";
-            //         files.entries[i].collapsedIcon = "fa fa-folder";
-            //         files.entries[i].expandedIcon = "fa fa-folder-open";
-            //       }
-            //       else {
-            //         files.entries[i].items = {};
-            //         files.entries[i].icon = "fa fa-file";
-            //         files.entries[i].data = "File";
-            //       }
-            //       files.entries[i].label = files.entries[i].name;
-            //       files.entries[i].id = i;
-            //       array.push(files.entries[i]);
-
-            //     } networkArray = array; },
-            //     error => this.log.debug("Error: ", error), );
-                
-            //     this.log.debug(array);
-            //     while (array.length == 0)
-            //       {
-            //         //setTimeout("sleep", 1000);
-            //         //createAwait()
-            //       }
-            
             indexArray[indexArray.length-1]++;
             indexArray.push(0);
           }
@@ -343,7 +292,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
 
       this.log.debug("Tree has been updated.");
-      this.data = tempChildren;  
+      this.log.debug(tempChildren);
+      this.data = tempChildren;
       this.path = path;
 
       this.persistanceDataService.getData()
@@ -354,7 +304,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               this.persistanceDataService.setData(this.dataObject)
                 .subscribe((res: any) => { });
             })
-
         },
         error => this.errorMessage = <any>error
       );
@@ -384,6 +333,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       let tempChildren: TreeNode[] = [];
       this.ussData.subscribe(
         files => {
+          files.entries.sort(this.sortFn);
           //TODO: Could be turned into a util service...
           for (let i: number = 0; i < files.entries.length; i++) {
             if (files.entries[i].directory) {
@@ -401,7 +351,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             files.entries[i].id = i;
             tempChildren.push(files.entries[i]);
 
-          } $event.node.children = tempChildren;
+          }
+          $event.node.children = tempChildren;
           $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
           this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
