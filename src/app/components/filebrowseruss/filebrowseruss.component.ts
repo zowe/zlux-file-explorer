@@ -106,6 +106,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   ngOnInit() {
+    this.loadUserHomeDirectory();
     this.persistanceDataService.getData()
       .subscribe(data => {
         if (data.contents.ussInput) {
@@ -124,6 +125,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  }
+
+  loadUserHomeDirectory(): void {
+    this.ussSrv.getUserHomeFolder()
+      .subscribe(
+        resp => {
+          if(resp && resp.home){
+            this.path = resp.home.trim();
+            this.displayTree(this.path, true);
+          }
+        },
+        error => this.errorMessage = <any>error
+      );
   }
 
   browsePath(path: string): void {
