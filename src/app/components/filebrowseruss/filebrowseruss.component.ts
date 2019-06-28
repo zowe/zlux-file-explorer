@@ -57,6 +57,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   popUpMenuX: number;
   popUpMenuY: number;
   selectedFile: TreeNode;
+  isLoading: boolean;
 
   //TODO:define interface types for uss-data/data
   data: TreeNode[];
@@ -81,6 +82,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.path = this.root;
     this.data = [];
     this.hideExplorer = false;
+    this.isLoading = false;
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -128,15 +130,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   loadUserHomeDirectory(): void {
+    this.isLoading = true;
     this.ussSrv.getUserHomeFolder()
       .subscribe(
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
             this.displayTree(this.path, true);
+            this.isLoading = false;
           }
         },
-        error => this.errorMessage = <any>error
+        error => {
+          this.isLoading = false;
+          this.errorMessage = <any>error;
+        }
       );
   }
 
@@ -231,6 +238,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     if (path === undefined || path == '') {
       path = this.root; 
     }
+    this.isLoading = true;
     this.ussData = this.ussSrv.getFile(path); 
     this.ussData.subscribe(
     files => {
@@ -252,6 +260,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         files.entries[i].id = i;
         tempChildren.push(files.entries[i]);
       }
+      this.isLoading = false;
       if (update == true) {//Tree is displayed to update existing opened nodes, while maintaining currently opened trees 
 
         let indexArray: number[];
@@ -319,7 +328,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 .subscribe((res: any) => { });
             })
         },
-        error => this.errorMessage = <any>error
+        error => {
+          this.isLoading = false;
+          this.errorMessage = <any>error;
+        }
       );
 
     }
