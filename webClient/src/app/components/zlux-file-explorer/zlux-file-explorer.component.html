@@ -18,21 +18,24 @@
     </svg> -->
   </div>
   <ul class="fileexplorer-tabs-list" role="tablist">
-    <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'bx--tabs__nav-item--selected' : ''" (click)="setIndex(tab.index)" id="tab-{{tab.index}}" class="bx--tabs__nav-item" role="presentation">
-      <a class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"  aria-selected="false">{{tab.name}}</a>
+    <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'fileexplorer-tab-selected' : 'fileexplorer-tab'" (click)="setIndex(tab.index)" id="tab-{{tab.index}}" class="bx--tabs__nav-item" role="presentation">
+      <a class="fileexplorer-tabs-text" href="javascript:void(0)" role="tab"  aria-selected="false">{{tab.name}}</a>
     </li>
   </ul>
 </nav>
 <div class="fileexplorer-browser-module">
-  <file-browser-uss
-    *ngIf="currentIndex == 0"
-    (fileContents)="onUssFileLoad($event)"
+  <file-browser-uss #ussComponent
+    [hidden]="currentIndex != 0"
     (nodeClick)="onNodeClick($event)"
-    [fileEdits]="parentUssEdit"
+    (newFileClick)="onNewFileClick($event)"
+    (newFolderClick)="onNewFolderClick($event)"
+    (deleteClick)="onDeleteClick($event)"
+    (copyClick)="onCopyClick($event)"
     [style]="style"
   ></file-browser-uss>
-  <file-browser-mvs 
-    *ngIf="currentIndex == 1"
+  <file-browser-mvs #mvsComponent
+    [hidden]="currentIndex != 1"
+    (pathChanged)="onPathChanged($event)"
     [style]="style"
   ></file-browser-mvs>
 </div>
