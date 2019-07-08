@@ -18,6 +18,68 @@ export class  MvsDataObject {
   mvsInput: string;
   mvsData: any;
 }
+.fileexplorer-tree-panel {
+  flex: 1 1 0px;
+  background: transparent;
+  height: 100%;
+  width: 100%;
+  margin-right: 10px;
+  color: white;
+}
+
+.ui-tree {
+  width: 100%;
+  height: 100%;
+  min-width: 300px;
+  background: transparent;
+  border: 0px;
+}
+
+.ui-tree .ui-tree-container {
+  padding: 15px;
+  font-size: medium;
+  color: white;
+  overflow: auto;
+  height: 100%;
+}
+
+.ui-tree .ui-widget .ui-widget-content {
+  background: transparent;
+  border: 0px;
+}
+
+.ui-treenode-label.ui-state-highlight {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.ui-tree .ui-treenode-label.ui-state-highlight {
+  color: black;
+}
+
+.ui-treenode {
+  width: fit-content;
+  padding: 1px;
+}
+
+.ui-treenode-label {
+  padding-left: 3px;
+}
+
+.ui-treenode-icon {
+  padding-right: 3px;
+}
+
+.ui-tree-empty-message {
+  color: white;
+}
+
+.ui-tree .ui-treenode-children {
+  margin: 0;
+  padding: 0 0 0 1em;
+}
 
 /*
   This program and the accompanying materials are
