@@ -49,10 +49,24 @@
 
 .ui-treenode {
   width: fit-content;
+  padding: 1px;
+}
+
+.ui-treenode-label {
+  padding-left: 3px;
+}
+
+.ui-treenode-icon {
+  padding-right: 3px;
 }
 
 .ui-tree-empty-message {
   color: white;
+}
+
+.ui-tree .ui-treenode-children {
+  margin: 0;
+  padding: 0 0 0 1em;
 }
 
 
