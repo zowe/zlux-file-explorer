@@ -41,6 +41,9 @@
 
 .ui-treenode-label.ui-state-highlight {
   background-color: #e0e0e0;
+  border-radius: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .ui-tree .ui-treenode-label.ui-state-highlight {
