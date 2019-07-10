@@ -205,6 +205,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  onNodeDblClick($event: any): void {
+    let updateTree = false; this.displayTree($event.node.path, updateTree);
+  }
+
   onRightClick($event: any): void {
     this.rtClickDisplay = !this.rtClickDisplay;
     this.popUpMenuX = $event.clientX;
@@ -349,7 +353,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   addChild(path: string, $event: any): void {
     if (this.selectedFile !== undefined && this.selectedFile.label == $event.node.label && this.selectedFile.children == $event.node.children) 
     {
-      let updateTree = false; this.displayTree(path, updateTree);
+      //let updateTree = false; this.displayTree(path, updateTree);
+      if ($event.node.expanded)
+      $event.node.expanded = false;
+      else
+      $event.node.expanded = true;
     } 
     else
     { 
