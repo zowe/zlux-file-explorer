@@ -351,7 +351,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   //Adds children to the existing this.data TreeNode array to update tree
   addChild(path: string, $event: any): void {
-    if (this.selectedFile !== undefined && this.selectedFile.label == $event.node.label && this.selectedFile.children == $event.node.children) 
+    if ($event.node.children && $event.node.children.length > 0) 
     {
       //let updateTree = false; this.displayTree(path, updateTree);
       if ($event.node.expanded)
