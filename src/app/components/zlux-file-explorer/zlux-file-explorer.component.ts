@@ -29,7 +29,7 @@ import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-import { PersistentDataService } from '../../services/persistentData.service';
+/*import { PersistentDataService } from '../../services/persistentData.service';*/
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowser,
   IFileBrowserMultiSelect,
@@ -48,7 +48,7 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
   templateUrl: './zlux-file-explorer.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./zlux-file-explorer.component.css'],
-  providers: [FileService, UtilsService, PersistentDataService]
+  providers: [FileService, UtilsService/*, PersistentDataService*/]
 })
 
 export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
@@ -64,7 +64,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   private mvsComponent: FileBrowserMVSComponent;
 
   constructor(private fileService: FileService,
-    private persistentDataService: PersistentDataService,
+    /*private persistentDataService: PersistentDataService,*/
     private utils: UtilsService, private elemRef: ElementRef,
     private cd: ChangeDetectorRef)
   {
@@ -99,16 +99,16 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    let dataObject = {mvsData:Array<MvsDataObject>(), ussData:Array<UssDataObject>()};
-    this.persistentDataService.getData()
-      .subscribe(data => {
-        dataObject = data.contents;
-        dataObject.mvsData = [];
-        dataObject.ussData = [];
-        //console.log(JSON.stringify(dataObject))
-        this.persistentDataService.setData(dataObject)
-          .subscribe((res: any) => { });
-      })
+    // let dataObject = {mvsData:Array<MvsDataObject>(), ussData:Array<UssDataObject>()};
+    // this.persistentDataService.getData()
+    //   .subscribe(data => {
+    //     dataObject = data.contents;
+    //     dataObject.mvsData = [];
+    //     dataObject.ussData = [];
+    //     //console.log(JSON.stringify(dataObject))
+    //     this.persistentDataService.setData(dataObject)
+    //       .subscribe((res: any) => { });
+    //   })
   }
 
   deleteFile(pathAndName: string) {
