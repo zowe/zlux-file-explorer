@@ -80,7 +80,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.renameDisplay = false;
     this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
     this.path = this.root;
-    this.data = [];
+    this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
     this.isLoading = false;
   }
@@ -187,26 +187,21 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void {
-    if ($event.target) {
-      if ($event.target.className.includes("ui-treenode-icon")) {
-        // TODO: Add node deflate feature (icon click --> expands/deflates)
-      }
-    }
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
+
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
       this.nodeClick.emit($event.node);
     }
     else {
-      let fileFolder = $event.node.path;
       this.nodeClick.emit($event.node);
-      //this.openFile(fileFolder, $event.node.label);
     }
   }
 
   onNodeDblClick($event: any): void {
-    let updateTree = false; this.displayTree($event.node.path, updateTree);
+    let updateTree = false; // A double click drills into a folder, so we fetch fresh contents
+    this.displayTree($event.node.path, updateTree);
   }
 
   onRightClick($event: any): void {
@@ -237,7 +232,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  //Displays the starting file structure of 'path'
+  //Displays the starting file structure of 'path'. When update == true, tree will be updated
+  //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
     if (path === undefined || path == '') {
       path = this.root; 
@@ -353,13 +349,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   addChild(path: string, $event: any): void {
     if ($event.node.children && $event.node.children.length > 0) 
     {
-      //let updateTree = false; this.displayTree(path, updateTree);
-      if ($event.node.expanded)
-      $event.node.expanded = false;
-      else
-      $event.node.expanded = true;
+      //If an opened node has children, and the user clicked on it...
+      if ($event.node.expanded) {
+        $event.node.expanded = false;
+      }
+      //If a closed node has children, and the user clicked on it...
+      else {
+        $event.node.expanded = true;
+      }
     } 
-    else
+    else //When the selected node has no children
     { 
       this.selectedFile = $event.node;
       $event.node.expanded = true;

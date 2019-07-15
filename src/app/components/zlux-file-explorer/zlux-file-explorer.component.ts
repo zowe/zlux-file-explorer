@@ -116,10 +116,12 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   }
 
   hideExplorers() {
-    if (this.ussComponent)
+    if (this.ussComponent) {
       this.ussComponent.hideExplorer = true;
-    if (this.mvsComponent)
+    }
+    if (this.mvsComponent) {
       this.mvsComponent.hideExplorer = true;
+    }
   }
 
   onCopyClick($event:any){
@@ -171,14 +173,16 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 
   showDatasets() {
     this.currentIndex = 1;
-    if (this.mvsComponent)
+    if (this.mvsComponent) {
       this.mvsComponent.hideExplorer = false;
+    }
   }
 
   showUss() {
     this.currentIndex = 0;
-    if (this.ussComponent)
+    if (this.ussComponent) {
       this.ussComponent.hideExplorer = false;
+    }
   }
 
   updateDirectory(dirName: string) {
