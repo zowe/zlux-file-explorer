@@ -40,8 +40,13 @@ export class TreeComponent {
   @Input() treeData: TreeNode;
   @Input() style: any;
   @Output() clickEvent = new EventEmitter<childEvent>();
+  @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
-  constructor() {}
+  lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
+  lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
+  constructor() {
+    this.lastClickedNodeName = null;
+  }
 
 /**
  * [nodeSelect provides the child folder click event to the parent file/folder tree tab]
@@ -50,8 +55,14 @@ export class TreeComponent {
  */
   nodeSelect(_event?: any) {
     if (_event){
-        this.clickEvent.emit(_event);
+      if (this.lastClickedNodeName == null || this.lastClickedNodeName != _event.node.name) {
+      this.lastClickedNodeName = _event.node.name;
+      this.clickEvent.emit(_event); 
+      setTimeout( () => (this.lastClickedNodeName = null), this.lastClickedNodeTimeout);
+    } else {
+      this.dblClickEvent.emit(_event);
     }
+  }
   }
 
   /**

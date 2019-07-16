@@ -27,6 +27,7 @@
     selectionMode="single"
     [(selection)]="selectedNode"
     (onNodeSelect)="nodeSelect($event)"
+    [ngStyle]="style"
   >
   <!-- add [filter]="true" with latest prime version (new feature March 2019) -->
   </p-tree>
