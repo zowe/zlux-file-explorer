@@ -29,6 +29,14 @@ import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
+import fontawesome from '@fortawesome/fontawesome';
+import faFolder from '@fortawesome/fontawesome-free-solid';
+import faFolderOpen from '@fortawesome/fontawesome-free-solid';
+import faFile from '@fortawesome/fontawesome-free-solid';
+
+
+
+
 
 @Component({
   selector: 'file-browser-uss',
@@ -147,12 +155,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  browsePath(path: string): void {
-    this.path = path;
+  initalizeCapabilities() {
+  //   //this.capabilities = new Array<Capability>();
+  //   //this.capabilities.push(FileBrowserCapabilities.FileBrowser);
+  //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
-  getDOMElement(): HTMLElement {
-    return this.elementRef.nativeElement;
+  onClick($event: any): void {
+    this.rtClickDisplay = false;
   }
 
   getSelectedPath(): string {
@@ -166,8 +176,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
-  onClick($event: any): void {
-    this.rtClickDisplay = false;
+  onNewFileClick($event: any): void {
+    this.newFileClick.emit($event);
+  }
+
+  onNewFolderClick($event: any): void {
+    this.newFolderClick.emit($event);
   }
 
   onCopyClick($event: any): void {
@@ -187,9 +201,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void {
+    if ($event.target) {
+      if ($event.target.className.includes("ui-treenode-icon")) {
+        // TODO: Add node deflate feature (icon click --> expands/deflates)
+      }
+    }
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
-
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
       this.nodeClick.emit($event.node);
@@ -248,12 +266,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         if (files.entries[i].directory) {
           files.entries[i].children = [];
           files.entries[i].data = "Folder";
-          files.entries[i].collapsedIcon = "fa fa-folder";
-          files.entries[i].expandedIcon = "fa fa-folder-open";
+          files.entries[i].collapsedIcon = "fas fa-folder";
+          files.entries[i].expandedIcon = "fas fa-folder-open";
         }
         else {
           files.entries[i].items = {};
-          files.entries[i].icon = "fa fa-file";
+          files.entries[i].icon = "fas fa-file";
           files.entries[i].data = "File";
         }
         files.entries[i].label = files.entries[i].name;
@@ -372,12 +390,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             if (files.entries[i].directory) {
               files.entries[i].children = [];
               files.entries[i].data = "Folder";
-              files.entries[i].collapsedIcon = "fa fa-folder";
-              files.entries[i].expandedIcon = "fa fa-folder-open";
+              files.entries[i].collapsedIcon = "fas fa-folder";
+              files.entries[i].expandedIcon = "fas fa-folder-open";
             }
             else {
               files.entries[i].items = {};
-              files.entries[i].icon = "fa fa-file";
+              files.entries[i].icon = "fas fa-file";
               files.entries[i].data = "File";
             }
             files.entries[i].label = files.entries[i].name;
@@ -393,7 +411,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             let newChild = $event.node.parent;
             newChild.children[$event.node.id] = $event.node;
             newChild.expanded = true;
-            newChild.expandedIcon = "fa fa-folder-open"; newChild.collapsedIcon = "fa fa-folder";
+            newChild.expandedIcon = "fas fa-folder-open"; newChild.collapsedIcon = "fas fa-folder";
             $event.node = newChild;
           }
 

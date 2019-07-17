@@ -9,6 +9,7 @@
   Copyright Contributors to the Zowe Project.
 */
 
+<<<<<<< HEAD:src/app/structures/persistantdata.ts
 
 export class  UssDataObject {
   ussInput: string;
@@ -17,6 +18,57 @@ export class  UssDataObject {
 export class  MvsDataObject {
   mvsInput: string;
   mvsData: any;
+=======
+.fileexplorer-browser-module{
+  margin-left: 10px;
+  margin-top: 10px;
+  height: 100%;
+}
+
+.fileexplorer-global{
+  height: 100%;
+}
+
+.fileexplorer-tabs{
+  height: 25px;
+  text-align: center;
+  padding-bottom: 30px;
+}
+
+.fileexplorer-tab {
+  font-size: 15px;
+  color: #007bff;
+  height: 35px;
+  width: 170px;
+  padding-top: 6px;
+  margin-left: -10px;
+}
+
+.fileexplorer-tab-selected {
+  font-size: 15px;
+  height: 35px;
+  width: 165px;
+  font-weight: bold;
+  padding-top: 6px;
+  margin-left: -7px;
+  color: #005abb;
+  background-color: #d4d4d4;
+}
+
+.fileexplorer-tabs-list {
+  -webkit-column-count: 2;
+  -moz-column-count: 2;
+  column-count: 2;
+  width: 100%;
+  height: 35px;
+  background-color: #464646;
+}
+
+.fileexplorer-tabs-text {
+  color: inherit;
+  text-decoration: none;
+  background-color: transparent;
+>>>>>>> replaced src with FTA node modules FE src:webClient/src/app/components/zlux-file-explorer/zlux-file-explorer.component.css
 }
 
 /*

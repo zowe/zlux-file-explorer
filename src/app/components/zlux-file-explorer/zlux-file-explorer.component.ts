@@ -16,7 +16,7 @@ import {
   NgModule, Component,
   Input, Output, ViewChild, ViewEncapsulation,
   ElementRef, ChangeDetectorRef,
-  OnChanges, SimpleChanges, AfterViewChecked, EventEmitter, OnInit, OnDestroy
+  OnChanges, SimpleChanges, AfterViewChecked, EventEmitter, OnInit, OnDestroy, AfterViewInit, AfterContentInit
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
@@ -51,7 +51,7 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
   providers: [FileService, UtilsService/*, PersistentDataService*/]
 })
 
-export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
+export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDestroy {
   //componentClass: ComponentClass;
   selectedItem: string;
   currentIndex: number;
