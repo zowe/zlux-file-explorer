@@ -11,9 +11,9 @@
 
 declare var require:any;
 import { Component, Input, Output, EventEmitter, ViewEncapsulation} from '@angular/core';
-import {TreeNode} from 'primeng/primeng';
-import {childEvent} from '../../structures/child-event';
-import {FileNode} from '../../structures/file-node';
+import { TreeNode } from 'primeng/primeng';
+import { childEvent } from '../../structures/child-event';
+import { FileNode } from '../../structures/file-node';
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -38,6 +38,8 @@ import {FileNode} from '../../structures/file-node';
  */
 export class TreeComponent {
   @Input() treeData: TreeNode;
+  @Input() style: any;
+  @Input() treeStyle: any;
   @Output() clickEvent = new EventEmitter<childEvent>();
   selectedNode: FileNode;
   constructor() {}
@@ -48,7 +50,6 @@ export class TreeComponent {
  * @return        [void]
  */
   nodeSelect(_event?: any) {
-    console.log("entered nodeSelect")
     if (_event){
         this.clickEvent.emit(_event);
     }

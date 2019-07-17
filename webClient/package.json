@@ -17,7 +17,8 @@
     "@angular/platform-browser": "~6.0.9",
     "@angular/router": "~6.0.9",
     "carbon-components": "~8.23.0",
-    "primeng": "~6.0.1"
+    "primeng": "~6.0.1",
+	"@fortawesome/fontawesome-free": "^5.9.0"
   },
   "devDependencies": {
     "angular2-template-loader": "~0.6.2",
