@@ -35,6 +35,7 @@
   ></file-browser-uss>
   <file-browser-mvs #mvsComponent
     [hidden]="currentIndex != 1"
+    (nodeClick)="onNodeClick($event)"
     (pathChanged)="onPathChanged($event)"
     [style]="style"
   ></file-browser-mvs>
