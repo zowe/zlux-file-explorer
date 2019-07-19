@@ -16,7 +16,7 @@ import { Observable, Subject } from 'rxjs';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
 import { childEvent } from '../../structures/child-event';
-// import { PersistentDataService } from '../../services/persistentData.service';
+import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
@@ -32,7 +32,7 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService/*, PersistentDataService*/]
+  providers: [FileService, PersistentDataService]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
@@ -50,7 +50,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   constructor(private fileService: FileService, 
     private elementRef:ElementRef, 
-    // private persistentDataService: PersistentDataService,
+    private persistentDataService: PersistentDataService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
@@ -63,14 +63,14 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   ngOnInit() {
 
-    // this.persistentDataService.getData()
-    //   .subscribe(data => {
-    //     if(data.contents.mvsInput){
-    //       this.path = data.contents.mvsInput;
-    //     }
-    //     data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.path = data.contents.mvsInput)
-    //   }
-    // )
+    this.persistentDataService.getData()
+      .subscribe(data => {
+        if(data.contents.mvsInput){
+          this.path = data.contents.mvsInput;
+        }
+        data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.path = data.contents.mvsInput)
+      }
+    )
     this.intervalId = setInterval(() => {
       this.updateDs();
     }, this.timeVar);
@@ -147,15 +147,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.data = temp;
 
         let dataObject:MvsDataObject;
-        // this.persistentDataService.getData()
-        //   .subscribe(data => {
-        //     dataObject = data.contents;
-        //     dataObject.mvsInput = this.path;
-        //     dataObject.mvsData = this.data;
-        //     //this.log.debug(JSON.stringify(dataObject));
-        //     this.persistentDataService.setData(dataObject)
-        //       .subscribe((res: any) => { });
-        //   })
+        this.persistentDataService.getData()
+          .subscribe(data => {
+            dataObject = data.contents;
+            dataObject.mvsInput = this.path;
+            dataObject.mvsData = this.data;
+            //this.log.debug(JSON.stringify(dataObject));
+            this.persistentDataService.setData(dataObject)
+              .subscribe((res: any) => { });
+          })
 
       },
       error => this.errorMessage = <any>error
