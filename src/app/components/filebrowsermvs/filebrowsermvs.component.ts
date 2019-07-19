@@ -19,6 +19,7 @@ import { childEvent } from '../../structures/child-event';
 // import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { TreeNode } from 'primeng/primeng';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -60,6 +61,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
 
@@ -71,10 +73,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     //     data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.path = data.contents.mvsInput)
     //   }
     // )
-    this.intervalId = setInterval(() => {
-      this.updateDs();
-    }, this.timeVar);
-    this.updateDs();
   }
 
   ngOnDestroy(){
@@ -108,9 +106,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }*/
 
   clickInEventHandler($event:any):void{
-      //TODO:need to assess the Datasets drill in behavior
-      this.path = $event.node.label + ".";
-      this.updateDs();
+    //TODO:need to assess the Datasets drill in behavior
+    if($event.node.type === 'Folder'){
+      $event.node.expanded = !$event.node.expanded;
+    } else {
+      this.nodeClick.emit($event.node);
+    }
   }
 
   onRightClick($event:any):void{
@@ -123,43 +124,60 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   updateDs():void{
     this.dsData = this.fileService.queryDatasets(this.path);
-    this.dsData.subscribe(
-      ds =>{
-        //TODO: move this to a UtilsService
-        let temp:any = [];
-        let currentNode:any = {};
-        for(let i:number= 0; i< ds.datasets.length; i++){
-          currentNode = {};
-          //TODO: assuming parent entries come first always??? Need to validate this?
-          if (/C|X/.test(ds.datasets[i].csiEntryType)){
-            currentNode.children = [];
-            currentNode.data = "Documents Folder";
-            currentNode.expandedIcon = "fa fa-folder-open";
-            currentNode.collapsedIcon = "fa fa-database";
+    this.dsData.subscribe((res) => {
+      if(res.datasets.length > 0){
+        let parents: TreeNode[] = [];
+        for(let i:number = 0; i < res.datasets.length; i++){
+          let currentNode:TreeNode = {};
+          currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
+          currentNode.children = [];
+          currentNode.data = {};
+          if(res.datasets[i].members){
+            currentNode.type = 'Folder';
+            currentNode.expanded = false;
+            currentNode.expandedIcon = 'fa fa-folder-open';
+            currentNode.collapsedIcon = 'fa fa-database';
+            currentNode.data.hasChildren = true;
+            //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
+            this.addChildren(currentNode, res.datasets[i].members);
+          } else {
+            currentNode.type = 'nonPDS';
+            currentNode.expanded = false;
+            currentNode.icon = 'fa fa-cube';
+            currentNode.data.hasChildren = false;
           }
-          else {
-            currentNode.items = {};
-            currentNode.icon= "fa fa-cube";
-          }
-          currentNode.label = ds.datasets[i].name.replace(/^\s+|\s+$/, '');
-          temp.push(currentNode);
+          currentNode.data.id = i;
+          currentNode.data.path = currentNode.label
+          currentNode.data.fileName = currentNode.data.name = currentNode.data.path;
+          currentNode.data.isDataset = true;
+          parents.push(currentNode);
         }
-        this.data = temp;
+        this.data = parents;
+      } else {
+        //data set probably doesnt exist
+      }
+    }, (err) => {
+      this.errorMessage = <any>err;
+    })
+  }
 
-        let dataObject:MvsDataObject;
-        // this.persistentDataService.getData()
-        //   .subscribe(data => {
-        //     dataObject = data.contents;
-        //     dataObject.mvsInput = this.path;
-        //     dataObject.mvsData = this.data;
-        //     //this.log.debug(JSON.stringify(dataObject));
-        //     this.persistentDataService.setData(dataObject)
-        //       .subscribe((res: any) => { });
-        //   })
-
-      },
-      error => this.errorMessage = <any>error
-    );
+  addChildren(parentNode: TreeNode, members: Array<any>){
+    for(let i: number = 0; i < members.length; i++){
+      let childNode: TreeNode = {};
+      childNode.type = 'nonPDS';
+      childNode.icon = 'fa fa-cube';
+      childNode.label = members[i].name.replace(/^\s+|\s+$/, '');
+      childNode.parent = parentNode;
+      childNode.data = {
+        id: i,
+        fileName: childNode.label,
+        name: childNode.label,
+        hasChildren: false,
+        isDataset: true,
+        path: `${parentNode.label}(${childNode.label})`
+      }
+      parentNode.children.push(childNode);
+    }
   }
 
 
