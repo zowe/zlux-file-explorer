@@ -17,7 +17,7 @@ import {
 import { Observable, Subject } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
-import { PersistentDataService } from '../../services/persistentData.service';
+// import { PersistentDataService } from '../../services/persistentData.service';
 /*import { ComponentClass } from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileBrowserFileSelectedEvent, IFileBrowserUSS }
   from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
@@ -43,7 +43,7 @@ import faFile from '@fortawesome/fontawesome-free-solid';
   templateUrl: './filebrowseruss.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowseruss.component.css'],
-  providers: [UssCrudService, PersistentDataService]
+  providers: [UssCrudService/*, PersistentDataService*/]
 })
 
 export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowserUSS,
@@ -65,6 +65,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   popUpMenuX: number;
   popUpMenuY: number;
   selectedFile: TreeNode;
+  isLoading: boolean;
 
   //TODO:define interface types for uss-data/data
   data: TreeNode[];
@@ -76,7 +77,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
     private utils: UtilsService, 
-    private persistanceDataService: PersistentDataService,
+    /*private persistentDataService: PersistentDataService,*/
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
@@ -87,8 +88,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.renameDisplay = false;
     this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
     this.path = this.root;
-    this.data = [];
+    this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
+    this.isLoading = false;
     fontawesome.library.add(faFolder);
     fontawesome.library.add(faFolderOpen);
     fontawesome.library.add(faFile);
@@ -120,18 +122,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   ngOnInit() {
+    // this.loadUserHomeDirectory();
 
-   
 
-    this.persistanceDataService.getData()
-      .subscribe(data => {
-        if (data.contents.ussInput) {
-          this.path = data.contents.ussInput; }
-        if (data.contents.ussData !== undefined)
-        data.contents.ussData.length == 0 ? this.displayTree(this.path, false) : (this.data = data.contents.ussData, this.path = data.contents.ussInput)
-        else
-        this.displayTree(this.root, false);
-      })
+    
+    // this.persistentDataService.getData()
+    //   .subscribe(data => {
+    //     if (data.contents.ussInput) {
+    //       this.path = data.contents.ussInput; }
+    //     if (data.contents.ussData !== undefined)
+    //     data.contents.ussData.length == 0 ? this.displayTree(this.path, false) : (this.data = data.contents.ussData, this.path = data.contents.ussInput)
+    //     else
+    //     this.displayTree(this.root, false);
+    //   })
       // this.intervalId = setInterval(() => {
       //   this.updateUss(this.path);
       // }, this.timeVar);
@@ -154,6 +157,22 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   getSelectedPath(): string {
     //TODO:how do we want to want to handle caching vs message to app to open said path
     return this.path;
+  // loadUserHomeDirectory(): void {
+  //   this.isLoading = true;
+  //   this.ussSrv.getUserHomeFolder()
+  //     .subscribe(
+  //       resp => {
+  //         if(resp && resp.home){
+  //           this.path = resp.home.trim();
+  //           this.displayTree(this.path, true);
+  //           this.isLoading = false;
+  //         }
+  //       },
+  //       error => {
+  //         this.isLoading = false;
+  //         this.errorMessage = <any>error;
+  //       }
+  //     );
   }
 
   initalizeCapabilities() {
@@ -172,7 +191,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onDeleteClick($event: any): void {
     this.deleteClick.emit($event);
+
   }
+
 
   onNewFileClick($event: any): void {
     this.newFileClick.emit($event);
@@ -181,7 +202,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNewFolderClick($event: any): void {
     this.newFolderClick.emit($event);
   }
-
+  
   onNodeClick($event: any): void {
     if ($event.target) {
       if ($event.target.className.includes("ui-treenode-icon")) {
@@ -190,6 +211,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
+
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
       this.nodeClick.emit($event.node);
@@ -199,6 +221,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.nodeClick.emit($event.node);
       //this.openFile(fileFolder, $event.node.label);
     }
+  }
+
+  onNodeDblClick($event: any): void {
+    let updateTree = false; // A double click drills into a folder, so we fetch fresh contents
+    this.displayTree($event.node.path, updateTree);
   }
 
   onRightClick($event: any): void {
@@ -229,11 +256,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  //Displays the starting file structure of 'path'
+  //Displays the starting file structure of 'path'. When update == true, tree will be updated
+  //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
     if (path === undefined || path == '') {
       path = this.root; 
     }
+    this.isLoading = true;
     this.ussData = this.ussSrv.getFile(path); 
     this.ussData.subscribe(
     files => {
@@ -255,6 +284,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         files.entries[i].id = i;
         tempChildren.push(files.entries[i]);
       }
+      this.isLoading = false;
       if (update == true) {//Tree is displayed to update existing opened nodes, while maintaining currently opened trees 
 
         let indexArray: number[];
@@ -313,16 +343,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.data = tempChildren;
       this.path = path;
 
-      this.persistanceDataService.getData()
-            .subscribe(data => {
-              this.dataObject = data.contents;
-              this.dataObject.ussInput = this.path;
-              this.dataObject.ussData = this.data;
-              this.persistanceDataService.setData(this.dataObject)
-                .subscribe((res: any) => { });
-            })
+      // this.persistentDataService.getData()
+      //       .subscribe(data => {
+      //         this.dataObject = data.contents;
+      //         this.dataObject.ussInput = this.path;
+      //         this.dataObject.ussData = this.data;
+      //         this.persistentDataService.setData(this.dataObject)
+      //           .subscribe((res: any) => { });
+      //       })
         },
-        error => this.errorMessage = <any>error
+        error => {
+          this.isLoading = false;
+          this.errorMessage = <any>error;
+        }
       );
 
     }
@@ -338,11 +371,18 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   //Adds children to the existing this.data TreeNode array to update tree
   addChild(path: string, $event: any): void {
-    if (this.selectedFile !== undefined && this.selectedFile.label == $event.node.label && this.selectedFile.children == $event.node.children) 
+    if ($event.node.children && $event.node.children.length > 0) 
     {
-      let updateTree = false; this.displayTree(path, updateTree);
+      //If an opened node has children, and the user clicked on it...
+      if ($event.node.expanded) {
+        $event.node.expanded = false;
+      }
+      //If a closed node has children, and the user clicked on it...
+      else {
+        $event.node.expanded = true;
+      }
     } 
-    else
+    else //When the selected node has no children
     { 
       this.selectedFile = $event.node;
       $event.node.expanded = true;
@@ -389,14 +429,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           }
           if (index != -1) {
             this.data[index] = $event.node;
-            this.persistanceDataService.getData()
-              .subscribe(data => {
-                this.dataObject = data.contents;
-                this.dataObject.ussInput = this.path;
-                this.dataObject.ussData = this.data;
-                this.persistanceDataService.setData(this.dataObject)
-                  .subscribe((res: any) => { });
-              })
+            // this.persistentDataService.getData()
+            //   .subscribe(data => {
+            //     this.dataObject = data.contents;
+            //     this.dataObject.ussInput = this.path;
+            //     this.dataObject.ussData = this.data;
+            //     this.persistentDataService.setData(this.dataObject)
+            //       .subscribe((res: any) => { });
+            //   })
             
           }
           else

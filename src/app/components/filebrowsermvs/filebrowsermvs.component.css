@@ -11,7 +11,7 @@
 */
 
 .filebrowsermvs-search {
-  width: 95%;
+  width: fit-content;
   min-width: 250px;
   margin-left: 5px;
   display: inline-block;

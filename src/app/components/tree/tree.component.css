@@ -9,6 +9,10 @@
   Copyright Contributors to the Zowe Project.
 */
 
+
+
+/* !important tags are used here to prevent css bleeding from other FE instances */
+
 .fileexplorer-tree-panel {
   flex: 1 1 0px !important;
   background: transparent !important;
