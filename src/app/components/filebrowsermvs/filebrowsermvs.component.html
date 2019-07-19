@@ -9,16 +9,16 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-  <div>
+  <div style="height: 100%">
     <img src="../../../assets/explorer-uparrow.png" (click)="levelUp()" style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
     <!-- <svg width="14" height="16" viewBox="0 0 14 16" fill-rule="evenodd" (click)="levelUp()"><path d="M6 3.4V16h2V3.4l4.7 4.9L14 7 7 0 0 7l1.3 1.3z"></path></svg> -->
     <div class="filebrowsermvs-search">
       <input [(ngModel)]="path" placeholder="Enter a dataset..." class="filebrowsermvs-search-input" (change)="updateTree();">
     </div>
-    <div [hidden]="hideExplorer">
-      <tree-root [treeData]="data" [style]="style"
-      (clickEvent)="clickInEventHandler($event)"
-      (contextmenu)="$event.preventDefault(); onRightClick($event);"></tree-root>
+    <div [hidden]="hideExplorer" style="height: 100%; overflow-y: scroll;">
+        <tree-root [treeData]="data" [style]="style"
+        (clickEvent)="clickInEventHandler($event)"
+        (contextmenu)="$event.preventDefault(); onRightClick($event);"></tree-root>
     </div>
   </div>
 <!-- 
