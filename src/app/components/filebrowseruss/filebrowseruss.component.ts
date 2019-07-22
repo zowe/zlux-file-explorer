@@ -17,7 +17,7 @@ import {
 import { Observable, Subject } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
-// import { PersistentDataService } from '../../services/persistentData.service';
+import { PersistentDataService } from '../../services/persistentData.service';
 /*import { ComponentClass } from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileBrowserFileSelectedEvent, IFileBrowserUSS }
   from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
@@ -43,7 +43,7 @@ import faFile from '@fortawesome/fontawesome-free-solid';
   templateUrl: './filebrowseruss.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowseruss.component.css'],
-  providers: [UssCrudService/*, PersistentDataService*/]
+  providers: [UssCrudService, PersistentDataService]
 })
 
 export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowserUSS,
@@ -77,7 +77,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
     private utils: UtilsService, 
-    // private persistentDataService: PersistentDataService,
+    private persistentDataService: PersistentDataService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
@@ -337,14 +337,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.data = tempChildren;
       this.path = path;
 
-      // this.persistentDataService.getData()
-      //       .subscribe(data => {
-      //         this.dataObject = data.contents;
-      //         this.dataObject.ussInput = this.path;
-      //         this.dataObject.ussData = this.data;
-      //         this.persistentDataService.setData(this.dataObject)
-      //           .subscribe((res: any) => { });
-      //       })
+      this.persistentDataService.getData()
+            .subscribe(data => {
+              this.dataObject = data.contents;
+              this.dataObject.ussInput = this.path;
+              this.dataObject.ussData = this.data;
+              this.persistentDataService.setData(this.dataObject)
+                .subscribe((res: any) => { });
+            })
         },
         error => {
           // this.isLoading = false;
@@ -423,14 +423,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           }
           if (index != -1) {
             this.data[index] = $event.node;
-            // this.persistentDataService.getData()
-            //   .subscribe(data => {
-            //     this.dataObject = data.contents;
-            //     this.dataObject.ussInput = this.path;
-            //     this.dataObject.ussData = this.data;
-              //   this.persistentDataService.setData(this.dataObject)
-              //     .subscribe((res: any) => { });
-              // })
+            this.persistentDataService.getData()
+              .subscribe(data => {
+                this.dataObject = data.contents;
+                this.dataObject.ussInput = this.path;
+                this.dataObject.ussData = this.data;
+                this.persistentDataService.setData(this.dataObject)
+                  .subscribe((res: any) => { });
+              })
             
           }
           else
