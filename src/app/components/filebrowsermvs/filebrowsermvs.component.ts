@@ -12,7 +12,8 @@
 
 
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import { take } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
 import { childEvent } from '../../structures/child-event';
@@ -39,6 +40,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //componentClass:ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities:Array<Capability>;
+  private clickCount = 0;
   public hideExplorer: boolean;
   path: string;
   rtClickDisplay: boolean;
@@ -105,12 +107,33 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return this.capabilities;
   }*/
 
-  clickInEventHandler($event:any):void{
+  onNodeClick($event:any):void{
     //TODO:need to assess the Datasets drill in behavior
-    if($event.node.type === 'Folder'){
-      $event.node.expanded = !$event.node.expanded;
-    } else {
-      this.nodeClick.emit($event.node);
+    this.clickCount++;
+    let dblClickTimeout;
+    dblClickTimeout = setTimeout(()=>{
+      if(this.clickCount == 1){
+        if($event.node.type === 'Folder'){
+          $event.node.expanded = !$event.node.expanded;
+          this.nodeClick.emit($event.node);
+        } else {
+          this.nodeClick.emit($event.node);
+        }
+        this.clickCount = 0;
+      } else {
+        this.onNodeDblClick($event, dblClickTimeout);
+      }
+    }, 250)
+  }
+
+  onNodeDblClick($event: any, timeout): void{
+    this.clickCount = 0;
+    clearTimeout(timeout);
+    if($event.node.type === 'Folder' && $event.node.children){
+      this.path = $event.node.data.path;
+      this.updateTreeAsync($event.node.data.path).then((res) => {
+        this.data = res[0].children;
+      });
     }
   }
 
@@ -122,43 +145,84 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
   }
 
-  updateDs():void{
-    this.dsData = this.fileService.queryDatasets(this.path);
-    this.dsData.subscribe((res) => {
-      if(res.datasets.length > 0){
+  updateTreeAsync(path: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.fileService.queryDatasets(path).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
-        for(let i:number = 0; i < res.datasets.length; i++){
-          let currentNode:TreeNode = {};
-          currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
-          currentNode.children = [];
-          currentNode.data = {};
-          if(res.datasets[i].members){
-            currentNode.type = 'Folder';
-            currentNode.expanded = false;
-            currentNode.expandedIcon = 'fa fa-folder-open';
-            currentNode.collapsedIcon = 'fa fa-database';
-            currentNode.data.hasChildren = true;
-            //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
-            this.addChildren(currentNode, res.datasets[i].members);
-          } else {
-            currentNode.type = 'nonPDS';
-            currentNode.expanded = false;
-            currentNode.icon = 'fa fa-cube';
-            currentNode.data.hasChildren = false;
+        if(res.datasets.length > 0){
+          for(let i:number = 0; i < res.datasets.length; i++){
+            let currentNode:TreeNode = {};
+            currentNode.data = {};
+            currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
+            currentNode.data.id = i;
+            currentNode.data.path = currentNode.label
+            currentNode.data.fileName = currentNode.data.name = currentNode.data.path;
+            currentNode.data.isDataset = true;
+            currentNode.children = [];
+            if(res.datasets[i].members){
+              currentNode.type = 'Folder';
+              currentNode.expanded = false;
+              currentNode.expandedIcon = 'fa fa-folder-open';
+              currentNode.collapsedIcon = 'fa fa-database';
+              currentNode.data.hasChildren = true;
+              //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
+              this.addChildren(currentNode, res.datasets[i].members);
+            } else {
+              currentNode.type = 'nonPDS';
+              currentNode.expanded = false;
+              currentNode.icon = 'fa fa-cube';
+              currentNode.data.hasChildren = false;
+            }
+            parents.push(currentNode);
           }
-          currentNode.data.id = i;
-          currentNode.data.path = currentNode.label
-          currentNode.data.fileName = currentNode.data.name = currentNode.data.path;
-          currentNode.data.isDataset = true;
-          parents.push(currentNode);
+          this.data = parents;
+        } else {
+          //data set probably doesnt exist
         }
-        this.data = parents;
-      } else {
-        //data set probably doesnt exist
-      }
-    }, (err) => {
-      this.errorMessage = <any>err;
+        resolve(parents);
+      }, (err) => {
+        reject(err);
+      })
     })
+  }
+  
+  updateTreeSync(path: string): void{
+    this.pathChanged.emit(this.path);
+    this.fileService.queryDatasets(path).subscribe((res) =>{
+      if(res.datasets.length > 0){
+            let parents: TreeNode[] = [];
+            for(let i:number = 0; i < res.datasets.length; i++){
+              let currentNode:TreeNode = {};
+              currentNode.data = {};
+              currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
+              currentNode.data.id = i;
+              currentNode.data.path = currentNode.label
+              currentNode.data.fileName = currentNode.data.name = currentNode.data.path;
+              currentNode.data.isDataset = true;
+              currentNode.children = [];
+              if(res.datasets[i].members){
+                currentNode.type = 'Folder';
+                currentNode.expanded = false;
+                currentNode.expandedIcon = 'fa fa-folder-open';
+                currentNode.collapsedIcon = 'fa fa-database';
+                currentNode.data.hasChildren = true;
+                //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
+                this.addChildren(currentNode, res.datasets[i].members);
+              } else {
+                currentNode.type = 'nonPDS';
+                currentNode.expanded = false;
+                currentNode.icon = 'fa fa-cube';
+                currentNode.data.hasChildren = false;
+              }
+              parents.push(currentNode);
+            }
+            this.data = parents;
+          } else {
+            //data set probably doesnt exist
+          }
+        }, (err) => {
+          this.errorMessage = <any>err;
+      })
   }
 
   addChildren(parentNode: TreeNode, members: Array<any>){
@@ -169,7 +233,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       childNode.label = members[i].name.replace(/^\s+|\s+$/, '');
       childNode.parent = parentNode;
       childNode.data = {
-        id: i,
+        id: parentNode.data.id,
         fileName: childNode.label,
         name: childNode.label,
         hasChildren: false,
@@ -186,22 +250,18 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 * @param index [tree index where the 'folder' parent is accessed]
 */
   levelUp(): void {
-      this.path = this.path.replace(/\.$/, '');
-      if (!this.path.includes('.')){
-        this.path = '';
-      }
-      else{
-        this.path = this.path.replace(/\.[^\.]+$/, '')
-      }
-      this.updateDs();
-  }
-  updateTree(): void {
-      this.pathChanged.emit(this.path);
-      this.updateDs();
+    if(!this.path.includes('.')){
+      this.path = '';
     }
+    let regex = new RegExp(/\.[^\.]+$/);
+    if(this.path.substr(this.path.length - 2, 2) == '.*'){
+      this.path = this.path.replace(regex, '').replace(regex, '.*');
+    } else {
+      this.path = this.path.replace(regex, '.*')
+    }
+    this.updateTreeAsync(this.path);
   }
-
-
+}
 
 
 /*
