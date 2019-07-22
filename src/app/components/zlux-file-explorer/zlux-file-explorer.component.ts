@@ -151,9 +151,9 @@ ngAfterContentInit(){
     } 
 
     default: { 
-      this.headerStyle = {'background-color': '#464646'};
-      this.treeStyle = {'color': 'white'};
-      this.style = {'background-color': '#464646'};
+      // this.headerStyle = {'background-color': '#464646'};
+      this.treeStyle = {'filter': 'brightness(3)'};
+      // this.style = {'background-color': '#464646'};
 
        
        break; 
