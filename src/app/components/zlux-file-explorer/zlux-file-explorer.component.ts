@@ -15,21 +15,18 @@ declare var require: any;
 import {
   NgModule, Component,
   Input, Output, ViewChild, ViewEncapsulation,
-  ElementRef, ChangeDetectorRef,/*
-  OnChanges, SimpleChanges, AfterViewChecked, */EventEmitter, OnInit, OnDestroy, /*AfterViewInit,*/ AfterContentInit
+  ElementRef, ChangeDetectorRef, EventEmitter, OnInit, OnDestroy,
 } from '@angular/core';
-// import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule,/* MenuItem,*/ MenuModule, DialogModule } from 'primeng/primeng';
+import { TreeModule, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
 import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
-// import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-// import { PersistentDataService } from '../../services/persistentData.service';
+/*import { PersistentDataService } from '../../services/persistentData.service';*/
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowser,
   IFileBrowserMultiSelect,
@@ -51,7 +48,7 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
   providers: [FileService, UtilsService/*, PersistentDataService*/]
 })
 
-export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDestroy {
+export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
   selectedItem: string;
   currentIndex: number;
@@ -93,20 +90,16 @@ export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDe
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
 
-  ngOnInit() {
-  
-    // var obj = {
-    //   "ussInput": "",
-    //   "mvsInput": "",
-    //   "ussData": [],
-    //   "mvsData": []
-    // }
-    // this.persistentDataService.setData(obj)
-    //   .subscribe((res: any) => { });
-  }
-
-ngAfterContentInit(){
-
+ngOnInit(){
+  // var obj = {
+  //   "ussInput": "",
+  //   "mvsInput": "",
+  //   "ussData": [],
+  //   "mvsData": []
+  // }
+  // this.persistentDataService.setData(obj)
+  //   .subscribe((res: any) => { });
+  // }
   switch(this.theme) { 
     case 'carbon': { 
        this.headerStyle =  {
@@ -115,12 +108,10 @@ ngAfterContentInit(){
         'width':'99.7%',
         'text-align':'left',
         'padding-left': '7px'
-        // 'margin-bottom' : '5px'
       };
        this.inputStyle = {
         'background-color': '#eee', 
         'color': 'black', 
-        // 'width': '99.5%',
         'border':'2px solid #3d70b2',
         'margin-top': '20px'
       };
@@ -177,31 +168,31 @@ ngAfterContentInit(){
   }
 
   hideExplorers() {
-    if (this.ussComponent){
+    if (this.ussComponent) {
       this.ussComponent.hideExplorer = true;
     }
-    if (this.mvsComponent){
+    if (this.mvsComponent) {
       this.mvsComponent.hideExplorer = true;
   }
 }
 
-  onCopyClick($event:any){
+  onCopyClick($event:any) {
     this.copyClick.emit($event);
   }
 
-  onDeleteClick($event:any){
+  onDeleteClick($event:any) {
     this.deleteClick.emit($event);
   }
 
-  onNewFileClick($event:any){
+  onNewFileClick($event:any) {
     this.newFileClick.emit($event);
   }
 
-  onNewFolderClick($event:any){
+  onNewFolderClick($event:any) {
     this.newFolderClick.emit($event);
   }
 
-  onNodeClick($event:any){
+  onNodeClick($event:any) {
     //console.log($event);
     this.nodeClick.emit($event);
   }
@@ -234,17 +225,17 @@ ngAfterContentInit(){
 
   showDatasets() {
     this.currentIndex = 1;
-  if (this.mvsComponent){
-    this.mvsComponent.hideExplorer = false;
-}
-}
+    if (this.mvsComponent) {
+      this.mvsComponent.hideExplorer = false;
+    }
+  }
 
   showUss() {
     this.currentIndex = 0;
-    if (this.ussComponent){
+    if (this.ussComponent) {
       this.ussComponent.hideExplorer = false;
+    }
   }
-}
 
   updateDirectory(dirName: string) {
     this.showUss();
