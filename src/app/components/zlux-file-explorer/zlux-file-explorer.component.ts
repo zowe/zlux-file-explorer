@@ -162,7 +162,7 @@ ngAfterContentInit(){
 
 }
   ngOnDestroy() {
-    let dataObject = {mvsData:Array<MvsDataObject>(), ussData:Array<UssDataObject>()};
+    // let dataObject = {mvsData:Array<MvsDataObject>(), ussData:Array<UssDataObject>()};
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     dataObject = data.contents;
