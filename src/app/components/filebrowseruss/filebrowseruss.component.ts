@@ -204,11 +204,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
   
   onNodeClick($event: any): void {
-    if ($event.target) {
-      if ($event.target.className.includes("ui-treenode-icon")) {
-        // TODO: Add node deflate feature (icon click --> expands/deflates)
-      }
-    }
+    // if ($event.target) {
+      // if ($event.target.className.includes("ui-treenode-icon")) {
+			// TODO: Add node deflate feature (icon click --> expands/deflates)
+      // }
+    // }
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
 
