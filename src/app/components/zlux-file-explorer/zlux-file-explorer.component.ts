@@ -15,13 +15,13 @@ declare var require: any;
 import {
   NgModule, Component,
   Input, Output, ViewChild, ViewEncapsulation,
-  ElementRef, ChangeDetectorRef,/*
-  OnChanges, SimpleChanges, AfterViewChecked, */EventEmitter, OnInit, OnDestroy, /*AfterViewInit,*/ AfterContentInit
+  ElementRef, ChangeDetectorRef,
+  OnChanges, SimpleChanges, AfterViewChecked, EventEmitter, OnInit, OnDestroy, AfterViewInit, AfterContentInit
 } from '@angular/core';
-// import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule,/* MenuItem,*/ MenuModule, DialogModule } from 'primeng/primeng';
+import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
@@ -29,7 +29,7 @@ import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-// import { PersistentDataService } from '../../services/persistentData.service';
+import { PersistentDataService } from '../../services/persistentData.service';
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowser,
   IFileBrowserMultiSelect,
@@ -48,7 +48,7 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
   templateUrl: './zlux-file-explorer.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./zlux-file-explorer.component.css'],
-  providers: [FileService, UtilsService/*, PersistentDataService*/]
+  providers: [FileService, UtilsService, PersistentDataService]
 })
 
 export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDestroy {
@@ -64,7 +64,7 @@ export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDe
   private mvsComponent: FileBrowserMVSComponent;
 
   constructor(private fileService: FileService,
-    // private persistentDataService: PersistentDataService,
+    private persistentDataService: PersistentDataService,
     private utils: UtilsService, private elemRef: ElementRef,
     private cd: ChangeDetectorRef)
   {
@@ -94,7 +94,7 @@ export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDe
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
-  
+    console.log('path ' + this.selectPath);
     // var obj = {
     //   "ussInput": "",
     //   "mvsInput": "",
@@ -138,9 +138,7 @@ ngAfterContentInit(){
 
       this.style = {
         'background-color':'#F4F7FB',
-        'margin-top': '10px',
-        'max-height':'320px',
-        'overflow-y': 'scroll'
+        'margin-right':'20px'
         
         
       };
@@ -161,15 +159,15 @@ ngAfterContentInit(){
 }
   ngOnDestroy() {
     let dataObject = {mvsData:Array<MvsDataObject>(), ussData:Array<UssDataObject>()};
-    // this.persistentDataService.getData()
-    //   .subscribe(data => {
-    //     dataObject = data.contents;
-    //     dataObject.mvsData = [];
-    //     dataObject.ussData = [];
-    //     //console.log(JSON.stringify(dataObject))
-    //     this.persistentDataService.setData(dataObject)
-    //       .subscribe((res: any) => { });
-    //   })
+    this.persistentDataService.getData()
+      .subscribe(data => {
+        dataObject = data.contents;
+        dataObject.mvsData = [];
+        dataObject.ussData = [];
+        //console.log(JSON.stringify(dataObject))
+        this.persistentDataService.setData(dataObject)
+          .subscribe((res: any) => { });
+      })
   }
 
   deleteFile(pathAndName: string) {
