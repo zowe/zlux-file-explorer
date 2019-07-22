@@ -66,18 +66,27 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   ngOnInit() {
 
-    this.persistentDataService.getData()
-      .subscribe(data => {
-        if(data.contents.mvsInput){
-          this.path = data.contents.mvsInput;
-        }
-        data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.path = data.contents.mvsInput)
-      }
-    )
-    this.intervalId = setInterval(() => {
-      this.updateDs();
-    }, this.timeVar);
-    this.updateDs();
+
+    /* TODO: Make persistentDataService work again, 
+    which should save opened tree node setups upon close 
+    to re-open them later, giving the user the ability 
+    to pickup progress where they left off
+    */
+
+    // this.persistentDataService.getData()
+    //   .subscribe(data => {
+    //     if(data.contents.mvsInput){
+    //       this.path = data.contents.mvsInput;
+    //     }
+    //     data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.path = data.contents.mvsInput)
+    //   }
+    // )
+
+
+    // this.intervalId = setInterval(() => {
+    //   this.updateDs();
+    // }, this.timeVar);
+    // this.updateDs();
   }
 
   ngOnDestroy(){
@@ -149,16 +158,16 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         }
         this.data = temp;
 
-        let dataObject:MvsDataObject;
-        this.persistentDataService.getData()
-          .subscribe(data => {
-            dataObject = data.contents;
-            dataObject.mvsInput = this.path;
-            dataObject.mvsData = this.data;
-            //this.log.debug(JSON.stringify(dataObject));
-            this.persistentDataService.setData(dataObject)
-              .subscribe((res: any) => { });
-          })
+        // let dataObject:MvsDataObject;
+        // this.persistentDataService.getData()
+        //   .subscribe(data => {
+        //     dataObject = data.contents;
+        //     dataObject.mvsInput = this.path;
+        //     dataObject.mvsData = this.data;
+        //     //this.log.debug(JSON.stringify(dataObject));
+        //     this.persistentDataService.setData(dataObject)
+        //       .subscribe((res: any) => { });
+        //   })
 
       },
       error => this.errorMessage = <any>error
