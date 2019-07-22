@@ -185,47 +185,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       })
     })
   }
-  
-  updateTreeSync(path: string): void{
-    this.pathChanged.emit(this.path);
-    this.fileService.queryDatasets(path).subscribe((res) =>{
-      if(res.datasets.length > 0){
-            let parents: TreeNode[] = [];
-            for(let i:number = 0; i < res.datasets.length; i++){
-              let currentNode:TreeNode = {};
-              currentNode.data = {};
-              currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
-              currentNode.data.id = i;
-              currentNode.data.path = currentNode.label
-              currentNode.data.fileName = currentNode.data.name = currentNode.data.path;
-              currentNode.data.isDataset = true;
-              currentNode.children = [];
-              if(res.datasets[i].members){
-                currentNode.type = 'Folder';
-                currentNode.expanded = false;
-                currentNode.expandedIcon = 'fa fa-folder-open';
-                currentNode.collapsedIcon = 'fa fa-database';
-                currentNode.data.hasChildren = true;
-                //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
-                this.addChildren(currentNode, res.datasets[i].members);
-              } else {
-                currentNode.type = 'nonPDS';
-                currentNode.expanded = false;
-                currentNode.icon = 'fa fa-cube';
-                currentNode.data.hasChildren = false;
-              }
-              parents.push(currentNode);
-            }
-            this.data = parents;
-          } else {
-            //data set probably doesnt exist
-          }
-        }, (err) => {
-          this.errorMessage = <any>err;
-      })
-  }
 
-  addChildren(parentNode: TreeNode, members: Array<any>){
+  addChildren(parentNode: TreeNode, members: Array<any>): void{
     for(let i: number = 0; i < members.length; i++){
       let childNode: TreeNode = {};
       childNode.type = 'nonPDS';
@@ -249,7 +210,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 * [levelUp: function to ascend up a level in the file/folder tree]
 * @param index [tree index where the 'folder' parent is accessed]
 */
-  levelUp(): void {
+  levelUp(): void{
     if(!this.path.includes('.')){
       this.path = '';
     }
