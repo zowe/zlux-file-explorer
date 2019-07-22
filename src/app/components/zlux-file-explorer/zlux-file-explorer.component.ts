@@ -15,13 +15,13 @@ declare var require: any;
 import {
   NgModule, Component,
   Input, Output, ViewChild, ViewEncapsulation,
-  ElementRef, ChangeDetectorRef,/*
-  OnChanges, SimpleChanges, AfterViewChecked, */EventEmitter, OnInit, OnDestroy, /*AfterViewInit,*/ AfterContentInit
+  ElementRef, ChangeDetectorRef,
+  OnChanges, SimpleChanges, AfterViewChecked, EventEmitter, OnInit, OnDestroy, AfterViewInit, AfterContentInit
 } from '@angular/core';
-// import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule,/* MenuItem,*/ MenuModule, DialogModule } from 'primeng/primeng';
+import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
@@ -29,7 +29,7 @@ import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-// import { PersistentDataService } from '../../services/persistentData.service';
+/*import { PersistentDataService } from '../../services/persistentData.service';*/
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowser,
   IFileBrowserMultiSelect,
@@ -64,26 +64,18 @@ export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDe
   private mvsComponent: FileBrowserMVSComponent;
 
   constructor(private fileService: FileService,
-    // private persistentDataService: PersistentDataService,
+    /*private persistentDataService: PersistentDataService,*/
     private utils: UtilsService, private elemRef: ElementRef,
     private cd: ChangeDetectorRef)
   {
     //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
     this.tabs = [{ index: 0, name: "USS" }, { index: 1, name: "Datasets (Beta)" }];
-    // this.tabs = [{ index: 0, name: "USS" }];
-    //  { index: 1, name: "Datasets (Beta)" }];
 
   }
 
   @Input() selectPath: string;
-  @Input() theme: string;
   @Input() style: ZluxFileExplorerStyle = {};
-  @Input() headerStyle: ZluxFileExplorerStyle = {};
-  @Input() inputStyle: ZluxFileExplorerStyle = {};
-  @Input() searchStyle: ZluxFileExplorerStyle = {};
-  @Input() treeStyle: ZluxFileExplorerStyle = {};
-
 
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -96,7 +88,6 @@ export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDe
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
-  
     // var obj = {
     //   "ussInput": "",
     //   "mvsInput": "",
@@ -107,60 +98,6 @@ export class ZluxFileExplorerComponent implements OnInit, AfterContentInit, OnDe
     //   .subscribe((res: any) => { });
   }
 
-ngAfterContentInit(){
-
-  switch(this.theme) { 
-    case 'carbon': { 
-       this.headerStyle =  {
-        'background-color': '#3d70b2',
-        'color': 'white',
-        'width':'99.7%',
-        'text-align':'left',
-        'padding-left': '7px'
-        // 'margin-bottom' : '5px'
-      };
-       this.inputStyle = {
-        'background-color': '#eee', 
-        'color': 'black', 
-        // 'width': '99.5%',
-        'border':'2px solid #3d70b2',
-        'margin-top': '20px'
-      };
-      this.searchStyle = {
-        'min-width': '250px',
-        'display': 'inline-block',
-        'height': '40px',
-        'width':'90%',
-  
-      };
-
-      this.treeStyle = {
-        'color':'#646464'
-      };
-
-      this.style = {
-        'background-color':'#F4F7FB',
-        'margin-top': '10px',
-        'max-height':'320px',
-        'overflow-y': 'scroll'
-        
-        
-      };
-
-       break; 
-    } 
-
-    default: { 
-      // this.headerStyle = {'background-color': '#464646'};
-      this.treeStyle = {'filter': 'brightness(3)'};
-      // this.style = {'background-color': '#464646'};
-
-       
-       break; 
-    } 
- } 
-
-}
   ngOnDestroy() {
     // let dataObject = {mvsData:Array<MvsDataObject>(), ussData:Array<UssDataObject>()};
     // this.persistentDataService.getData()
@@ -179,10 +116,12 @@ ngAfterContentInit(){
   }
 
   hideExplorers() {
-    if (this.ussComponent)
+    if (this.ussComponent) {
       this.ussComponent.hideExplorer = true;
-    if (this.mvsComponent)
+    }
+    if (this.mvsComponent) {
       this.mvsComponent.hideExplorer = true;
+    }
   }
 
   onCopyClick($event:any){
@@ -234,14 +173,16 @@ ngAfterContentInit(){
 
   showDatasets() {
     this.currentIndex = 1;
-    if (this.mvsComponent)
+    if (this.mvsComponent) {
       this.mvsComponent.hideExplorer = false;
+    }
   }
 
   showUss() {
     this.currentIndex = 0;
-    if (this.ussComponent)
+    if (this.ussComponent) {
       this.ussComponent.hideExplorer = false;
+    }
   }
 
   updateDirectory(dirName: string) {

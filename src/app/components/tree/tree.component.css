@@ -9,6 +9,10 @@
   Copyright Contributors to the Zowe Project.
 */
 
+
+
+/* !important tags are used here to prevent other apps to bleed into the FE style */
+
 .fileexplorer-tree-panel {
   flex: 1 1 0px;
   background: transparent;

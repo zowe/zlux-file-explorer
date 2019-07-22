@@ -77,7 +77,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
     private utils: UtilsService, 
-    // private persistentDataService: PersistentDataService,
+    /*private persistentDataService: PersistentDataService,*/
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
@@ -181,6 +181,27 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   getSelectedPath(): string {
     //TODO:how do we want to want to handle caching vs message to app to open said path
     return this.path;
+<<<<<<< HEAD
+=======
+  }
+
+  loadUserHomeDirectory(): void {
+    this.isLoading = true;
+    this.ussSrv.getUserHomeFolder()
+      .subscribe(
+        resp => {
+          if(resp && resp.home){
+            this.path = resp.home.trim();
+            this.displayTree(this.path, true);
+            this.isLoading = false;
+          }
+        },
+        error => {
+          this.isLoading = false;
+          this.errorMessage = <any>error;
+        }
+      );
+>>>>>>> cleanup
   }
 
   initalizeCapabilities() {
@@ -214,11 +235,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void {
-    // if ($event.target) {
-      // if ($event.target.className.includes("ui-treenode-icon")) {
-			// TODO: Add node deflate feature (icon click --> expands/deflates)
-      // }
-    // }
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
     if ($event.node.data === 'Folder') {
@@ -441,9 +457,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             //     this.dataObject = data.contents;
             //     this.dataObject.ussInput = this.path;
             //     this.dataObject.ussData = this.data;
-              //   this.persistentDataService.setData(this.dataObject)
-              //     .subscribe((res: any) => { });
-              // })
+            //   this.persistentDataService.setData(this.dataObject)
+            //     .subscribe((res: any) => { });
+            // })
             
           }
           else
