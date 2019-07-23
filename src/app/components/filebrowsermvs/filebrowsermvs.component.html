@@ -16,7 +16,8 @@
       <input [(ngModel)]="path" placeholder="Enter a dataset..." class="filebrowsermvs-search-input" (change)="updateTreeAsync(path);">
     </div>
     <div [hidden]="hideExplorer" style="height: 100%; overflow-y: scroll;">
-        <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)" [style]="style"
+        <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
+          (dblClickEvent)="onNodeDblClick($event)" [style]="style"
           (contextmenu)="$event.preventDefault(); onRightClick($event);">
         </tree-root>
     </div>
