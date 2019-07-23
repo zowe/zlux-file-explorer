@@ -25,13 +25,13 @@ export class FileService {
 
   constructor(private http: Http){}
 
-    queryDatasets(query:string): Observable<any>  {
+    queryDatasets(query:string, detail?: boolean): Observable<any>  {
         let url:string;
         if (!query.includes('.')){
           url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ) + '*');
         }
         else{
-          url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), undefined, undefined, true);
+          url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), detail.toString(), undefined, true);
         }
         return this.http.get(url)
         .map(res=>res.json())
