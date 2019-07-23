@@ -136,6 +136,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       csiEntryType: queryRes.csiEntryType,
       name: queryRes.name,
     };
+    if(!!queryRes.members){
+      datasetAttrs.members = queryRes.members;
+    }
     if(!!queryRes.volser){
       datasetAttrs.volser = queryRes.volser;
     }
@@ -192,6 +195,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               currentNode.data.hasChildren = false;
             }
             parents.push(currentNode);
+            console.log('current node', currentNode);
           }
           this.data = parents;
         } else {
