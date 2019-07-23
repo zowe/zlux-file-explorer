@@ -16,6 +16,7 @@ import { Observable } from 'rxjs/Observable';
 import { take } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
+import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
 // import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
@@ -40,7 +41,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //componentClass:ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities:Array<Capability>;
-  private clickCount = 0;
   public hideExplorer: boolean;
   path: string;
   rtClickDisplay: boolean;
@@ -64,6 +64,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() dblClickEvent = new EventEmitter<MouseEvent>();
 
   ngOnInit() {
 
@@ -102,38 +103,23 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return this.path;
   }
 
-  /*getCapabilities(): Capability[]
-  {
-    return this.capabilities;
-  }*/
-
-  onNodeClick($event:any):void{
-    //TODO:need to assess the Datasets drill in behavior
-    this.clickCount++;
-    let dblClickTimeout;
-    dblClickTimeout = setTimeout(()=>{
-      if(this.clickCount == 1){
-        if($event.node.type === 'Folder'){
-          $event.node.expanded = !$event.node.expanded;
-          this.nodeClick.emit($event.node);
-        } else {
-          this.nodeClick.emit($event.node);
-        }
-        this.clickCount = 0;
-      } else {
-        this.onNodeDblClick($event, dblClickTimeout);
-      }
-    }, 250)
+  onNodeClick($event: any): void{
+    if($event.node.data.hasChildren){
+      $event.node.expanded = !$event.node.expanded;
+      this.nodeClick.emit($event.node);
+    } else {
+      this.nodeClick.emit($event.node);
+    }
   }
-
-  onNodeDblClick($event: any, timeout): void{
-    this.clickCount = 0;
-    clearTimeout(timeout);
-    if($event.node.type === 'Folder' && $event.node.children){
+    
+  onNodeDblClick($event: any): void{
+    if($event.node.data.hasChildren && $event.node.children.length > 0){
       this.path = $event.node.data.path;
       this.updateTreeAsync($event.node.data.path).then((res) => {
         this.data = res[0].children;
       });
+    } else {
+      this.dblClickEvent.emit($event.node);
     }
   }
 
@@ -145,22 +131,55 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
   }
 
+  populateDatasetAttrs(queryRes: DatasetAttributes): DatasetAttributes{
+    let datasetAttrs: DatasetAttributes = {
+      csiEntryType: queryRes.csiEntryType,
+      name: queryRes.name,
+    };
+    if(!!queryRes.volser){
+      datasetAttrs.volser = queryRes.volser;
+    }
+    if(!!queryRes.dsorg){
+      let dsorg: DatasetOrganization = {
+        maxRecordLen: queryRes.dsorg.maxRecordLen,
+        organization: queryRes.dsorg.organization,
+        totalBlockSize: queryRes.dsorg.totalBlockSize
+      };
+      datasetAttrs.dsorg = dsorg;
+    }
+    if(!!queryRes.recfm){
+      let recfm: RecordFormat = {
+        carriageControl: queryRes.recfm.carriageControl,
+        isBlocked: queryRes.recfm.isBlocked,
+        recordLength: queryRes.recfm.recordLength
+      };
+      datasetAttrs.recfm = recfm;
+    }
+    return datasetAttrs;
+  }
+
   updateTreeAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.fileService.queryDatasets(path).pipe(take(1)).subscribe((res) => {
+      this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
         if(res.datasets.length > 0){
           for(let i:number = 0; i < res.datasets.length; i++){
             let currentNode:TreeNode = {};
-            currentNode.data = {};
-            currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
-            currentNode.data.id = i;
-            currentNode.data.path = currentNode.label
-            currentNode.data.fileName = currentNode.data.name = currentNode.data.path;
-            currentNode.data.isDataset = true;
             currentNode.children = [];
-            if(res.datasets[i].members){
-              currentNode.type = 'Folder';
+            currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
+            let currentNodeData: ProjectStructure = {
+              id: String(i),
+              name: currentNode.label,
+              fileName: currentNode.label,
+              path: currentNode.label,
+              hasChildren: null,
+              isDataset: true,
+              datasetAttrs: this.populateDatasetAttrs((res.datasets[i] as DatasetAttributes))
+            };
+            currentNode.data = currentNodeData;
+            if(currentNode.data.datasetAttrs.dsorg
+              && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'
+              && res.datasets[i].members){
               currentNode.expanded = false;
               currentNode.expandedIcon = 'fa fa-folder-open';
               currentNode.collapsedIcon = 'fa fa-database';
@@ -168,7 +187,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
               this.addChildren(currentNode, res.datasets[i].members);
             } else {
-              currentNode.type = 'nonPDS';
               currentNode.expanded = false;
               currentNode.icon = 'fa fa-cube';
               currentNode.data.hasChildren = false;
@@ -189,7 +207,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   addChildren(parentNode: TreeNode, members: Array<any>): void{
     for(let i: number = 0; i < members.length; i++){
       let childNode: TreeNode = {};
-      childNode.type = 'nonPDS';
       childNode.icon = 'fa fa-cube';
       childNode.label = members[i].name.replace(/^\s+|\s+$/, '');
       childNode.parent = parentNode;
@@ -223,6 +240,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.updateTreeAsync(this.path);
   }
 }
+
+
 
 
 /*
