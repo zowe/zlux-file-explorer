@@ -62,6 +62,7 @@
 
 .ui-treenode-icon {
   padding-right: 3px;
+  display: inline;
 }
 
 .ui-tree-empty-message {
@@ -71,6 +72,10 @@
 .ui-tree .ui-treenode-children {
   margin: 0;
   padding: 0 0 0 1em;
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0,0,0,0);
 }
 
 
