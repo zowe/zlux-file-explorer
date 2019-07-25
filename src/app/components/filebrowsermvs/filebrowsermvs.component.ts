@@ -220,7 +220,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         isDataset: true,
       }
       childNodeData.path = childNodeData.fileName = `${parentNode.label}(${childNode.label})`;
-      childNode.data = childNodeData;
+      childNode.data = (childNodeData as ProjectStructure);
       parentNode.children.push(childNode);
     }
   }
