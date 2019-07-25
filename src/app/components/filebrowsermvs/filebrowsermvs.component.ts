@@ -207,7 +207,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   addChildren(parentNode: TreeNode, members: Array<any>): void{
     for(let i: number = 0; i < members.length; i++){
       let childNode: TreeNode = {};
-      childNode.icon = 'fa fa-cube';
+      childNode.icon = 'fa fa-file';
       childNode.label = members[i].name.replace(/^\s+|\s+$/, '');
       childNode.parent = parentNode;
       let childNodeData: ProjectStructure = {
