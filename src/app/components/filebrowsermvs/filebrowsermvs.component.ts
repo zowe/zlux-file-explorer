@@ -113,10 +113,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNodeClick($event: any): void{
     if($event.node.data.hasChildren){
       $event.node.expanded = !$event.node.expanded;
-      this.nodeClick.emit($event.node);
-    } else {
-      this.nodeClick.emit($event.node);
     }
+    this.nodeClick.emit($event.node);
   }
     
   onNodeDblClick($event: any): void{
@@ -125,9 +123,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.updateTreeAsync($event.node.data.path).then((res) => {
         this.data = res[0].children;
       });
-    } else {
-      this.dblClickEvent.emit($event.node);
     }
+    this.dblClickEvent.emit($event.node);
   }
 
   onRightClick($event:any):void{
