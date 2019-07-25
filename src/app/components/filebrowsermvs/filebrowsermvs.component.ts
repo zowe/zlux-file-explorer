@@ -181,17 +181,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
             };
             currentNode.data = currentNodeData;
             if(currentNode.data.datasetAttrs.dsorg
-              && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'
-              && res.datasets[i].members){
+                && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'
+                && res.datasets[i].members){
               currentNode.expanded = false;
               currentNode.expandedIcon = 'fa fa-folder-open';
-              currentNode.collapsedIcon = 'fa fa-database';
+              currentNode.collapsedIcon = 'fa fa-folder';
               currentNode.data.hasChildren = true;
               //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
               this.addChildren(currentNode, res.datasets[i].members);
             } else {
               currentNode.expanded = false;
-              currentNode.icon = 'fa fa-cube';
+              currentNode.icon = 'fa fa-file';
               currentNode.data.hasChildren = false;
             }
             parents.push(currentNode);
