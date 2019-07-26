@@ -43,6 +43,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //capabilities:Array<Capability>;
   public hideExplorer: boolean;
   path: string;
+  lastPath: string;
   rtClickDisplay: boolean;
   errorMessage: String;
   intervalId: any;
@@ -59,6 +60,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
     this.path = "";
+    this.lastPath = "";
     this.rtClickDisplay = false;
     this.hideExplorer = false;
   }
@@ -66,10 +68,35 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
-    // TODO: keep expanded folders open when updating periodically
-    // setInterval(() => {
-    //   this.updateTreeAsync(this.path);
-    // }, this.updateInterval); //5 minute interval
+    this.intervalId = setInterval(() => {
+      if(this.data){
+        this.getTreeForQueryAsync(this.lastPath).then((res: TreeNode[]) => {
+          let newData = res;
+          //Only update if data sets are added/removed
+          if(this.data.length != newData.length){
+            let expandedFolders = this.data.filter(dataObj => dataObj.expanded);
+            //checks if the query response contains the same PDS' that are currently expanded
+            let newDataHasExpanded = newData.filter(dataObj => expandedFolders.some(expanded => expanded.label === dataObj.label));
+            //Keep currently expanded datasets expanded after update
+            if(newDataHasExpanded.length > 0){
+              let expandedNewData = newData.map((obj) => {
+                let retObj = {};
+                newDataHasExpanded.forEach((expandedObj) => {
+                  if(obj.label == expandedObj.label){
+                    obj.expanded = true;
+                  }
+                  retObj = obj;
+                })
+                return retObj;
+              })
+              this.data = expandedNewData;
+            } else {
+              this.data = newData;
+            }
+          }
+        });
+      }
+    }, this.updateInterval);
   }
 
   ngOnDestroy(){
@@ -107,7 +134,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNodeDblClick($event: any): void{
     if($event.node.data.hasChildren && $event.node.children.length > 0){
       this.path = $event.node.data.path;
-      this.updateTreeAsync($event.node.data.path).then((res) => {
+      this.getTreeForQueryAsync($event.node.data.path).then((res) => {
         this.data = res[0].children;
       });
     }
@@ -141,10 +168,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return datasetAttrs;
   }
 
-  updateTreeAsync(path: string): Promise<any> {
+  updateTreeView(path: string): void {
+    this.getTreeForQueryAsync(path).then((res) => {
+      this.data = res;
+    });
+  }
+
+  getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
+        this.lastPath = path;
         if(res.datasets.length > 0){
           for(let i:number = 0; i < res.datasets.length; i++){
             let currentNode:TreeNode = {};
@@ -161,8 +195,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               datasetAttrs: this.populateDatasetAttrs((res.datasets[i] as DatasetAttributes))
             };
             currentNode.data = currentNodeData;
+            let migrated: boolean = (currentNode.data.datasetAttrs.volser
+              && (currentNode.data.datasetAttrs.volser == 'MIGRAT'
+              || currentNode.data.datasetAttrs.volser == 'ARCIVE'));
             if(currentNode.data.datasetAttrs.dsorg
                 && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'){
+              if(migrated) currentNode.styleClass = 'ui-treenode-label-italic';
               currentNode.type = 'folder';
               currentNode.expanded = false;
               currentNode.expandedIcon = 'fa fa-folder-open';
@@ -172,18 +210,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
                 this.addChildren(currentNode, res.datasets[i].members);
               }
             } else {
+              if(migrated) currentNode.styleClass = 'ui-treenode-label-italic';
               currentNode.type = 'file';
-              if(currentNode.data.datasetAttrs.volser
-                  && (currentNode.data.datasetAttrs.volser == 'MIGRAT'
-                  || currentNode.data.datasetAttrs.volser == 'ARCHIV')){
-                currentNode.icon = 'fa fa-file-archive-o';
-              } else {
-                currentNode.icon = 'fa fa-file';
-              }
+              currentNode.icon = 'fa fa-file';
             }
             parents.push(currentNode);
           }
-          this.data = parents;
         } else {
           //data set probably doesnt exist
         }
@@ -228,7 +260,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     } else {
       this.path = this.path.replace(regex, '.*')
     }
-    this.updateTreeAsync(this.path);
+    this.updateTreeView(this.path);
   }
 }
 
