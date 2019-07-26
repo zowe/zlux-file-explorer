@@ -16,9 +16,11 @@
     "@angular/http": "~6.0.9",
     "@angular/platform-browser": "~6.0.9",
     "@angular/router": "~6.0.9",
+    "@fortawesome/angular-fontawesome": "~0.2.1",
+    "@fortawesome/fontawesome-svg-core": "~1.2.19",
+    "@fortawesome/free-solid-svg-icons": "~5.9.0",
     "carbon-components": "~8.23.0",
-    "primeng": "~6.0.1",
-    "@fortawesome/fontawesome-free": "~5.9.0"
+    "primeng": "~6.0.1"
   },
   "devDependencies": {
     "angular2-template-loader": "~0.6.2",
