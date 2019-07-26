@@ -22,7 +22,6 @@ import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
-import { faFolder, faFolderOpen, faFile, faFileArchive} from '@fortawesome/fontawesome-free-solid';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -177,7 +176,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               if(currentNode.data.datasetAttrs.volser
                   && (currentNode.data.datasetAttrs.volser == 'MIGRAT'
                   || currentNode.data.datasetAttrs.volser == 'ARCHIV')){
-                currentNode.icon = 'fa fa-file-archive';
+                currentNode.icon = 'fa fa-file-archive-o';
               } else {
                 currentNode.icon = 'fa fa-file';
               }
