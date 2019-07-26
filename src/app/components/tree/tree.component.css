@@ -64,6 +64,11 @@
   padding-left: 3px;
 }
 
+.ui-treenode-label-italic {
+  padding-left: 3px;
+  font-style: italic;
+}
+
 .ui-treenode-icon {
   padding-right: 3px;
   display: inline;
