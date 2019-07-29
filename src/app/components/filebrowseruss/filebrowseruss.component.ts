@@ -90,7 +90,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.path = this.root;
     this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
-    this.isLoading = false;
+    // this.isLoading = false;
+    fontawesome.library.add(faFolder);
+    fontawesome.library.add(faFolderOpen);
+    fontawesome.library.add(faFile);
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -100,6 +103,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
 
+  @Input() inputStyle: any;
+  @Input() searchStyle: any;
+  @Input() treeStyle: any;
   @Input() style: any;
   @Input()
   set fileEdits(input: any) {
@@ -116,14 +122,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   ngOnInit() {
-<<<<<<< HEAD
-    this.loadUserHomeDirectory();
-=======
     // this.loadUserHomeDirectory();
 
 
     
->>>>>>> Removed unecessary ngStyle, added scrollbar, comment
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
@@ -133,21 +135,28 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //     else
     //     this.displayTree(this.root, false);
     //   })
-<<<<<<< HEAD
-      // this.intervalId = setInterval(() => {
-      //   this.updateUss(this.path);
-      // }, this.timeVar);
-=======
     //   this.intervalId = setInterval(() => {
     //     this.updateUss(this.path);
     //   }, this.timeVar);
->>>>>>> Removed unecessary ngStyle, added scrollbar, comment
   }
 
   ngOnDestroy() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  }
+
+  browsePath(path: string): void {
+    this.path = path;
+  }
+
+  getDOMElement(): HTMLElement {
+    return this.elementRef.nativeElement;
+  }
+
+  getSelectedPath(): string {
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this.path;
   }
 
   loadUserHomeDirectory(): void {
@@ -178,46 +187,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rtClickDisplay = false;
   }
 
-  getSelectedPath(): string {
-    //TODO:how do we want to want to handle caching vs message to app to open said path
-    return this.path;
-<<<<<<< HEAD
-=======
-  }
-
-  loadUserHomeDirectory(): void {
-    this.isLoading = true;
-    this.ussSrv.getUserHomeFolder()
-      .subscribe(
-        resp => {
-          if(resp && resp.home){
-            this.path = resp.home.trim();
-            this.displayTree(this.path, true);
-            this.isLoading = false;
-          }
-        },
-        error => {
-          this.isLoading = false;
-          this.errorMessage = <any>error;
-        }
-      );
->>>>>>> cleanup
-  }
-
-  initalizeCapabilities() {
-  //   //this.capabilities = new Array<Capability>();
-  //   //this.capabilities.push(FileBrowserCapabilities.FileBrowser);
-  //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
-  }
-
-  onNewFileClick($event: any): void {
-    this.newFileClick.emit($event);
-  }
-
-  onNewFolderClick($event: any): void {
-    this.newFolderClick.emit($event);
-  }
-
   onCopyClick($event: any): void {
     this.copyClick.emit($event);
   }
@@ -233,10 +202,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNewFolderClick($event: any): void {
     this.newFolderClick.emit($event);
   }
-
+  
   onNodeClick($event: any): void {
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
+
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
       this.nodeClick.emit($event.node);
@@ -433,7 +403,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
           }
           $event.node.children = tempChildren;
-          $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
+          $event.node.expandedIcon = "fas fa-folder-open"; $event.node.collapsedIcon = "fas fa-folder";
           this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
           while ($event.node.parent !== undefined) {
