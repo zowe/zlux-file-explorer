@@ -11,7 +11,7 @@
 
 
 
-/* !important tags are used here to prevent other apps to bleed into the FE style */
+/* !important tags are used here to prevent other apps from bleeding into the FE style */
 
 .fileexplorer-tree-panel {
   flex: 1 1 0px;
