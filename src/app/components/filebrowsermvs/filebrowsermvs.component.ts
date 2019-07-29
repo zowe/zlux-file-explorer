@@ -148,26 +148,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
   }
 
-  populateDatasetAttrs(queryRes: DatasetAttributes): DatasetAttributes{
-    let datasetAttrs: DatasetAttributes = {
-      csiEntryType: queryRes.csiEntryType,
-      name: queryRes.name,
-    };
-    if(!!queryRes.members){
-      datasetAttrs.members = queryRes.members;
-    }
-    if(!!queryRes.volser){
-      datasetAttrs.volser = queryRes.volser;
-    }
-    if(!!queryRes.dsorg){
-      datasetAttrs.dsorg = (queryRes.dsorg as DatasetOrganization);
-    }
-    if(!!queryRes.recfm){
-      datasetAttrs.recfm = (queryRes.recfm as RecordFormat);
-    }
-    return datasetAttrs;
-  }
-
   updateTreeView(path: string): void {
     this.getTreeForQueryAsync(path).then((res) => {
       this.data = res;
@@ -185,6 +165,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
             currentNode.children = [];
             currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
             //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
+            let resAttr = res.datasets[i];
             let currentNodeData: ProjectStructure = {
               id: String(i),
               name: currentNode.label,
@@ -192,7 +173,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               path: currentNode.label,
               hasChildren: false,
               isDataset: true,
-              datasetAttrs: this.populateDatasetAttrs((res.datasets[i] as DatasetAttributes))
+              datasetAttrs: ({
+                csiEntryType: resAttr.csiEntryType,
+                dsorg: resAttr.dsorg,
+                recfm: resAttr.recfm,
+                volser: resAttr.volser
+              } as DatasetAttributes)
             };
             currentNode.data = currentNodeData;
             let migrated: boolean = (currentNode.data.datasetAttrs.volser
@@ -238,6 +224,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         name: childNode.label,
         hasChildren: false,
         isDataset: true,
+        datasetAttrs: parentNode.data.datasetAttrs
       }
       childNodeData.path = childNodeData.fileName = `${parentNode.label}(${childNode.label})`;
       childNode.data = (childNodeData as ProjectStructure);

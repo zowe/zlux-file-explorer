@@ -27,11 +27,9 @@ export interface ProjectStructure {
 
 export interface DatasetAttributes {
   csiEntryType: string,
-  name: string,
-  dsorg?: DatasetOrganization,
-  members?: Array<any>,
-  recfm?: RecordFormat,
-  volser?: string
+  dsorg: DatasetOrganization,
+  recfm: RecordFormat,
+  volser: string
 }
 
 export interface RecordFormat {
