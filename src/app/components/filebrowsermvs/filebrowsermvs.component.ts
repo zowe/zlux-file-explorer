@@ -18,7 +18,7 @@ import { take } from 'rxjs/operators';
 import { FileService } from '../../services/file.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
-// import { PersistentDataService } from '../../services/persistentData.service';
+import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
@@ -35,7 +35,7 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService/*, PersistentDataService*/]
+  providers: [FileService, PersistentDataService]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
@@ -55,7 +55,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   constructor(private fileService: FileService, 
     private elementRef:ElementRef, 
-    // private persistentDataService: PersistentDataService,
+    private persistentDataService: PersistentDataService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
@@ -64,6 +64,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rtClickDisplay = false;
     this.hideExplorer = false;
   }
+  @Input() inputStyle: any;
+  @Input() searchStyle: any;
+  @Input() treeStyle: any;
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();

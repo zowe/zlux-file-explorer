@@ -29,6 +29,14 @@ import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
+import fontawesome from '@fortawesome/fontawesome';
+import faFolder from '@fortawesome/fontawesome-free-solid';
+import faFolderOpen from '@fortawesome/fontawesome-free-solid';
+import faFile from '@fortawesome/fontawesome-free-solid';
+
+
+
+
 
 @Component({
   selector: 'file-browser-uss',
@@ -82,7 +90,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.path = this.root;
     this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
-    this.isLoading = false;
+    // this.isLoading = false;
+    fontawesome.library.add(faFolder);
+    fontawesome.library.add(faFolderOpen);
+    fontawesome.library.add(faFile);
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -92,6 +103,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
 
+  @Input() inputStyle: any;
+  @Input() searchStyle: any;
+  @Input() treeStyle: any;
   @Input() style: any;
   @Input()
   set fileEdits(input: any) {
@@ -108,7 +122,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   ngOnInit() {
-    this.loadUserHomeDirectory();
+    // this.loadUserHomeDirectory();
+
+
+    
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
@@ -118,15 +135,28 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //     else
     //     this.displayTree(this.root, false);
     //   })
-      // this.intervalId = setInterval(() => {
-      //   this.updateUss(this.path);
-      // }, this.timeVar);
+    //   this.intervalId = setInterval(() => {
+    //     this.updateUss(this.path);
+    //   }, this.timeVar);
   }
 
   ngOnDestroy() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  }
+
+  browsePath(path: string): void {
+    this.path = path;
+  }
+
+  getDOMElement(): HTMLElement {
+    return this.elementRef.nativeElement;
+  }
+
+  getSelectedPath(): string {
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this.path;
   }
 
   loadUserHomeDirectory(): void {
@@ -145,19 +175,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.errorMessage = <any>error;
         }
       );
-  }
-
-  browsePath(path: string): void {
-    this.path = path;
-  }
-
-  getDOMElement(): HTMLElement {
-    return this.elementRef.nativeElement;
-  }
-
-  getSelectedPath(): string {
-    //TODO:how do we want to want to handle caching vs message to app to open said path
-    return this.path;
   }
 
   initalizeCapabilities() {
@@ -185,7 +202,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNewFolderClick($event: any): void {
     this.newFolderClick.emit($event);
   }
-
+  
   onNodeClick($event: any): void {
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
@@ -238,7 +255,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     if (path === undefined || path == '') {
       path = this.root; 
     }
-    this.isLoading = true;
+    // this.isLoading = true;
     this.ussData = this.ussSrv.getFile(path); 
     this.ussData.subscribe(
     files => {
@@ -248,19 +265,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         if (files.entries[i].directory) {
           files.entries[i].children = [];
           files.entries[i].data = "Folder";
-          files.entries[i].collapsedIcon = "fa fa-folder";
-          files.entries[i].expandedIcon = "fa fa-folder-open";
+          files.entries[i].collapsedIcon = "fas fa-folder";
+          files.entries[i].expandedIcon = "fas fa-folder-open";
         }
         else {
           files.entries[i].items = {};
-          files.entries[i].icon = "fa fa-file";
+          files.entries[i].icon = "fas fa-file";
           files.entries[i].data = "File";
         }
         files.entries[i].label = files.entries[i].name;
         files.entries[i].id = i;
         tempChildren.push(files.entries[i]);
       }
-      this.isLoading = false;
+      // this.isLoading = false;
       if (update == true) {//Tree is displayed to update existing opened nodes, while maintaining currently opened trees 
 
         let indexArray: number[];
@@ -329,7 +346,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       //       })
         },
         error => {
-          this.isLoading = false;
+          // this.isLoading = false;
           this.errorMessage = <any>error;
         }
       );
@@ -372,12 +389,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             if (files.entries[i].directory) {
               files.entries[i].children = [];
               files.entries[i].data = "Folder";
-              files.entries[i].collapsedIcon = "fa fa-folder";
-              files.entries[i].expandedIcon = "fa fa-folder-open";
+              files.entries[i].collapsedIcon = "fas fa-folder";
+              files.entries[i].expandedIcon = "fas fa-folder-open";
             }
             else {
               files.entries[i].items = {};
-              files.entries[i].icon = "fa fa-file";
+              files.entries[i].icon = "fas fa-file";
               files.entries[i].data = "File";
             }
             files.entries[i].label = files.entries[i].name;
@@ -386,14 +403,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
           }
           $event.node.children = tempChildren;
-          $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
+          $event.node.expandedIcon = "fas fa-folder-open"; $event.node.collapsedIcon = "fas fa-folder";
           this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
           while ($event.node.parent !== undefined) {
             let newChild = $event.node.parent;
             newChild.children[$event.node.id] = $event.node;
             newChild.expanded = true;
-            newChild.expandedIcon = "fa fa-folder-open"; newChild.collapsedIcon = "fa fa-folder";
+            newChild.expandedIcon = "fas fa-folder-open"; newChild.collapsedIcon = "fas fa-folder";
             $event.node = newChild;
           }
 
@@ -410,9 +427,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             //     this.dataObject = data.contents;
             //     this.dataObject.ussInput = this.path;
             //     this.dataObject.ussData = this.data;
-            //     this.persistentDataService.setData(this.dataObject)
-            //       .subscribe((res: any) => { });
-            //   })
+            //   this.persistentDataService.setData(this.dataObject)
+            //     .subscribe((res: any) => { });
+            // })
             
           }
           else
