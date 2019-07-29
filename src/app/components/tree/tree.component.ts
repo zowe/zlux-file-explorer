@@ -39,6 +39,7 @@ import { FileNode } from '../../structures/file-node';
 export class TreeComponent implements AfterContentInit, OnDestroy {
   @Input() treeData: TreeNode;
   @Input() style: any;
+  @Input() treeStyle: any;
   @Output() clickEvent = new EventEmitter<childEvent>();
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();

@@ -77,6 +77,10 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 
   @Input() selectPath: string;
   @Input() style: ZluxFileExplorerStyle = {};
+  @Input() headerStyle: ZluxFileExplorerStyle = {};
+  @Input() inputStyle: ZluxFileExplorerStyle = {};
+  @Input() searchStyle: ZluxFileExplorerStyle = {};
+  @Input() treeStyle: ZluxFileExplorerStyle = {};
 
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -98,6 +102,54 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     // }
     // this.persistentDataService.setData(obj)
     //   .subscribe((res: any) => { });
+    switch(this.theme) { 
+      case 'carbon': { 
+         this.headerStyle =  {
+          'background-color': '#3d70b2',
+          'color': 'white',
+          'width':'99.7%',
+          'text-align':'left',
+          'padding-left': '7px'
+        };
+         this.inputStyle = {
+          'background-color': '#eee', 
+          'color': 'black', 
+          'border':'2px solid #3d70b2',
+          'margin-top': '20px'
+        };
+        this.searchStyle = {
+          'min-width': '250px',
+          'display': 'inline-block',
+          'height': '40px',
+          'width':'90%',
+    
+        };
+  
+        this.treeStyle = {
+          'color':'#646464'
+        };
+  
+        this.style = {
+          'background-color':'#F4F7FB',
+          'margin-top': '10px',
+          'max-height':'320px',
+          'overflow-y': 'scroll'
+          
+          
+        };
+  
+         break; 
+      } 
+  
+      default: { 
+        // this.headerStyle = {'background-color': '#464646'};
+        this.treeStyle = {'filter': 'brightness(3)'};
+        // this.style = {'background-color': '#464646'};
+  
+         
+         break; 
+      } 
+   } 
   }
 
   ngOnDestroy() {

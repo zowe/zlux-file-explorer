@@ -10,30 +10,20 @@
 -->
 
 <div style="height: 100%;">
-
-    <!-- Tabs, searchbar, and loading indicator -->
-    <img src="../../../assets/explorer-uparrow.png" 
-      data-toggle="tooltip" title="Go up to the parent level" (click)="levelUp()" 
-      style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
-    <div class="filebrowseruss-search">
-      <input #fileExplorerUSSInput [(ngModel)]="path" list="searchUSSHistory" placeholder="Enter an absolute path..." class="filebrowseruss-search-input"
-        (keydown.enter)="displayTree(path, false); onPathChanged(path);" [disabled]="isLoading" (ngModelChange)="checkPathSlash($event)">
-      <!-- TODO: make search history a directive to use in both uss and mvs-->
-      <datalist id="searchUSSHistory">
-        <option *ngFor="let item of ussSearchHistory.searchHistoryVal" [value]="item"></option>
-      </datalist>
+    <img src="../../../assets/explorer-uparrow.png" (click)="levelUp()" style="width: 20px; height: 20px; cursor: pointer;"  [ngStyle]="treeStyle">
+    <!-- <svg width="14" height="16" viewBox="0 0 14 16" fill-rule="evenodd" (click)="levelUp()"><path d="M6 3.4V16h2V3.4l4.7 4.9L14 7 7 0 0 7l1.3 1.3z"></path></svg> -->
+    <div class="filebrowseruss-search" [ngStyle] = "searchStyle">
+        <input [(ngModel)]="path" placeholder="Enter a directory..." class="filebrowseruss-search-input" [ngStyle] = "inputStyle" (change)="displayTree(path, false)" [disabled]="isLoading">
     </div>
     <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading" style="margin-left: 9px;"></div>
 
     <!-- Main tree -->
     <div (click)="onClick($event);" [hidden]="hideExplorer" style="height: 100%;">
-      <tree-root [treeData]="data" 
-        (clickEvent)="onNodeClick($event)"
-        (dblClickEvent)="onNodeDblClick($event)" 
-        [style]="style"
-        (rightClickEvent)="onNodeRightClick($event)"
-        (panelRightClickEvent)="onPanelRightClick($event)"
-      ></tree-root>
+            <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
+            (dblClickEvent)="onNodeDblClick($event)" [ngStyle]="treeStyle"
+            (contextmenu)="$event.preventDefault(); onRightClick($event);" 
+            ></tree-root>
+        </div>
     </div>
 </div>
 
