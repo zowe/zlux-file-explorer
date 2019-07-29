@@ -475,7 +475,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       //       })
         },
         error => {
-          // this.isLoading = false;
+          this.isLoading = false;
           this.errorMessage = <any>error;
         }
       );
