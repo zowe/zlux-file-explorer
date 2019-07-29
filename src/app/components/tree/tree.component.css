@@ -56,8 +56,13 @@
   cursor: pointer;
 }
 
+.ui-treenode-content{
+  display: table;
+}
+
 .ui-treenode-label {
   padding-left: 3px;
+  display: table-cell;
 }
 
 .ui-treenode-label-italic {
@@ -66,7 +71,7 @@
 
 .ui-treenode-icon {
   padding-right: 3px;
-  display: inline;
+  display: table-cell;
 }
 
 .ui-tree-empty-message {
