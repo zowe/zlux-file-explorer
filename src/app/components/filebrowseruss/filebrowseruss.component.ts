@@ -14,7 +14,7 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject
 } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -131,8 +131,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   loadUserHomeDirectory(): void {
     this.isLoading = true;
-    this.ussSrv.getUserHomeFolder()
-      .subscribe(
+    const observable: Observable<any> = this.ussSrv.getUserHomeFolder()
+    const subscription: Subscription = observable.subscribe(
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
@@ -145,6 +145,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.errorMessage = <any>error;
         }
       );
+    setTimeout(() => {
+      this.isLoading = false;
+      subscription.unsubscribe();
+    }, 2000);
   }
 
   browsePath(path: string): void {
