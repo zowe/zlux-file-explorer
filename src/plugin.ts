@@ -1,5 +1,4 @@
 
-
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
@@ -10,21 +9,8 @@
   Copyright Contributors to the Zowe Project.
 */
 
-.filebrowseruss-search {
-  width: 80%;
-  margin-left: 10px;
-  display: inline-block;
-  margin-left: 10px;
-  height: 40px;
-}
+export { ZluxFileExplorerModule as FileExplorerModule, ZluxFileExplorerComponent as FileExplorerComponent  } from './app/components/zlux-file-explorer/zlux-file-explorer.component';
 
-.filebrowseruss-search-input{
-  width: 80%;
-  min-height: 30px;
-  font-family: monospace;
-  font-size: 15px;
-  height: 35px;
-}
 
 /*
   This program and the accompanying materials are

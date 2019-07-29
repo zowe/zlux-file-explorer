@@ -11,9 +11,9 @@
 
 declare var require:any;
 import { Component, Input, Output, EventEmitter, ViewEncapsulation} from '@angular/core';
-import {TreeNode} from 'primeng/primeng';
-import {childEvent} from '../../structures/child-event';
-import {FileNode} from '../../structures/file-node';
+import { TreeNode } from 'primeng/primeng';
+import { childEvent } from '../../structures/child-event';
+import { FileNode } from '../../structures/file-node';
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -38,9 +38,15 @@ import {FileNode} from '../../structures/file-node';
  */
 export class TreeComponent {
   @Input() treeData: TreeNode;
+  @Input() style: any;
   @Output() clickEvent = new EventEmitter<childEvent>();
+  @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
-  constructor() {}
+  lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
+  lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
+  constructor() {
+    this.lastClickedNodeName = null;
+  }
 
 /**
  * [nodeSelect provides the child folder click event to the parent file/folder tree tab]
@@ -48,9 +54,14 @@ export class TreeComponent {
  * @return        [void]
  */
   nodeSelect(_event?: any) {
-    console.log("entered nodeSelect")
     if (_event){
-        this.clickEvent.emit(_event);
+      if (this.lastClickedNodeName == null || this.lastClickedNodeName != (_event.node.name || _event.node.data.name)) {
+        this.lastClickedNodeName = _event.node.name || _event.node.data.name;
+        this.clickEvent.emit(_event); 
+        setTimeout( () => (this.lastClickedNodeName = null), this.lastClickedNodeTimeout);
+      } else {
+        this.dblClickEvent.emit(_event);
+      }
     }
   }
 
