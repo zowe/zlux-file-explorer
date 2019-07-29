@@ -38,6 +38,7 @@
   ></file-browser-uss>
   <file-browser-mvs #mvsComponent
     [hidden]="currentIndex != 1"
+    (nodeClick)="onNodeClick($event)"
     (pathChanged)="onPathChanged($event)"
     [inputStyle]="inputStyle"
     [treeStyle]="treeStyle"

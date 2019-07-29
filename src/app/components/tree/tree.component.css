@@ -67,8 +67,18 @@
   padding-left: 3px !important;
 }
 
+.ui-treenode-label-italic {
+  padding-left: 3px;
+  font-style: italic;
+}
+
 .ui-treenode-icon {
+<<<<<<< HEAD
   padding-right: 3px !important;
+=======
+  padding-right: 3px;
+  display: inline;
+>>>>>>> 2806fb9092a6b0cc547a51f5752ac24f7174c3c2
 }
 
 .ui-tree-empty-message {
@@ -78,6 +88,10 @@
 .ui-tree .ui-treenode-children {
   margin: 0 !important;
   padding: 0 0 0 1em !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0,0,0,0);
 }
 
 
