@@ -72,6 +72,11 @@
   font-style: italic;
 }
 
+.ui-treenode-label-italic {
+  padding-left: 3px;
+  font-style: italic;
+}
+
 .ui-treenode-icon {
   padding-right: 3px;
   display: inline;
@@ -84,6 +89,10 @@
 .ui-tree .ui-treenode-children {
   margin: 0 !important;
   padding: 0 0 0 1em !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0,0,0,0);
 }
 
 ::-webkit-scrollbar-corner {
