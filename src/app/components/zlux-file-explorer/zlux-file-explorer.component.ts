@@ -81,6 +81,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @Input() inputStyle: ZluxFileExplorerStyle = {};
   @Input() searchStyle: ZluxFileExplorerStyle = {};
   @Input() treeStyle: ZluxFileExplorerStyle = {};
+  @Input() theme: any;
 
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
