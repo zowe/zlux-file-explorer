@@ -73,12 +73,8 @@
 }
 
 .ui-treenode-icon {
-<<<<<<< HEAD
-  padding-right: 3px !important;
-=======
   padding-right: 3px;
   display: inline;
->>>>>>> 2806fb9092a6b0cc547a51f5752ac24f7174c3c2
 }
 
 .ui-tree-empty-message {
