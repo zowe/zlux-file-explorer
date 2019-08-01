@@ -142,7 +142,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   
       default: { 
         // this.headerStyle = {'background-color': '#464646'};
-        this.treeStyle = {'filter': 'brightness(3)'};
+        this.treeStyle = {'filter': 'brightness(3)', 'color':'white'};
         // this.style = {'background-color': '#464646'};
   
          
