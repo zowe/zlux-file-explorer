@@ -1,12 +1,31 @@
 {
-  "name": "@zlux/file-explorer",
-  "version": "0.0.2",
-  "scripts": {
-    "start": "webpack --progress --colors --watch",
-    "build": "webpack --progress --colors",
-    "lint": "ng lint"
+  "_from": "git+ssh://git@github.com/zowe/zlux-file-explorer.git#src-for-widgets",
+  "_id": "@zlux/file-explorer@0.0.2",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/@zlux/file-explorer",
+  "_phantomChildren": {
+    "lodash.debounce": "4.0.8",
+    "warning": "3.0.0"
   },
-  "license": "EPL-2.0",
+  "_requested": {
+    "type": "git",
+    "raw": "@zlux/file-explorer@git+ssh://git@github.com/zowe/zlux-file-explorer.git#src-for-widgets",
+    "name": "@zlux/file-explorer",
+    "escapedName": "@zlux%2ffile-explorer",
+    "scope": "@zlux",
+    "rawSpec": "git+ssh://git@github.com/zowe/zlux-file-explorer.git#src-for-widgets",
+    "saveSpec": "git+ssh://git@github.com/zowe/zlux-file-explorer.git#src-for-widgets",
+    "fetchSpec": "ssh://git@github.com/zowe/zlux-file-explorer.git",
+    "gitCommittish": "src-for-widgets"
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "git+ssh://git@github.com/zowe/zlux-file-explorer.git#feecf361e5a2a656495e15611cc9d75f41cafb71",
+  "_spec": "@zlux/file-explorer@git+ssh://git@github.com/zowe/zlux-file-explorer.git#src-for-widgets",
+  "_where": "C:\\Zowe\\zlux\\file-transfer-app\\webClient",
+  "bundleDependencies": false,
   "dependencies": {
     "@angular/animations": "~6.0.9",
     "@angular/common": "~6.0.9",
@@ -17,13 +36,17 @@
     "@angular/platform-browser": "~6.0.9",
     "@angular/router": "~6.0.9",
     "carbon-components": "~8.23.0",
-    "primeng": "~6.0.1"
+    "primeng": "~6.0.1",
+    "@fortawesome/fontawesome-free": "~5.9.0"
+ 
   },
+  "deprecated": false,
+  "description": "This program and the accompanying materials are\r made available under the terms of the Eclipse Public License v2.0 which accompanies\r this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html",
   "devDependencies": {
     "angular2-template-loader": "~0.6.2",
     "codelyzer": "~4.4.2",
-    "css-loader": "~1.0.0",
     "copy-webpack-plugin": "~4.5.2",
+    "css-loader": "~1.0.0",
     "exports-loader": "~0.7.0",
     "extract-text-webpack-plugin": "~3.0.2",
     "file-loader": "~1.1.11",
@@ -41,5 +64,13 @@
     "webpack-cli": "~3.0.0",
     "webpack-config": "~7.5.0",
     "zone.js": "~0.8.26"
-  }
+  },
+  "license": "EPL-2.0",
+  "name": "@zlux/file-explorer",
+  "scripts": {
+    "build": "webpack --progress --colors",
+    "lint": "ng lint",
+    "start": "webpack --progress --colors --watch"
+  },
+  "version": "0.0.2"
 }
