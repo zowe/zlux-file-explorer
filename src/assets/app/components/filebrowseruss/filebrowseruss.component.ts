@@ -179,6 +179,22 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.isLoading = false;
       subscription.unsubscribe();
     }, 2000);
+<<<<<<< HEAD
+=======
+  }
+
+  browsePath(path: string): void {
+    this.path = path;
+  }
+
+  getDOMElement(): HTMLElement {
+    return this.elementRef.nativeElement;
+  }
+
+  getSelectedPath(): string {
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this.path;
+>>>>>>> afafe4bbdfcd43e25e64e5fe36e94664f5374460
   }
 
   initalizeCapabilities() {

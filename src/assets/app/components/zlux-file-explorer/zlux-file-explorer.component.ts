@@ -21,7 +21,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule, MenuItem, MenuModule, DialogModule, TreeNode } from 'primeng/primeng';
+import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
@@ -140,8 +140,12 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
          break; 
       } 
   
-      default: {
+      default: { 
+        // this.headerStyle = {'background-color': '#464646'};
         this.treeStyle = {'filter': 'brightness(3)', 'color':'white'};
+        // this.style = {'background-color': '#464646'};
+  
+         
          break; 
       } 
    } 
