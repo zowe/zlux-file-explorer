@@ -196,7 +196,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
                 this.addChildren(currentNode, res.datasets[i].members);
               }
             } else {
-              if(migrated) currentNode.styleClass = 'ui-treenode-label-italic';
+              currentNode.icon = (migrated) ? 'fa fa-clock-o' : 'fa fa-file';
               currentNode.type = 'file';
               currentNode.icon = 'fa fa-file';
             }
