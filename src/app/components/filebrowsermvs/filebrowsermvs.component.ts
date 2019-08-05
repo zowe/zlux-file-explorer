@@ -198,7 +198,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
             } else {
               currentNode.icon = (migrated) ? 'fa fa-clock-o' : 'fa fa-file';
               currentNode.type = 'file';
-              currentNode.icon = 'fa fa-file';
             }
             parents.push(currentNode);
           }
