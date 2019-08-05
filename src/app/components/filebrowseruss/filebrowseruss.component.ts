@@ -136,9 +136,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
-            this.displayTree(this.path, true);
-            this.isLoading = false;
+            if (this.path.length == 0 || this.path.charAt(0) != '/') {
+              this.path = '/';
+            }
+          } else {
+            this.path = '/';
           }
+          this.displayTree(this.path, true);
+          this.isLoading = false;
         },
         error => {
           this.isLoading = false;
