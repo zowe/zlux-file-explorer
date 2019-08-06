@@ -186,11 +186,14 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               || currentNode.data.datasetAttrs.volser == 'ARCIVE'));
             if(currentNode.data.datasetAttrs.dsorg
                 && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'){
-              if(migrated) currentNode.styleClass = 'ui-treenode-label-italic';
               currentNode.type = 'folder';
               currentNode.expanded = false;
-              currentNode.expandedIcon = 'fa fa-folder-open';
-              currentNode.collapsedIcon = 'fa fa-folder';
+              if(migrated){
+                currentNode.icon = 'fa fa-clock-o';
+              } else {
+                currentNode.expandedIcon = 'fa fa-folder-open';
+                currentNode.collapsedIcon = 'fa fa-folder';
+              }
               if(res.datasets[i].members){
                 currentNode.data.hasChildren = true;
                 this.addChildren(currentNode, res.datasets[i].members);
