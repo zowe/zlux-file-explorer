@@ -29,14 +29,6 @@ import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
-// import fontawesome from '@fortawesome/fontawesome';
-// import faFolder from '@fortawesome/fontawesome-free-solid';
-// import faFolderOpen from '@fortawesome/fontawesome-free-solid';
-// import faFile from '@fortawesome/fontawesome-free-solid';
-
-
-
-
 
 @Component({
   selector: 'file-browser-uss',
@@ -69,7 +61,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   dataObject: UssDataObject;
   ussData: Observable<any>;
   intervalId: any;
-  timeVar: number = 10000;//time represents in ms how fat tree updates changes from mainframe
+  timeVar: number = 10000;//time represents in ms how fast tree updates changes from mainframe
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -88,9 +80,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
     this.isLoading = false;
-    // fontawesome.library.add(faFolder);
-    // fontawesome.library.add(faFolderOpen);
-    // fontawesome.library.add(faFile);
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -123,9 +112,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   ngOnInit() {
     this.loadUserHomeDirectory();
-
-
-    
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
