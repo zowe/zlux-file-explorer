@@ -29,10 +29,10 @@ import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
-import fontawesome from '@fortawesome/fontawesome';
-import faFolder from '@fortawesome/fontawesome-free-solid';
-import faFolderOpen from '@fortawesome/fontawesome-free-solid';
-import faFile from '@fortawesome/fontawesome-free-solid';
+// import fontawesome from '@fortawesome/fontawesome';
+// import faFolder from '@fortawesome/fontawesome-free-solid';
+// import faFolderOpen from '@fortawesome/fontawesome-free-solid';
+// import faFile from '@fortawesome/fontawesome-free-solid';
 
 
 
@@ -65,12 +65,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private deletionQueue = new Map();
 
   //TODO:define interface types for uss-data/data
-  private data: TreeNode[];
-  private dataObject: UssDataObject;
-  private ussData: Observable<any>;
-  private intervalId: any;
-  private updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
-  @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
+  data: TreeNode[];
+  dataObject: UssDataObject;
+  ussData: Observable<any>;
+  intervalId: any;
+  timeVar: number = 10000;//time represents in ms how fat tree updates changes from mainframe
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -89,9 +88,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
     this.isLoading = false;
-    fontawesome.library.add(faFolder);
-    fontawesome.library.add(faFolderOpen);
-    fontawesome.library.add(faFile);
+    // fontawesome.library.add(faFolder);
+    // fontawesome.library.add(faFolderOpen);
+    // fontawesome.library.add(faFile);
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -387,12 +386,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         if (files.entries[i].directory) {
           files.entries[i].children = [];
           files.entries[i].data = "Folder";
-          files.entries[i].collapsedIcon = "fas fa-folder";
-          files.entries[i].expandedIcon = "fas fa-folder-open";
+          files.entries[i].collapsedIcon = "fa fa-folder";
+          files.entries[i].expandedIcon = "fa fa-folder-open";
         }
         else {
           files.entries[i].items = {};
-          files.entries[i].icon = "fas fa-file";
+          files.entries[i].icon = "fa fa-file";
           files.entries[i].data = "File";
         }
         files.entries[i].label = files.entries[i].name;
@@ -511,12 +510,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             if (files.entries[i].directory) {
               files.entries[i].children = [];
               files.entries[i].data = "Folder";
-              files.entries[i].collapsedIcon = "fas fa-folder";
-              files.entries[i].expandedIcon = "fas fa-folder-open";
+              files.entries[i].collapsedIcon = "fa fa-folder";
+              files.entries[i].expandedIcon = "fa fa-folder-open";
             }
             else {
               files.entries[i].items = {};
-              files.entries[i].icon = "fas fa-file";
+              files.entries[i].icon = "fa fa-file";
               files.entries[i].data = "File";
             }
             files.entries[i].label = files.entries[i].name;
@@ -525,14 +524,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
           }
           $event.node.children = tempChildren;
-          $event.node.expandedIcon = "fas fa-folder-open"; $event.node.collapsedIcon = "fas fa-folder";
+          $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
           this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
           while (node.parent !== undefined) {
             let newChild = node.parent;
             newChild.children[node.id] = node;
             newChild.expanded = true;
-            newChild.expandedIcon = "fas fa-folder-open"; newChild.collapsedIcon = "fas fa-folder";
+            newChild.expandedIcon = "fa fa-folder-open"; newChild.collapsedIcon = "fa fa-folder";
             $event.node = newChild;
           }
 
