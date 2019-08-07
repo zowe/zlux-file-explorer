@@ -107,8 +107,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
           'background-color': '#3d70b2',
           'color': 'white',
           'width':'99.7%',
-          'text-align':'left',
-          'padding-left': '7px'
+          'text-align':'right'
         };
          this.inputStyle = {
           'background-color': '#eee', 
@@ -132,8 +131,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
           'background-color':'#F4F7FB',
           'margin-top': '10px',
           'max-height':'320px',
-          'overflow-y': 'scroll'
-          
+          'overflow-y': 'scroll',
           
         };
   
