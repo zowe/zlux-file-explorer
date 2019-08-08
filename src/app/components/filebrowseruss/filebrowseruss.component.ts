@@ -85,6 +85,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.isLoading = false;
   }
 
+  @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
@@ -242,6 +243,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
+    this.pathChanged.emit(path);
     if (path === undefined || path == '') {
       path = this.root; 
     }

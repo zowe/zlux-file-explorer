@@ -27,6 +27,7 @@
     <file-browser-uss #ussComponent
       [hidden]="currentIndex != 0"
       (nodeClick)="onNodeClick($event)"
+      (pathChanged)="onPathChanged($event)"
       (newFileClick)="onNewFileClick($event)"
       (newFolderClick)="onNewFolderClick($event)"
       (deleteClick)="onDeleteClick($event)"
