@@ -19,6 +19,9 @@
         <option *ngFor="let item of mvsSearchHistory.searchHistoryVal" [value]="item"></option>
       </datalist>
     </div>
+    <label>
+      Include Additional Qualifiers <input type="checkbox" [(ngModel)]="additionalQualifiers">
+    </label>
     <div [hidden]="hideExplorer" style="height: 100%;">
         <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
           (dblClickEvent)="onNodeDblClick($event)" [style]="style"
