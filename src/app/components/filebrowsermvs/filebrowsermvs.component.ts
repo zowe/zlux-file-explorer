@@ -18,10 +18,11 @@ import { take } from 'rxjs/operators';
 import { FileService } from '../../services/file.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
-// import { PersistentDataService } from '../../services/persistentData.service';
+//import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
+import { SearchHistoryService } from '../../services/searchHistoryService';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -35,7 +36,7 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService/*, PersistentDataService*/]
+  providers: [FileService, /*PersistentDataService,*/ SearchHistoryService ]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
@@ -56,9 +57,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   constructor(private fileService: FileService, 
     private elementRef:ElementRef, 
     // private persistentDataService: PersistentDataService,
+    private mvsSearchHistory:SearchHistoryService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
+    this.mvsSearchHistory.onInit('mvs');
     this.path = "";
     this.lastPath = "";
     this.rtClickDisplay = false;
@@ -152,6 +155,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.getTreeForQueryAsync(path).then((res) => {
       this.data = res;
     });
+    
+    this.refreshHistory(path);
   }
 
   getTreeForQueryAsync(path: string): Promise<any> {
@@ -234,6 +239,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  refreshHistory(path:string) {
+    const sub = this.mvsSearchHistory
+                  .saveSearchHistory(path)
+                  .subscribe(()=>{
+                    if(sub) sub.unsubscribe();
+                  });
+  }
 
 /**
 * [levelUp: function to ascend up a level in the file/folder tree]
