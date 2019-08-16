@@ -44,6 +44,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //capabilities:Array<Capability>;
   public hideExplorer: boolean;
   path: string;
+  additionalQualifiers: boolean;
   lastPath: string;
   rtClickDisplay: boolean;
   errorMessage: String;
@@ -66,6 +67,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.lastPath = "";
     this.rtClickDisplay = false;
     this.hideExplorer = false;
+    this.additionalQualifiers = true;
   }
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -161,7 +163,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
+      this.fileService.queryDatasets(path, true, this.additionalQualifiers).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
         this.lastPath = path;
         if(res.datasets.length > 0){
