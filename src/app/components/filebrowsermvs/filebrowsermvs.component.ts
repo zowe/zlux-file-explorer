@@ -53,6 +53,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //TODO:define interface types for mvs-data/data
   data: any;
   dsData: Observable<any>;
+  isLoading: boolean;
 
   constructor(private fileService: FileService, 
     private elementRef:ElementRef, 
@@ -66,6 +67,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.lastPath = "";
     this.rtClickDisplay = false;
     this.hideExplorer = false;
+    this.isLoading = false;
   }
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -161,6 +163,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
+      this.isLoading = true;
       this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
         this.lastPath = path;
@@ -209,11 +212,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
             }
             parents.push(currentNode);
           }
+          this.isLoading = false;
         } else {
           //data set probably doesnt exist
         }
         resolve(parents);
       }, (err) => {
+        this.isLoading = false;
         reject(err);
       })
     })
