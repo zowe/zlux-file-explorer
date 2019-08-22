@@ -53,6 +53,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //TODO:define interface types for mvs-data/data
   data: any;
   dsData: Observable<any>;
+  private focusedNode: TreeNode;
+  private focusedParentNode: TreeNode;
 
   constructor(private fileService: FileService, 
     private elementRef:ElementRef, 
@@ -108,6 +110,14 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  getAllInDirectory(): TreeNode[] {
+    if (!this.focusedParentNode) {
+      return this.data;
+    } else {
+      return this.focusedParentNode.children;
+    }
+  }
+  
   /*initalizeCapabilities(){
     this.capabilities = new Array<Capability>();
     this.capabilities.push(FileBrowserCapabilities.FileBrowser);
@@ -132,6 +142,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       $event.node.expanded = !$event.node.expanded;
     }
     this.nodeClick.emit($event.node);
+    this.focusedNode = $event.node;
+    if ($event.node.children) {
+      this.focusedParentNode = $event.node;
+    }
+    
   }
     
   onNodeDblClick($event: any): void{

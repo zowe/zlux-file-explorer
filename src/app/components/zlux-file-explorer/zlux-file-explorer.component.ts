@@ -26,6 +26,7 @@ import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
 import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
+import { TreeNode } from 'primeng/primeng';
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
@@ -42,6 +43,10 @@ import { tab } from '../../structures/tab';
 import { FileBrowserMVSComponent } from '../filebrowsermvs/filebrowsermvs.component';
 import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.component';
 
+const DEFAULT_TREE_INNER_WIDTH = 315;
+const SLIDER_WIDTH = 10;
+const FILE_INDEX = 0;
+const DATASET_INDEX = 1;
 
 @Component({
   selector: 'zlux-file-explorer',
@@ -63,6 +68,11 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserMVSComponent)
   private mvsComponent: FileBrowserMVSComponent;
 
+  @ViewChild('slider')
+  private sliderRef: ElementRef;
+  
+  private resizeTimer: any;
+
   constructor(private fileService: FileService,
     /*private persistentDataService: PersistentDataService,*/
     private utils: UtilsService, private elemRef: ElementRef,
@@ -76,7 +86,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 
   @Input() selectPath: string;
   @Input() style: ZluxFileExplorerStyle = {};
-
+  @Input() showSlider: boolean = true;
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
@@ -86,7 +96,15 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @Output() datasetSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() resized: EventEmitter<number> = new EventEmitter<number>();
 
+  public menuHidden: boolean = false;
+  public treeWidth: any = {"width": DEFAULT_TREE_INNER_WIDTH+'px'};
+  public dragging: boolean = false;
+  private lastX: number = 0;
+  private currentTreeWidth: number = DEFAULT_TREE_INNER_WIDTH;
+  private lastTreeWidth: number = DEFAULT_TREE_INNER_WIDTH;
+  
   ngOnInit() {
     // var obj = {
     //   "ussInput": "",
@@ -153,14 +171,63 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   //   this.fileOutput.emit($event);
   // }
 
-  provideZLUXDispatcherCallbacks(): ZLUX.ApplicationCallbacks {
-    return {
-      onMessage: (eventContext: any): Promise<any> => {
-        return this.zluxOnMessage(eventContext);
+  startDrag(event: any) {
+    this.lastX = event.clientX;
+    this.sliderRef.nativeElement.onpointermove = (event)=> {this.drag(event)};
+    if (this.sliderRef.nativeElement.setPointerCapture) {//safari??
+      try {
+        this.sliderRef.nativeElement.setPointerCapture(event.pointerId);
+      } catch (e) {
+        //ignore
       }
+    }
+    this.dragging = true;
+  }
+  
+  stopDrag(event: any) {
+    this.sliderRef.nativeElement.onpointermove = null;
+    if (this.sliderRef.nativeElement.releasePointerCapture) {//safari??
+      try {
+        this.sliderRef.nativeElement.releasePointerCapture(event.pointerId);
+      } catch (e) {
+        //ignore
+      }
+    }
+    this.dragging = false;
+  }
+  
+  drag(event: any) {
+    if (this.dragging) {
+      let diff = this.lastX-event.clientX;
+      this.currentTreeWidth = this.currentTreeWidth - diff;
+      this.lastX = event.clientX;
+      this.treeWidth.width = this.currentTreeWidth+'px';
+      this.scheduleResizeEvent();
     }
   }
 
+  toggleHide() {
+    this.menuHidden = !this.menuHidden;
+    if (this.menuHidden) {
+      this.lastTreeWidth = this.currentTreeWidth;
+      this.currentTreeWidth = 0;
+      this.treeWidth.width='0px';
+    } else {
+      this.currentTreeWidth = this.lastTreeWidth;
+      this.treeWidth.width = this.lastTreeWidth+'px';
+    }
+    this.scheduleResizeEvent();
+  }
+
+  private scheduleResizeEvent() {
+    if (!this.resizeTimer) {
+      this.resizeTimer = setTimeout(()=> {
+        this.resized.emit(this.currentTreeWidth+SLIDER_WIDTH);
+        this.resizeTimer = undefined;
+      },10);
+    }
+  }
+  
   setIndex(inputIndex: number) {
     this.currentIndex = inputIndex;
     if (this.currentIndex == 0)
@@ -188,6 +255,14 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   updateDirectory(dirName: string) {
     this.showUss();
     this.ussComponent.updateUss(dirName);
+  }
+
+  getNodesInFocus(): TreeNode[] {
+    if (this.currentIndex == FILE_INDEX) {
+      return this.ussComponent.getAllInDirectory().map(x => x.data);
+    } else {
+      return this.mvsComponent.getAllInDirectory().map(x => x.data);
+    }
   }
 
   zluxOnMessage(eventContext: any): Promise<any> {

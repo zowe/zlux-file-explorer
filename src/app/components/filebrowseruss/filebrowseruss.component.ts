@@ -62,6 +62,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   //TODO:define interface types for uss-data/data
   data: TreeNode[];
+  private focusedNode: TreeNode;
+  private focusedParentNode: TreeNode;
   dataObject: UssDataObject;
   ussData: Observable<any>;
   intervalId: any;
@@ -179,6 +181,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
+
+  getAllInDirectory(): TreeNode[] {
+    if (!this.focusedParentNode) {
+      return this.data;
+    } else {
+      return this.focusedParentNode.children;
+    }
+  }
+
+  
   onClick($event: any): void {
     this.rtClickDisplay = false;
   }
@@ -202,7 +214,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNodeClick($event: any): void {
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
-
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
       this.nodeClick.emit($event.node);
@@ -210,6 +221,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     else {
       this.nodeClick.emit($event.node);
     }
+    this.focusedNode = $event.node;
+    if ($event.node.children) {
+      this.focusedParentNode = $event.node;
+    }
+
   }
 
   onNodeDblClick($event: any): void {

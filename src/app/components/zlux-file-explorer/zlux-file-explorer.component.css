@@ -18,30 +18,36 @@
 
 .fileexplorer-global{
   height: 100%;
+  display: flex;
+  user-select: none;
+}
+
+.fileexplorer-panel {
+  height: 100%;
+  width: calc(100% - 10px);
 }
 
 .fileexplorer-tabs{
   height: 25px;
   text-align: center;
   padding-bottom: 30px;
+  overflow: hidden;
 }
 
 .fileexplorer-tab {
   font-size: 15px;
   color: #007bff;
   height: 35px;
-  width: 170px;
+  width: 100%;
   padding-top: 6px;
-  margin-left: -10px;
 }
 
 .fileexplorer-tab-selected {
   font-size: 15px;
   height: 35px;
-  width: 165px;
+  width: 100%;
   font-weight: bold;
   padding-top: 6px;
-  margin-left: -7px;
   color: #005abb;
   background-color: #d4d4d4;
 }
@@ -54,14 +60,43 @@
   height: 35px;
   background-color: #464646;
   cursor: pointer;
+  display: flex;
 }
 
 .fileexplorer-tabs-text {
   color: inherit;
   text-decoration: none;
   background-color: transparent;
+  text-overflow: clip;
 }
 
+.slider {
+  width: 10px;
+  height: 100%;
+  background-color: #464646;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.slider-expand {
+  background: url(../../../assets/expand.png);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.slider-button {
+  width: 10px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  border-style: none !important;
+  border-width: 0 !important;
+}
+.slider-contract {
+  background: url(../../../assets/contract.png);
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
 
 /*
