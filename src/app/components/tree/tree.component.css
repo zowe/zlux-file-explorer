@@ -53,6 +53,7 @@
 .ui-treenode {
   width: fit-content;
   padding: 1px;
+  cursor: pointer;
 }
 
 .ui-treenode-label {
