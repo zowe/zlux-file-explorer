@@ -68,13 +68,21 @@ export class UssCrudService {
       .map(res=>res.json())
       .catch(this.handleErrorObservable);
   }
+
   saveFile(path:string, fileContents:string, targetEncoding?: string, forceOverwrite?: boolean): Observable<any>{
-      let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', path, undefined, targetEncoding, undefined, forceOverwrite, undefined, true);
+      let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', path, "UTF-8", targetEncoding, undefined, forceOverwrite, undefined, true);
       return this.http.put(url,fileContents)
       .map(res=>{
         res.json()
       })
       .catch(this.handleErrorObservable);
+  }
+  
+  getUserHomeFolder(): Observable<any>{
+    let url :string = ZoweZLUX.uriBroker.omvsSegmentUri();
+    return this.http.get(url)
+    .map(res=>res.json())
+    .catch(this.handleErrorObservable);
   }
 }
 
