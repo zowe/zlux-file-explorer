@@ -19,6 +19,7 @@
         <option *ngFor="let item of mvsSearchHistory.searchHistoryVal" [value]="item"></option>
       </datalist>
     </div>
+    <div class="fa fa-spinner fa-spin" [hidden]="!isLoading"></div>
     <div [hidden]="hideExplorer" style="height: 100%;">
         <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
           (dblClickEvent)="onNodeDblClick($event)" [style]="style"
