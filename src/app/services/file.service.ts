@@ -28,7 +28,7 @@ export class FileService {
 
     queryDatasets(query:string, detail?: boolean, includeAdditionalQualifiers?: boolean): Observable<any>  {
       let url:string;
-      url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), detail.toString(), undefined, true, includeAdditionalQualifiers.toString());
+      url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), detail.toString(), undefined, true, undefined, undefined, undefined, undefined, undefined, includeAdditionalQualifiers.toString());
       return this.http.get(url)
       .map(res=>res.json())
       .catch(this.handleErrorObservable);
