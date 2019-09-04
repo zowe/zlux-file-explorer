@@ -29,13 +29,14 @@ import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
+import { SearchHistoryService } from '../../services/searchHistoryService';
 
 @Component({
   selector: 'file-browser-uss',
   templateUrl: './filebrowseruss.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowseruss.component.css'],
-  providers: [UssCrudService/*, PersistentDataService*/]
+  providers: [UssCrudService, /*PersistentDataService,*/ SearchHistoryService]
 })
 
 export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowserUSS,
@@ -70,9 +71,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     private ussSrv: UssCrudService,
     private utils: UtilsService, 
     /*private persistentDataService: PersistentDataService,*/
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
+    private ussSearchHistory:SearchHistoryService,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger
+    ) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
+    this.ussSearchHistory.onInit('uss');
     this.rtClickDisplay = false;
     this.addFileDisplay = false;
     this.addFolderDisplay = false;
@@ -123,7 +127,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //     this.displayTree(this.root, false);
     //   })
       // this.intervalId = setInterval(() => {
-      //   this.updateUss(this.path);
+        this.updateUss(this.path);
       // }, this.timeVar);
   }
 
@@ -343,7 +347,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         }
       );
 
+      this.refreshHistory(this.path);
     }
+
+  private refreshHistory(path:string) {
+    const sub = this.ussSearchHistory
+                  .saveSearchHistory(path)
+                  .subscribe(()=>{
+                    if(sub) sub.unsubscribe();
+                  });
+}
 
   public sleep(milliseconds) {
       var start = new Date().getTime();

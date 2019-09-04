@@ -18,10 +18,11 @@ import { take } from 'rxjs/operators';
 import { FileService } from '../../services/file.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
-// import { PersistentDataService } from '../../services/persistentData.service';
+//import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
+import { SearchHistoryService } from '../../services/searchHistoryService';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -35,7 +36,7 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService/*, PersistentDataService*/]
+  providers: [FileService, /*PersistentDataService,*/ SearchHistoryService ]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
@@ -52,17 +53,21 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //TODO:define interface types for mvs-data/data
   data: any;
   dsData: Observable<any>;
+  isLoading: boolean;
 
   constructor(private fileService: FileService, 
     private elementRef:ElementRef, 
     // private persistentDataService: PersistentDataService,
+    private mvsSearchHistory:SearchHistoryService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
+    this.mvsSearchHistory.onInit('mvs');
     this.path = "";
     this.lastPath = "";
     this.rtClickDisplay = false;
     this.hideExplorer = false;
+    this.isLoading = false;
   }
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -155,10 +160,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.getTreeForQueryAsync(path).then((res) => {
       this.data = res;
     });
+    
+    this.refreshHistory(path);
   }
 
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
+      this.isLoading = true;
       this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
         this.lastPath = path;
@@ -189,27 +197,31 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               || currentNode.data.datasetAttrs.volser == 'ARCIVE'));
             if(currentNode.data.datasetAttrs.dsorg
                 && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'){
-              if(migrated) currentNode.styleClass = 'ui-treenode-label-italic';
               currentNode.type = 'folder';
               currentNode.expanded = false;
-              currentNode.expandedIcon = 'fa fa-folder-open';
-              currentNode.collapsedIcon = 'fa fa-folder';
+              if(migrated){
+                currentNode.icon = 'fa fa-clock-o';
+              } else {
+                currentNode.expandedIcon = 'fa fa-folder-open';
+                currentNode.collapsedIcon = 'fa fa-folder';
+              }
               if(res.datasets[i].members){
                 currentNode.data.hasChildren = true;
                 this.addChildren(currentNode, res.datasets[i].members);
               }
             } else {
-              if(migrated) currentNode.styleClass = 'ui-treenode-label-italic';
+              currentNode.icon = (migrated) ? 'fa fa-clock-o' : 'fa fa-file';
               currentNode.type = 'file';
-              currentNode.icon = 'fa fa-file';
             }
             parents.push(currentNode);
           }
+          this.isLoading = false;
         } else {
           //data set probably doesnt exist
         }
         resolve(parents);
       }, (err) => {
+        this.isLoading = false;
         reject(err);
       })
     })
@@ -235,6 +247,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  refreshHistory(path:string) {
+    const sub = this.mvsSearchHistory
+                  .saveSearchHistory(path)
+                  .subscribe(()=>{
+                    if(sub) sub.unsubscribe();
+                  });
+  }
 
 /**
 * [levelUp: function to ascend up a level in the file/folder tree]

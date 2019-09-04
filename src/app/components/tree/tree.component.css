@@ -72,10 +72,6 @@
   display: table-cell;
 }
 
-.ui-treenode-label-italic {
-  font-style: italic;
-}
-
 .ui-treenode-icon {
   padding-right: 3px;
   display: table-cell;
