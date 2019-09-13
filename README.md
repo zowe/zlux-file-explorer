@@ -7,26 +7,14 @@ SPDX-License-Identifier: EPL-2.0
 Copyright Contributors to the Zowe Project.
 # File Explorer
 
-This application is used to display files & folder from USS, along with increasing support for datasets.
+This is an angular component that can be included in applications for being able to locate & view the hierarchy of files and datasets on z/OS through the Zowe ZSS server APIs.
 
-# Standalone version
-
-## Install
-
-Download NodeJS & npm. Go inside the ```webClient``` folder. Execute ```npm install``` to install dependencies.
-
-## Build
-
-Execute ```npm run build``` inside the ```webClient``` folder to compile, or execute ```npm start``` to begin real-time compilation & building.
-
-# Widget version (```src-for-widgets``` branch)
-
-You don't need to install or build the widget version of the File Explorer. Instead, it can be embedded as an Angular component for use in your own application. 
+**NOTE Because this relies upon ZSS APIs, it must be used in an environment which handles session lifecycles, as you must log in to ZSS prior to using those APIs. One way to utilize this is to use this within a Zowe App, within the Zowe Desktop**
 
 ## Embedding
 
 Navigate to your application's package.json file. Under devDepencies, add a
-```"@zlux/file-explorer": "git+ssh://git@github.com:zowe/zlux-file-explorer.git#src-for-widgets",```
+```"@zlux/file-explorer": "git+ssh://git@github.com:zowe/zlux-file-explorer.git",```
 listing. Execute ```npm install``` inside your host application to install File Explorer dependencies.
 
 Then, navigate to your application's module file. Import the File Explorer module by adding
