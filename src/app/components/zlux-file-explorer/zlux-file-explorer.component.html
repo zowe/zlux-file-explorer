@@ -9,44 +9,13 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="fileexplorer-global">
-  <nav data-tabs class="fileexplorer-tabs" role="navigation">
-    <div class="fileexplorer-tabs-trigger" tabindex="0">
-      <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
-      <!-- <svg width="10" height="5" viewBox="0 0 10 5" fill-rule="evenodd">
-        <path d="M10 0L5 5 0 0z"></path>
-      </svg> -->
-    </div>
-    <ul class="fileexplorer-tabs-list" role="tablist" [ngStyle] = "headerStyle">
-      <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'fileexplorer-tab-selected' : 'fileexplorer-tab'" (click)="setIndex(tab.index)" [ngStyle] = "headerStyle" id="tab-{{tab.index}}" class="bx--tabs__nav-item" role="presentation">
-        <a class="fileexplorer-tabs-text" [ngStyle] = "headerStyle" href="javascript:void(0)" role="tab"  aria-selected="false">{{tab.name}}</a>
-      </li>
-    </ul>
-  </nav>
-  <div class="fileexplorer-browser-module" [ngStyle] = "style">
-    <file-browser-uss #ussComponent
-      [hidden]="currentIndex != 0"
-      (nodeClick)="onNodeClick($event)"
-      (pathChanged)="onPathChanged($event)"
-      (newFileClick)="onNewFileClick($event)"
-      (newFolderClick)="onNewFolderClick($event)"
-      (deleteClick)="onDeleteClick($event)"
-      (copyClick)="onCopyClick($event)"
-      [inputStyle]="inputStyle"
-      [treeStyle]="treeStyle"
-      [searchStyle]="searchStyle"
-      [style] = "style"
-    ></file-browser-uss>
-    <file-browser-mvs #mvsComponent
-      [hidden]="currentIndex != 1"
-      (nodeClick)="onNodeClick($event)"
-      (pathChanged)="onPathChanged($event)"
-      [inputStyle]="inputStyle"
-      [treeStyle]="treeStyle"
-      [searchStyle]="searchStyle"
-      [style] = "style"
-    ></file-browser-mvs>
-  </div>
+<div class="fileexplorer-global" [ngStyle]="popupStyle">
+<nav data-tabs class="fileexplorer-tabs" role="navigation">
+  <div class="fileexplorer-tabs-trigger" tabindex="-1">
+    <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
+    <!-- <svg width="10" height="5" viewBox="0 0 10 5" fill-rule="evenodd">
+      <path d="M10 0L5 5 0 0z"></path>
+    </svg> -->
   </div>
   <ul class="fileexplorer-tabs-list" role="tablist">
     <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'fileexplorer-tab-selected' : 'fileexplorer-tab'" (click)="setIndex(tab.index)" id="tab-{{tab.index}}" role="presentation">

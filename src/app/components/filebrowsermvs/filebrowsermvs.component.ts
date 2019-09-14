@@ -253,6 +253,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.isLoading = false;
         } else {
           //data set probably doesnt exist
+          this.isLoading = false;
         }
         console.log(`resolution wtf`);
         resolve([parents, parentMap]);
