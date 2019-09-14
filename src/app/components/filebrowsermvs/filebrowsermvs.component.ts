@@ -215,6 +215,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.isLoading = false;
         } else {
           //data set probably doesnt exist
+          this.isLoading = false;
         }
         resolve(parents);
       }, (err) => {
