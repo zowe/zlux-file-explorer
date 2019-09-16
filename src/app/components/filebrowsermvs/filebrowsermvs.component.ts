@@ -11,16 +11,17 @@
 */
 
 
-import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { take } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
+import { UtilsService } from '../../services/utils.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
 // import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
 
 /*import {FileBrowserFileSelectedEvent,
@@ -51,12 +52,16 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
   data: any;
+  private dataMap: any = {};
   dsData: Observable<any>;
 
   constructor(private fileService: FileService, 
-    private elementRef:ElementRef, 
+              private elementRef:ElementRef,
+              private utils:UtilsService,
     // private persistentDataService: PersistentDataService,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
+              @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions
+             ) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
     this.path = "";
@@ -70,10 +75,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){
-        this.getTreeForQueryAsync(this.lastPath).then((res: TreeNode[]) => {
-          let newData = res;
+        this.getTreeForQueryAsync(this.lastPath).then((response: any) => {
+          console.log(`returned from wtf`);
+          let newData = response[0];
           //Only update if data sets are added/removed
           if(this.data.length != newData.length){
+            this.dataMap = response[1];
             let expandedFolders = this.data.filter(dataObj => dataObj.expanded);
             //checks if the query response contains the same PDS' that are currently expanded
             let newDataHasExpanded = newData.filter(dataObj => expandedFolders.some(expanded => expanded.label === dataObj.label));
@@ -126,6 +133,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onNodeClick($event: any): void{
     if($event.node.type == 'folder'){
+    console.log(`node which?`,$event);
       $event.node.expanded = !$event.node.expanded;
     }
     this.nodeClick.emit($event.node);
@@ -140,12 +148,38 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  onRightClick($event:any):void{
-      this.log.debug('right click!')
-      this.rtClickDisplay =!this.rtClickDisplay;
-      //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
-      this.log.debug('right click CRUD menu not supported for Datasets, yet (MVD-1614)!')
-      setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
+  onNodeRightClick(event:any) {
+    let node = event.node;    
+    console.log(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
+  }
+
+  onRightClick(event:any):void{
+    let result = this.utils.getNameFromHTML(event.target, true);
+    this.rtClickDisplay =!this.rtClickDisplay;
+    //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
+    setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
+    let isMember = !result.folder;
+    let node;
+    if (isMember) {
+      let nodeChildren = this.dataMap[result.name.substring(0,result.name.indexOf('('))].children;
+      let memberName = result.name.substring(result.name.indexOf('(')+1, result.name.lastIndexOf(')'));
+      for (let i = 0; i < nodeChildren.length; i++) {
+        if (nodeChildren[i].label == memberName) {
+          node = nodeChildren[i];
+          break;
+        }
+      }
+    } else {
+      node = this.dataMap[result.name];
+    }
+    let items = [{text: result.name, action:()=>{console.log('wut');}}];
+    if (node) {
+      items.push({text: node.data.datasetAttrs.recfm.recordLength, action:()=> {console.log('wut');}});
+    }
+    if (this.windowActions) {
+      this.windowActions.spawnContextMenu(event.clientX, event.clientY, items, true);
+    }
+    event.preventDefault();
   }
 
   updateTreeView(path: string): void {
@@ -158,6 +192,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return new Promise((resolve, reject) => {
       this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
+        let parentMap = {};
         this.lastPath = path;
         if(res.datasets.length > 0){
           for(let i:number = 0; i < res.datasets.length; i++){
@@ -201,11 +236,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               currentNode.icon = 'fa fa-file';
             }
             parents.push(currentNode);
+            parentMap[currentNode.label]= currentNode;
           }
         } else {
           //data set probably doesnt exist
         }
-        resolve(parents);
+        console.log(`resolution wtf`);
+        resolve([parents, parentMap]);
       }, (err) => {
         reject(err);
       })
@@ -213,6 +250,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   addChildren(parentNode: TreeNode, members: Array<any>): void{
+    console.log('wtf');
     for(let i: number = 0; i < members.length; i++){
       let childNode: TreeNode = {};
       childNode.type = 'file';
