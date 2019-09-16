@@ -39,7 +39,7 @@ import { FileNode } from '../../structures/file-node';
 export class TreeComponent {
   @Input() treeData: TreeNode;
   @Input() style: any;
-  @Input() treeStyle: any;
+  @Output() nodeContextEvent = new EventEmitter<childEvent>();
   @Output() clickEvent = new EventEmitter<childEvent>();
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
@@ -55,6 +55,7 @@ export class TreeComponent {
  * @return        [void]
  */
   nodeSelect(_event?: any) {
+    console.log(`Which?`,_event);
     if (_event){
       if (this.lastClickedNodeName == null || this.lastClickedNodeName != (_event.node.name || _event.node.data.name)) {
         this.lastClickedNodeName = _event.node.name || _event.node.data.name;
@@ -64,6 +65,11 @@ export class TreeComponent {
         this.dblClickEvent.emit(_event);
       }
     }
+  }
+
+  onNodeRightClick(event) {
+    console.log(`on node right click`);
+    this.nodeContextEvent.emit(event);
   }
 
   /**

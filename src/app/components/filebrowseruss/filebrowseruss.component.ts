@@ -12,7 +12,7 @@
 
 import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
-  Output, ViewEncapsulation, Inject
+  Output, ViewEncapsulation, Inject, Optional
 } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
@@ -27,7 +27,7 @@ import { Capability, FileBrowserCapabilities }
 //TODO: Implement new capabilities from zlux-platform
 import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { SearchHistoryService } from '../../services/searchHistoryService';
 
@@ -53,6 +53,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   renameDisplay: boolean;
   selectedItem: string;
   path: string;
+  private _uneditedPath:string;
   root: string;
   newPath: string;
   popUpMenuX: number;
@@ -68,12 +69,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   timeVar: number = 10000;//time represents in ms how fast tree updates changes from mainframe
 
   constructor(private elementRef: ElementRef, 
-    private ussSrv: UssCrudService,
-    private utils: UtilsService, 
-    /*private persistentDataService: PersistentDataService,*/
-    private ussSearchHistory:SearchHistoryService,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger
-    ) {
+              private ussSrv: UssCrudService,
+              private utils: UtilsService, 
+              /*private persistentDataService: PersistentDataService,*/
+              @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
     this.ussSearchHistory.onInit('uss');
@@ -84,6 +84,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.renameDisplay = false;
     this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
     this.path = this.root;
+    this._uneditedPath = this.path;
     this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
     this.isLoading = false;
@@ -157,6 +158,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
+            this._uneditedPath = this.path;
             this.displayTree(this.path, true);
             this.isLoading = false;
           }
@@ -166,10 +168,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.errorMessage = <any>error;
         }
       );
-    setTimeout(() => {
-      this.isLoading = false;
-      subscription.unsubscribe();
-    }, 2000);
+  }
+
+  getDOMElement(): HTMLElement {
+    return this.elementRef.nativeElement;
+  }
+
+  getSelectedPath(): string {
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this._uneditedPath;
   }
 
   initalizeCapabilities() {
@@ -199,8 +206,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
   
   onNodeClick($event: any): void {
+    console.log(`node which?`,$event);
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
+    this._uneditedPath = this.path;
 
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
@@ -216,12 +225,31 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.displayTree($event.node.path, updateTree);
   }
 
-  onRightClick($event: any): void {
-    this.rtClickDisplay = !this.rtClickDisplay;
-    this.popUpMenuX = $event.clientX;
-    this.popUpMenuY = $event.clientY;
-    this.selectedItem = this.path + '/' + $event.target.innerText;
-    this.isFile = this.utils.isfile(this.checkPath(this.selectedItem), this.data);
+  onNodeRightClick(event:any) {
+    let node = event.node;
+    console.log(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
+  }
+
+  onRightClick(event:any):void{
+    let result = this.utils.getNameFromHTML(event.target, false);
+    let path;
+    if (!this._uneditedPath) {
+      path = '/'+result.name;
+    } else if (this._uneditedPath.endsWith('/')) {
+      path = this._uneditedPath + result.name;
+    } else {
+      path = this._uneditedPath + '/' + result.name;
+    }
+    if (this.windowActions) {
+      this.windowActions.spawnContextMenu(event.clientX, event.clientY, [{text: result.name, action:()=>{console.log('wut');}}], true);
+    }
+
+    this.rtClickDisplay =!this.rtClickDisplay;
+    //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
+    setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
+    this.selectedItem = path;
+    this.isFile = !result.folder;
+    event.preventDefault();
   }
 
   onRenameClick($event: any): void {
@@ -331,6 +359,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.log.debug(tempChildren);
       this.data = tempChildren;
       this.path = path;
+      this._uneditedPath = path;
 
       // this.persistentDataService.getData()
       //       .subscribe(data => {
@@ -522,6 +551,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       if (this.path === '' || this.path == '/') {
         this.path = '/';
       }
+      this._uneditedPath = this.path;
 
       let parentindex = this.path.length - 1;
       while (this.path.charAt(parentindex) != '/') { parentindex--; }
