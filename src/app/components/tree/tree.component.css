@@ -56,12 +56,18 @@
   cursor: pointer;
 }
 
+.ui-treenode-content{
+  display: table;
+}
+
 .ui-treenode-label {
   padding-left: 3px;
+  display: table-cell;
 }
 
 .ui-treenode-icon {
   padding-right: 3px;
+  display: table-cell;
 }
 
 .ui-tree-empty-message {
@@ -71,6 +77,10 @@
 .ui-tree .ui-treenode-children {
   margin: 0;
   padding: 0 0 0 1em;
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0,0,0,0);
 }
 
 
