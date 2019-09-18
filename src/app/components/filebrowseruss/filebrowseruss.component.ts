@@ -14,7 +14,7 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject, Optional
 } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -29,13 +29,14 @@ import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
+import { SearchHistoryService } from '../../services/searchHistoryService';
 
 @Component({
   selector: 'file-browser-uss',
   templateUrl: './filebrowseruss.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowseruss.component.css'],
-  providers: [UssCrudService/*, PersistentDataService*/]
+  providers: [UssCrudService, /*PersistentDataService,*/ SearchHistoryService]
 })
 
 export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowserUSS,
@@ -71,10 +72,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               private ussSrv: UssCrudService,
               private utils: UtilsService, 
               /*private persistentDataService: PersistentDataService,*/
+              private ussSearchHistory:SearchHistoryService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
+    this.ussSearchHistory.onInit('uss');
     this.rtClickDisplay = false;
     this.addFileDisplay = false;
     this.addFolderDisplay = false;
@@ -122,7 +125,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //     this.displayTree(this.root, false);
     //   })
       // this.intervalId = setInterval(() => {
-      //   this.updateUss(this.path);
+        this.updateUss(this.path);
       // }, this.timeVar);
   }
 
@@ -134,21 +137,30 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   loadUserHomeDirectory(): void {
     this.isLoading = true;
-    this.ussSrv.getUserHomeFolder()
-      .subscribe(
+    const observable: Observable<any> = this.ussSrv.getUserHomeFolder()
+    const subscription: Subscription = observable.subscribe(
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
             this._uneditedPath = this.path;
-            this.displayTree(this.path, true);
-            this.isLoading = false;
+            if (this.path.length == 0 || this.path.charAt(0) != '/') {
+              this.path = '/';
+            }
+          } else {
+            this.path = '/';
           }
+          this.displayTree(this.path, true);
+          this.isLoading = false;
         },
         error => {
           this.isLoading = false;
           this.errorMessage = <any>error;
         }
       );
+    setTimeout(() => {
+      this.isLoading = false;
+      subscription.unsubscribe();
+    }, 2000);
   }
 
   getDOMElement(): HTMLElement {
@@ -356,7 +368,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         }
       );
 
+      this.refreshHistory(this.path);
     }
+
+  private refreshHistory(path:string) {
+    const sub = this.ussSearchHistory
+                  .saveSearchHistory(path)
+                  .subscribe(()=>{
+                    if(sub) sub.unsubscribe();
+                  });
+}
 
   public sleep(milliseconds) {
       var start = new Date().getTime();

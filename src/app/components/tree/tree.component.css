@@ -56,18 +56,18 @@
   cursor: pointer;
 }
 
-.ui-treenode-label {
-  padding-left: 3px;
+.ui-treenode-content{
+  display: table;
 }
 
-.ui-treenode-label-italic {
+.ui-treenode-label {
   padding-left: 3px;
-  font-style: italic;
+  display: table-cell;
 }
 
 .ui-treenode-icon {
   padding-right: 3px;
-  display: inline;
+  display: table-cell;
 }
 
 .ui-tree-empty-message {

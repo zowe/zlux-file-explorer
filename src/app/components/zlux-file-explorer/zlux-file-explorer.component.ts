@@ -190,6 +190,11 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     this.ussComponent.updateUss(dirName);
   }
 
+  updateDSList(query: string) {
+    this.showDatasets();
+    this.mvsComponent.updateTreeView(query);
+  }
+
   zluxOnMessage(eventContext: any): Promise<any> {
     return new Promise((resolve,reject)=> {
 
