@@ -167,45 +167,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     console.log(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
   }
 
-  onRightClick(event:any):void{
-    let result = this.utils.getNameFromHTML(event.target, true);
-    this.rtClickDisplay =!this.rtClickDisplay;
-    //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
-    setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
-    let isMember = !result.folder;
-    let node;
-    if (isMember) {
-      console.log("resultname: " + result.name);
-      let indexOfName = result.name.indexOf('(');
-      console.log(indexOfName);
-      let node = this.dataMap[result.name.substring(0, result.name.indexOf('('))];
-      if (node) {
-        node = this.dataMap[result.name];
-        let nodeChildren = node.children;
-        let memberName = result.name.substring(result.name.indexOf('(')+1, result.name.lastIndexOf(')'));
-        for (let i = 0; i < nodeChildren.length; i++) {
-          if (nodeChildren[i].label == memberName) {
-            node = nodeChildren[i];
-            break;
-          }
-        }
-      } else {
-        node = this.dataMap[result.name];
-      }
-    } else {
-      node = this.dataMap[result.name];
-    }
-    let items = this.rightClickPropertiesMap;
-    //[{text: result.name, action:()=>{console.log('wut');}}];
-    // if (node) {
-    //   items.push({text: node.data.datasetAttrs.recfm.recordLength, action:()=> {console.log('wut');}});
-    // }
-    if (this.windowActions) {
-      this.windowActions.spawnContextMenu(event.clientX, event.clientY, items, true);
-    }
-    event.preventDefault();
-  }
-
   updateTreeView(path: string): void {
     this.getTreeForQueryAsync(path).then((res) => {
       this.data = res;
@@ -273,7 +234,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.isLoading = false;
         }
         resolve(parents);
-        //resolve([parents, parentMap]);
       }, (err) => {
         this.isLoading = false;
         reject(err);
