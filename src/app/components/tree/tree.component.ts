@@ -39,7 +39,6 @@ import { FileNode } from '../../structures/file-node';
 export class TreeComponent {
   @Input() treeData: TreeNode;
   @Input() style: any;
-  @Output() nodeContextEvent = new EventEmitter<childEvent>();
   @Output() clickEvent = new EventEmitter<childEvent>();
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();
