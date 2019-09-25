@@ -49,13 +49,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   rtClickDisplay: boolean;
   errorMessage: String;
   intervalId: any;
-  timeVar: number = 15000;
   updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
   data: any;
-  private dataMap: any = {};
+  private dataMap: any;
   dsData: Observable<any>;
   isLoading: boolean;
+  private rightClickPropertiesMap: any;
 
   constructor(private fileService: FileService, 
               private elementRef:ElementRef,
@@ -72,6 +72,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rtClickDisplay = false;
     this.hideExplorer = false;
     this.isLoading = false;
+    this.dataMap = {};
+    this.rightClickPropertiesMap = {};
   }
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -111,6 +113,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         });
       }
     }, this.updateInterval);
+    this.initializeRightClickProperties();
   }
 
   ngOnDestroy(){
@@ -124,6 +127,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.capabilities.push(FileBrowserCapabilities.FileBrowser);
     this.capabilities.push(FileBrowserCapabilities.FileBrowserMVS);
   }*/
+
+  initializeRightClickProperties() {
+    //TODO: Add Dataset properties
+    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{console.log('Properties activated!');}}];
+  }
 
   browsePath(path: string): void{
     this.path = path;
@@ -168,21 +176,31 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     let isMember = !result.folder;
     let node;
     if (isMember) {
-      let nodeChildren = this.dataMap[result.name.substring(0,result.name.indexOf('('))].children;
-      let memberName = result.name.substring(result.name.indexOf('(')+1, result.name.lastIndexOf(')'));
-      for (let i = 0; i < nodeChildren.length; i++) {
-        if (nodeChildren[i].label == memberName) {
-          node = nodeChildren[i];
-          break;
+      console.log("resultname: " + result.name);
+      let indexOfName = result.name.indexOf('(');
+      console.log(indexOfName);
+      let node = this.dataMap[result.name.substring(0, result.name.indexOf('('))];
+      if (node) {
+        node = this.dataMap[result.name];
+        let nodeChildren = node.children;
+        let memberName = result.name.substring(result.name.indexOf('(')+1, result.name.lastIndexOf(')'));
+        for (let i = 0; i < nodeChildren.length; i++) {
+          if (nodeChildren[i].label == memberName) {
+            node = nodeChildren[i];
+            break;
+          }
         }
+      } else {
+        node = this.dataMap[result.name];
       }
     } else {
       node = this.dataMap[result.name];
     }
-    let items = [{text: result.name, action:()=>{console.log('wut');}}];
-    if (node) {
-      items.push({text: node.data.datasetAttrs.recfm.recordLength, action:()=> {console.log('wut');}});
-    }
+    let items = this.rightClickPropertiesMap;
+    //[{text: result.name, action:()=>{console.log('wut');}}];
+    // if (node) {
+    //   items.push({text: node.data.datasetAttrs.recfm.recordLength, action:()=> {console.log('wut');}});
+    // }
     if (this.windowActions) {
       this.windowActions.spawnContextMenu(event.clientX, event.clientY, items, true);
     }
@@ -248,15 +266,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               currentNode.type = 'file';
             }
             parents.push(currentNode);
-            parentMap[currentNode.label]= currentNode;
+            parentMap[currentNode.label] = currentNode;
           }
           this.isLoading = false;
         } else {
           //data set probably doesnt exist
           this.isLoading = false;
         }
-        console.log(`resolution wtf`);
-        resolve([parents, parentMap]);
+        resolve(parents);
+        //resolve([parents, parentMap]);
       }, (err) => {
         this.isLoading = false;
         reject(err);

@@ -42,6 +42,7 @@ export class TreeComponent {
   @Output() nodeContextEvent = new EventEmitter<childEvent>();
   @Output() clickEvent = new EventEmitter<childEvent>();
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
+  @Output() rightClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
   lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
   lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
@@ -67,9 +68,10 @@ export class TreeComponent {
     }
   }
 
-  onNodeRightClick(event) {
-    console.log(`on node right click`);
-    this.nodeContextEvent.emit(event);
+  nodeRightClickSelect(_event?: any) {
+    if (_event){
+      this.rightClickEvent.emit(_event);
+    }
   }
 
   /**
