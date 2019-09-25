@@ -30,6 +30,8 @@ import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { SearchHistoryService } from '../../services/searchHistoryService';
+import { MatDialog, MatDialogConfig } from '@angular/material';
+import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 
 @Component({
   selector: 'file-browser-uss',
@@ -74,6 +76,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               private utils: UtilsService, 
               /*private persistentDataService: PersistentDataService,*/
               private ussSearchHistory:SearchHistoryService,
+              private dialog: MatDialog,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
     //this.componentClass = ComponentClass.FileBrowser;
@@ -100,7 +103,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() propertiesClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() style: any;
   @Input()
@@ -188,7 +191,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showPropertiesDialog(rightClickedFile: TreeNode) {
-    this.propertiesClick.emit(rightClickedFile);
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    this.dialog.open(FilePropertiesModal, filePropConfig);
   }
 
   onClick($event: any): void {
@@ -243,6 +252,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.selectedItem = node.path;
     this.rightClickedFile = node;
     this.isFile = !node.directory;
+    this.rightClick.emit(event.node);
     event.originalEvent.preventDefault(); 
   }
 
