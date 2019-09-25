@@ -21,7 +21,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
+import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
@@ -86,6 +86,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @Output() datasetSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() propertiesClick: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     // var obj = {
@@ -147,6 +148,10 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 
   onPathChanged($event: any) {
     this.pathChanged.emit($event);
+  }
+
+  onPropertiesClick($event: any) {
+    this.propertiesClick.emit($event);
   }
 
   // onUssFileLoad($event:FileContents){
@@ -220,7 +225,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 
 @NgModule({
   declarations: [FileBrowserMVSComponent, FileBrowserUSSComponent, ZluxFileExplorerComponent, TreeComponent],
-  imports: [CommonModule, FormsModule, TreeModule, MenuModule, DialogModule],
+  imports: [CommonModule, FormsModule, TreeModule, MenuModule, DialogModule, ContextMenuModule],
   exports: [ZluxFileExplorerComponent],
   entryComponents: [ZluxFileExplorerComponent]
 })

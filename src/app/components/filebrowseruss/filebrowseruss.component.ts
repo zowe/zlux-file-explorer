@@ -58,15 +58,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   newPath: string;
   popUpMenuX: number;
   popUpMenuY: number;
-  selectedFile: TreeNode;
+  rightClickedFile: TreeNode;
   isLoading: boolean;
+  private rightClickPropertiesMap: any;
 
   //TODO:define interface types for uss-data/data
   data: TreeNode[];
   dataObject: UssDataObject;
   ussData: Observable<any>;
   intervalId: any;
-  timeVar: number = 10000;//time represents in ms how fast tree updates changes from mainframe
+  updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
 
   constructor(private elementRef: ElementRef, 
               private ussSrv: UssCrudService,
@@ -89,14 +90,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
     this.isLoading = false;
+    this.rightClickPropertiesMap = {};
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() propertiesClick: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() style: any;
   @Input()
@@ -115,6 +119,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   ngOnInit() {
     this.loadUserHomeDirectory();
+    this.initializeRightClickProperties();
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
@@ -126,7 +131,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //   })
       // this.intervalId = setInterval(() => {
         this.updateUss(this.path);
-      // }, this.timeVar);
+      // }, this.updateInterval);
   }
 
   ngOnDestroy() {
@@ -178,6 +183,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
+  initializeRightClickProperties() {
+    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{this.showPropertiesDialog(this.rightClickedFile)}}];
+  }
+
+  showPropertiesDialog(rightClickedFile: TreeNode) {
+    this.propertiesClick.emit(rightClickedFile);
+  }
+
   onClick($event: any): void {
     this.rtClickDisplay = false;
   }
@@ -220,29 +233,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onNodeRightClick(event:any) {
     let node = event.node;
-    console.log(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
-  }
-
-  onRightClick(event:any):void{
-    let result = this.utils.getNameFromHTML(event.target, false);
-    let path;
-    if (!this._uneditedPath) {
-      path = '/'+result.name;
-    } else if (this._uneditedPath.endsWith('/')) {
-      path = this._uneditedPath + result.name;
-    } else {
-      path = this._uneditedPath + '/' + result.name;
-    }
+    console.log(`Node right click at ${event.originalEvent.clientX},${event.originalEvent.clientY}, off=${event.originalEvent.offsetX},${event.originalEvent.offsetY}, node=`,node);
+  
     if (this.windowActions) {
-      this.windowActions.spawnContextMenu(event.clientX, event.clientY, [{text: result.name, action:()=>{console.log('wut');}}], true);
+      this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, this.rightClickPropertiesMap, true);
     }
 
     this.rtClickDisplay =!this.rtClickDisplay;
     //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
     setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
-    this.selectedItem = path;
-    this.isFile = !result.folder;
-    event.preventDefault();
+    this.selectedItem = node.path;
+    this.rightClickedFile = node;
+    this.isFile = !node.directory;
+    event.originalEvent.preventDefault(); 
   }
 
   onRenameClick($event: any): void {
@@ -403,7 +406,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     } 
     else //When the selected node has no children
     { 
-      this.selectedFile = $event.node;
       $event.node.expanded = true;
       this.ussData = this.ussSrv.getFile(path);
       let tempChildren: TreeNode[] = [];
