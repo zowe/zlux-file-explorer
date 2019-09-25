@@ -83,7 +83,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.intervalId = setInterval(() => {
       if(this.data){
         this.getTreeForQueryAsync(this.lastPath).then((response: any) => {
-          console.log(`returned from wtf`);
           let newData = response[0];
           //Only update if data sets are added/removed
           if(this.data.length != newData.length){
@@ -146,7 +145,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onNodeClick($event: any): void{
     if($event.node.type == 'folder'){
-    console.log(`node which?`,$event);
       $event.node.expanded = !$event.node.expanded;
     }
     this.nodeClick.emit($event.node);
@@ -162,7 +160,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeRightClick(event:any) {
-    let node = event.node;    
+    let node = event.node;
+    // TODO: Add right click properties menu to Datasets via Editor/Explorer interaction    
     console.log(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
   }
 
@@ -281,7 +280,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   addChildren(parentNode: TreeNode, members: Array<any>): void{
-    console.log('wtf');
     for(let i: number = 0; i < members.length; i++){
       let childNode: TreeNode = {};
       childNode.type = 'file';

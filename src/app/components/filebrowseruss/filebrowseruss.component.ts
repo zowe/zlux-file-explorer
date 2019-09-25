@@ -184,7 +184,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   initializeRightClickProperties() {
-    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{this.showPropertiesDialog(this.rightClickedFile)}}];
+    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{ this.showPropertiesDialog(this.rightClickedFile) }}];
   }
 
   showPropertiesDialog(rightClickedFile: TreeNode) {
@@ -212,7 +212,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void {
-    console.log(`node which?`,$event);
     this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
     this._uneditedPath = this.path;
@@ -233,8 +232,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onNodeRightClick(event:any) {
     let node = event.node;
-    console.log(`Node right click at ${event.originalEvent.clientX},${event.originalEvent.clientY}, off=${event.originalEvent.offsetX},${event.originalEvent.offsetY}, node=`,node);
-  
+     
     if (this.windowActions) {
       this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, this.rightClickPropertiesMap, true);
     }
