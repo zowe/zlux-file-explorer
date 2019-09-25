@@ -56,7 +56,6 @@ export class TreeComponent {
  * @return        [void]
  */
   nodeSelect(_event?: any) {
-    console.log(`Which?`,_event);
     if (_event){
       if (this.lastClickedNodeName == null || this.lastClickedNodeName != (_event.node.name || _event.node.data.name)) {
         this.lastClickedNodeName = _event.node.name || _event.node.data.name;
