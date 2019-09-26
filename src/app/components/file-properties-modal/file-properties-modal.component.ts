@@ -39,7 +39,10 @@ export class FilePropertiesModal implements OnInit {
     this.fileType = node.data;
     this.filePath = node.path;
     this.fileMode = node.mode;
-    this.fileSize = node.size;
+    this.fileSize = Math.round(node.size / 1000); // Converts bytes to Kb
+    if (this.fileSize == 0) {
+      this.fileSize = 1;
+    }
     if (node.icon) {
       this.fileIcon = node.icon;
     } else if (node.collapsedIcon) {
@@ -54,7 +57,12 @@ export class FilePropertiesModal implements OnInit {
         fileSize: this.fileSize,
       },
     ]
-    this.displayedColumns = ['fileCreatedAt', 'fileType', 'filePath', 'fileMode', 'fileSize'];
+    // TODO: Make ZSS return recursive "Folder" size, as the current size is misleading so we hide it
+    if (this.fileType == 'Folder') {
+      this.displayedColumns = ['fileCreatedAt', 'fileType', 'filePath', 'fileMode'];
+    } else {
+      this.displayedColumns = ['fileCreatedAt', 'fileType', 'filePath', 'fileMode', 'fileSize'];
+    }
     this.dataSource = new MatTableDataSource(this.DATA);
   }
 
