@@ -14,7 +14,7 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject, Optional
 } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -27,7 +27,7 @@ import { Capability, FileBrowserCapabilities }
 //TODO: Implement new capabilities from zlux-platform
 import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
-import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { SearchHistoryService } from '../../services/searchHistoryService';
 import { MatDialog, MatDialogConfig } from '@angular/material';
@@ -45,10 +45,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //componentClass: ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities: Array<Capability>;
+  windowManager: any;
   public hideExplorer: boolean;
-  isFile: boolean;
   errorMessage: String;
-  rtClickDisplay: boolean;
   addFileDisplay: boolean;
   addFolderDisplay: boolean;
   copyDisplay: boolean;
@@ -82,7 +81,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
     this.ussSearchHistory.onInit('uss');
-    this.rtClickDisplay = false;
     this.addFileDisplay = false;
     this.addFolderDisplay = false;
     this.copyDisplay = false;
@@ -201,7 +199,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onClick($event: any): void {
-    this.rtClickDisplay = false;
   }
 
   onCopyClick($event: any): void {
@@ -221,7 +218,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void {
-    this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
     this._uneditedPath = this.path;
 
@@ -243,15 +239,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let node = event.node;
      
     if (this.windowActions) {
-      this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, this.rightClickPropertiesMap, true);
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, this.rightClickPropertiesMap, true);
+      if (!didContextMenuSpawn) { // If context menu failed to spawn...
+        let heightAdjustment = event.originalEvent.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, heightAdjustment, this.rightClickPropertiesMap, true);
+      }
     }
 
-    this.rtClickDisplay =!this.rtClickDisplay;
-    //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
-    setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
-    this.selectedItem = node.path;
     this.rightClickedFile = node;
-    this.isFile = !node.directory;
     this.rightClick.emit(event.node);
     event.originalEvent.preventDefault(); 
   }
