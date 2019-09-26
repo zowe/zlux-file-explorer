@@ -46,7 +46,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   public hideExplorer: boolean;
   path: string;
   lastPath: string;
-  rtClickDisplay: boolean;
   errorMessage: String;
   intervalId: any;
   updateInterval: number = 300000;
@@ -69,7 +68,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.mvsSearchHistory.onInit('mvs');
     this.path = "";
     this.lastPath = "";
-    this.rtClickDisplay = false;
     this.hideExplorer = false;
     this.isLoading = false;
     this.dataMap = {};
@@ -129,7 +127,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     //TODO: Add Dataset properties
-    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{console.log('Properties activated!');}}];
+    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{this.log.debug('Properties activated!');}}];
   }
 
   browsePath(path: string): void{
@@ -164,7 +162,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNodeRightClick(event:any) {
     let node = event.node;
     // TODO: Add right click properties menu to Datasets via Editor/Explorer interaction    
-    console.log(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
+    this.log.debug(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
   }
 
   updateTreeView(path: string): void {
