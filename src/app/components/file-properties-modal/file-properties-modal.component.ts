@@ -48,6 +48,7 @@ export class FilePropertiesModal implements OnInit {
     } else if (node.collapsedIcon) {
       this.fileIcon = node.collapsedIcon;
     }
+    this.fileCreatedAt = this.fileCreatedAt.replace('T', ' ');
 
     this.DATA = [
       { fileCreatedAt: this.fileCreatedAt, 

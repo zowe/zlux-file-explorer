@@ -23,7 +23,7 @@
     <div (click)="onClick($event);" [hidden]="hideExplorer" style="height: 100%;">
       <tree-root [treeData]="data" 
       (clickEvent)="onNodeClick($event)"
-      (dblClickEvent)="$event.preventDefault(); onNodeDblClick($event)" 
+      (dblClickEvent)="onNodeDblClick($event)" 
       [style]="style"
       (rightClickEvent)="onNodeRightClick($event)"
       ></tree-root>
