@@ -85,7 +85,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.addFolderDisplay = false;
     this.copyDisplay = false;
     this.renameDisplay = false;
-    this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
+    this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
     this.path = this.root;
     this._uneditedPath = this.path;
     this.data = []; // Main treeData array (the nodes the Explorer displays)
@@ -282,9 +282,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
-    this.pathChanged.emit(path);
-    if (path === undefined || path == '') {
+    if (path === undefined) {
       path = this.root; 
+    }
+    if (path === '') {
+      this.log.warn("Please enter a valid path. For example: '/'");
     }
     this.isLoading = true;
     this.ussData = this.ussSrv.getFile(path); 
