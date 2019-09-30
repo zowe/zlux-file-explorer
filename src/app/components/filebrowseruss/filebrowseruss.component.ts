@@ -12,9 +12,9 @@
 
 import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
-  Output, ViewEncapsulation, Inject
+  Output, ViewEncapsulation, Inject, Optional
 } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -27,9 +27,11 @@ import { Capability, FileBrowserCapabilities }
 //TODO: Implement new capabilities from zlux-platform
 import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { SearchHistoryService } from '../../services/searchHistoryService';
+import { MatDialog, MatDialogConfig } from '@angular/material';
+import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 
 @Component({
   selector: 'file-browser-uss',
@@ -43,58 +45,63 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //componentClass: ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities: Array<Capability>;
+  windowManager: any;
   public hideExplorer: boolean;
-  isFile: boolean;
   errorMessage: String;
-  rtClickDisplay: boolean;
   addFileDisplay: boolean;
   addFolderDisplay: boolean;
   copyDisplay: boolean;
   renameDisplay: boolean;
   selectedItem: string;
   path: string;
+  private _uneditedPath:string;
   root: string;
   newPath: string;
   popUpMenuX: number;
   popUpMenuY: number;
-  selectedFile: TreeNode;
+  rightClickedFile: TreeNode;
   isLoading: boolean;
+  private rightClickPropertiesMap: any;
 
   //TODO:define interface types for uss-data/data
   data: TreeNode[];
   dataObject: UssDataObject;
   ussData: Observable<any>;
   intervalId: any;
-  timeVar: number = 10000;//time represents in ms how fast tree updates changes from mainframe
+  updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
 
   constructor(private elementRef: ElementRef, 
-    private ussSrv: UssCrudService,
-    private utils: UtilsService, 
-    /*private persistentDataService: PersistentDataService,*/
-    private ussSearchHistory:SearchHistoryService,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger
-    ) {
+              private ussSrv: UssCrudService,
+              private utils: UtilsService, 
+              /*private persistentDataService: PersistentDataService,*/
+              private ussSearchHistory:SearchHistoryService,
+              private dialog: MatDialog,
+              @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
     //this.componentClass = ComponentClass.FileBrowser;
     this.initalizeCapabilities();
     this.ussSearchHistory.onInit('uss');
-    this.rtClickDisplay = false;
     this.addFileDisplay = false;
     this.addFolderDisplay = false;
     this.copyDisplay = false;
     this.renameDisplay = false;
-    this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
+    this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
     this.path = this.root;
+    this._uneditedPath = this.path;
     this.data = []; // Main treeData array (the nodes the Explorer displays)
     this.hideExplorer = false;
     this.isLoading = false;
+    this.rightClickPropertiesMap = {};
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() style: any;
   @Input()
@@ -113,6 +120,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   ngOnInit() {
     this.loadUserHomeDirectory();
+    this.initializeRightClickProperties();
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
@@ -124,7 +132,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //   })
       // this.intervalId = setInterval(() => {
         this.updateUss(this.path);
-      // }, this.timeVar);
+      // }, this.updateInterval);
   }
 
   ngOnDestroy() {
@@ -140,6 +148,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
+            this._uneditedPath = this.path;
             if (this.path.length == 0 || this.path.charAt(0) != '/') {
               this.path = '/';
             }
@@ -160,17 +169,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }, 2000);
   }
 
-  browsePath(path: string): void {
-    this.path = path;
-  }
-
   getDOMElement(): HTMLElement {
     return this.elementRef.nativeElement;
   }
 
   getSelectedPath(): string {
     //TODO:how do we want to want to handle caching vs message to app to open said path
-    return this.path;
+    return this._uneditedPath;
   }
 
   initalizeCapabilities() {
@@ -179,8 +184,21 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
+  initializeRightClickProperties() {
+    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{ this.showPropertiesDialog(this.rightClickedFile) }}];
+  }
+
+  showPropertiesDialog(rightClickedFile: TreeNode) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    this.dialog.open(FilePropertiesModal, filePropConfig);
+  }
+
   onClick($event: any): void {
-    this.rtClickDisplay = false;
   }
 
   onCopyClick($event: any): void {
@@ -200,8 +218,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void {
-    this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
+    this._uneditedPath = this.path;
 
     if ($event.node.data === 'Folder') {
       this.addChild($event.node.path, $event);
@@ -217,12 +235,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.displayTree($event.node.path, updateTree);
   }
 
-  onRightClick($event: any): void {
-    this.rtClickDisplay = !this.rtClickDisplay;
-    this.popUpMenuX = $event.clientX;
-    this.popUpMenuY = $event.clientY;
-    this.selectedItem = this.path + '/' + $event.target.innerText;
-    this.isFile = this.utils.isfile(this.checkPath(this.selectedItem), this.data);
+  onNodeRightClick(event:any) {
+    let node = event.node;
+     
+    if (this.windowActions) {
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, this.rightClickPropertiesMap, true);
+      if (!didContextMenuSpawn) { // If context menu failed to spawn...
+        let heightAdjustment = event.originalEvent.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, heightAdjustment, this.rightClickPropertiesMap, true);
+      }
+    }
+
+    this.rightClickedFile = node;
+    this.rightClick.emit(event.node);
+    event.originalEvent.preventDefault(); 
   }
 
   onRenameClick($event: any): void {
@@ -248,8 +274,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
-    if (path === undefined || path == '') {
+    if (path === undefined) {
       path = this.root; 
+    }
+    if (path === '') {
+      this.log.warn("Please enter a valid path. For example: '/'");
     }
     this.isLoading = true;
     this.ussData = this.ussSrv.getFile(path); 
@@ -331,6 +360,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.log.debug(tempChildren);
       this.data = tempChildren;
       this.path = path;
+      this._uneditedPath = path;
 
       // this.persistentDataService.getData()
       //       .subscribe(data => {
@@ -382,7 +412,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     } 
     else //When the selected node has no children
     { 
-      this.selectedFile = $event.node;
       $event.node.expanded = true;
       this.ussData = this.ussSrv.getFile(path);
       let tempChildren: TreeNode[] = [];
@@ -522,6 +551,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       if (this.path === '' || this.path == '/') {
         this.path = '/';
       }
+      this._uneditedPath = this.path;
 
       let parentindex = this.path.length - 1;
       while (this.path.charAt(parentindex) != '/') { parentindex--; }

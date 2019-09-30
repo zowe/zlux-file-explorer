@@ -21,7 +21,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
+import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { FileService } from '../../services/file.service';
@@ -41,7 +41,8 @@ import { tab } from '../../structures/tab';
 //TODO: Implement new capabilities from zlux-platform
 import { FileBrowserMVSComponent } from '../filebrowsermvs/filebrowsermvs.component';
 import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.component';
-
+import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
+import { MatDialogModule, MatTableModule } from '@angular/material';
 
 @Component({
   selector: 'zlux-file-explorer',
@@ -86,6 +87,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @Output() datasetSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     // var obj = {
@@ -141,12 +143,15 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   }
 
   onNodeClick($event:any){
-    //console.log($event);
     this.nodeClick.emit($event);
   }
 
   onPathChanged($event: any) {
     this.pathChanged.emit($event);
+  }
+
+  onRightClick($event: any) {
+    this.rightClick.emit($event);
   }
 
   // onUssFileLoad($event:FileContents){
@@ -219,10 +224,23 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 }
 
 @NgModule({
-  declarations: [FileBrowserMVSComponent, FileBrowserUSSComponent, ZluxFileExplorerComponent, TreeComponent],
-  imports: [CommonModule, FormsModule, TreeModule, MenuModule, DialogModule],
+  declarations: [FileBrowserMVSComponent, 
+    FileBrowserUSSComponent, 
+    ZluxFileExplorerComponent, 
+    FilePropertiesModal,
+    TreeComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    TreeModule, 
+    MenuModule, 
+    MatDialogModule,
+    DialogModule, 
+    ContextMenuModule,
+    MatTableModule
+  ],
   exports: [ZluxFileExplorerComponent],
-  entryComponents: [ZluxFileExplorerComponent]
+  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal]
 })
 export class ZluxFileExplorerModule { }
 

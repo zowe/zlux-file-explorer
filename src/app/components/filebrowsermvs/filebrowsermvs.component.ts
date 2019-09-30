@@ -11,16 +11,17 @@
 */
 
 
-import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { take } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
+import { UtilsService } from '../../services/utils.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
 //import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
 import { SearchHistoryService } from '../../services/searchHistoryService';
 
@@ -45,29 +46,33 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   public hideExplorer: boolean;
   path: string;
   lastPath: string;
-  rtClickDisplay: boolean;
   errorMessage: String;
   intervalId: any;
-  timeVar: number = 15000;
   updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
   data: any;
+  private dataMap: any;
   dsData: Observable<any>;
   isLoading: boolean;
+  private rightClickPropertiesMap: any;
 
   constructor(private fileService: FileService, 
-    private elementRef:ElementRef, 
-    // private persistentDataService: PersistentDataService,
-    private mvsSearchHistory:SearchHistoryService,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
+              private elementRef:ElementRef,
+              private utils:UtilsService,
+              // private persistentDataService: PersistentDataService,
+              private mvsSearchHistory:SearchHistoryService,
+              @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions
+             ) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
     this.mvsSearchHistory.onInit('mvs');
     this.path = "";
     this.lastPath = "";
-    this.rtClickDisplay = false;
     this.hideExplorer = false;
     this.isLoading = false;
+    this.dataMap = {};
+    this.rightClickPropertiesMap = {};
   }
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -75,10 +80,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){
-        this.getTreeForQueryAsync(this.lastPath).then((res: TreeNode[]) => {
-          let newData = res;
+        this.getTreeForQueryAsync(this.lastPath).then((response: any) => {
+          let newData = response[0];
           //Only update if data sets are added/removed
           if(this.data.length != newData.length){
+            this.dataMap = response[1];
             let expandedFolders = this.data.filter(dataObj => dataObj.expanded);
             //checks if the query response contains the same PDS' that are currently expanded
             let newDataHasExpanded = newData.filter(dataObj => expandedFolders.some(expanded => expanded.label === dataObj.label));
@@ -102,6 +108,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         });
       }
     }, this.updateInterval);
+    this.initializeRightClickProperties();
   }
 
   ngOnDestroy(){
@@ -115,6 +122,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.capabilities.push(FileBrowserCapabilities.FileBrowser);
     this.capabilities.push(FileBrowserCapabilities.FileBrowserMVS);
   }*/
+
+  initializeRightClickProperties() {
+    //TODO: Add Dataset properties
+    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{this.log.debug('Properties activated!');}}];
+  }
 
   browsePath(path: string): void{
     this.path = path;
@@ -145,12 +157,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  onRightClick($event:any):void{
-      this.log.debug('right click!')
-      this.rtClickDisplay =!this.rtClickDisplay;
-      //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
-      this.log.debug('right click CRUD menu not supported for Datasets, yet (MVD-1614)!')
-      setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
+  onNodeRightClick(event:any) {
+    let node = event.node;
+    // TODO: Add right click properties menu to Datasets via Editor/Explorer interaction    
+    this.log.debug(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
   }
 
   updateTreeView(path: string): void {
@@ -166,6 +176,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.isLoading = true;
       this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
+        let parentMap = {};
         this.lastPath = path;
         if(res.datasets.length > 0){
           for(let i:number = 0; i < res.datasets.length; i++){
@@ -211,6 +222,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               currentNode.type = 'file';
             }
             parents.push(currentNode);
+            parentMap[currentNode.label] = currentNode;
           }
           this.isLoading = false;
         } else {
