@@ -23,11 +23,12 @@ export class FilePropertiesModal implements OnInit {
   private fileType = '';
   private filePath = '';
   private fileMode = 0;
-  private fileSize = 0;
+  private fileSize = '';
   private fileIcon = '';
   private DATA: any[] = [];
   private displayedColumns: string[];
   private dataSource;
+  private sizeType: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -39,10 +40,21 @@ export class FilePropertiesModal implements OnInit {
     this.fileType = node.data;
     this.filePath = node.path;
     this.fileMode = node.mode;
-    this.fileSize = Math.round(node.size / 1000); // Converts bytes to Kb
-    if (this.fileSize == 0) {
-      this.fileSize = 1;
+
+    if (node.size < 1024) { //Bytes
+      this.fileSize = node.size;
+      this.sizeType = "bytes";
+    } else if (node.size < 1048576) {
+      this.fileSize = (node.size / 1024).toFixed(3);
+      this.sizeType = "KB";
+    } else if (node.size < 1073741824) {
+      this.fileSize = (node.size / 1048576).toFixed(3);
+      this.sizeType = "MB";
+    } else {
+      this.fileSize = (node.size / 1073741824).toFixed(3);
+      this.sizeType = "GB";
     }
+
     if (node.icon) {
       this.fileIcon = node.icon;
     } else if (node.collapsedIcon) {
