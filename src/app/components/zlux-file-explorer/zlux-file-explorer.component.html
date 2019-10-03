@@ -37,6 +37,7 @@
   <file-browser-mvs #mvsComponent
     [hidden]="currentIndex != 1"
     (nodeClick)="onNodeClick($event)"
+    (rightClick)="onRightClick($event)"
     (pathChanged)="onPathChanged($event)"
     [style]="style"
   ></file-browser-mvs>

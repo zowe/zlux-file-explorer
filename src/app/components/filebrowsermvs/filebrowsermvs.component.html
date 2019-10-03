@@ -10,7 +10,9 @@
 -->
 
   <div style="height: 100%">
-    <img src="../../../assets/explorer-uparrow.png" (click)="levelUp()" style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
+    <img src="../../../assets/explorer-uparrow.png" 
+      data-toggle="tooltip" title="Go up to the parent level" (click)="levelUp()" 
+      style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
     <!-- <svg width="14" height="16" viewBox="0 0 14 16" fill-rule="evenodd" (click)="levelUp()"><path d="M6 3.4V16h2V3.4l4.7 4.9L14 7 7 0 0 7l1.3 1.3z"></path></svg> -->
     <div class="filebrowsermvs-search">
       <input [(ngModel)]="path" list="searchMVSHistory" placeholder="Enter a dataset..." class="filebrowsermvs-search-input" (keydown.enter)="updateTreeView(path);">
@@ -21,10 +23,12 @@
     </div>
     <div class="fa fa-spinner fa-spin" [hidden]="!isLoading"></div>
     <div [hidden]="hideExplorer" style="height: 100%;">
-        <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
-          (dblClickEvent)="onNodeDblClick($event)" [style]="style"
-          (rightClickEvent)="$event.preventDefault();">
-        </tree-root>
+      <tree-root [treeData]="data" 
+        (clickEvent)="onNodeClick($event)"
+        (dblClickEvent)="onNodeDblClick($event)" 
+        [style]="style"
+        (rightClickEvent)="onNodeRightClick($event)">
+      </tree-root>
     </div>
   </div>
   <div class="fa fa-spinner fa-spin" [hidden]="!isLoading"></div>

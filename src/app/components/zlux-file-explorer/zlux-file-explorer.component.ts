@@ -42,7 +42,8 @@ import { tab } from '../../structures/tab';
 import { FileBrowserMVSComponent } from '../filebrowsermvs/filebrowsermvs.component';
 import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.component';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
-import { MatDialogModule, MatTableModule } from '@angular/material';
+import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
+import { MatDialogModule, MatTableModule, MatSnackBarModule } from '@angular/material';
 
 @Component({
   selector: 'zlux-file-explorer',
@@ -275,6 +276,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     FileBrowserUSSComponent, 
     ZluxFileExplorerComponent, 
     FilePropertiesModal,
+    DeleteFileModal,
     TreeComponent],
   imports: [
     CommonModule, 
@@ -284,10 +286,11 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     MatDialogModule,
     DialogModule, 
     ContextMenuModule,
-    MatTableModule
+    MatTableModule,
+    MatSnackBarModule
   ],
   exports: [ZluxFileExplorerComponent],
-  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal]
+  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal, DeleteFileModal]
 })
 export class ZluxFileExplorerModule { }
 
