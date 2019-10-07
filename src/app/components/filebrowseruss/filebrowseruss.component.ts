@@ -574,7 +574,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.sendNotification('Editor', 'Failed to delete: ' + pathAndName);
         } else {
           this.sendNotification('Editor', 'Uknown error occured for: ' + pathAndName);
-          this.log.severe(error);
+          //Error gets printed in uss.crud.service.ts
         }
         this.errorMessage = <any>error }
     );
