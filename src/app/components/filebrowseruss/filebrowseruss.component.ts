@@ -566,18 +566,21 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.updateUss(this.path);
       },
       error => {
-        if (error.status == '403') { //Forbidden
+        if (error.status == '403') { //Forbidden (TODO: Implement ZSS functionality to return a 403 for permissions problems)
           this.sendNotification('Editor', 'Incorrect permissions to delete: ' + pathAndName);
-        } else if (error.status == '500') { //Internal Server Error
-          this.sendNotification('Editor', 'Server cannot find: ' + pathAndName);
-        } else {
+        } else if (error.status == '410') { //Gone (TODO: Implement ZSS functionality to return a 410 for a file/folder that has already been deleted)
           this.sendNotification('Editor', 'Failed to delete: ' + pathAndName);
+        } else if (error.status == '500') { //Internal Server Error
+          this.sendNotification('Editor', 'Failed to delete: ' + pathAndName);
+        } else {
+          this.sendNotification('Editor', 'Uknown error occured for: ' + pathAndName);
         }
         this.errorMessage = <any>error }
     );
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
-        this.sendNotification('Editor', 'Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.');
+        this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
       }
     }, 4000);
   }
