@@ -559,7 +559,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   deleteFile(pathAndName: string): void {
-    this.ussSrv.deleteFile(pathAndName)
+    let deleteSubscription = this.ussSrv.deleteFile(pathAndName)
     .subscribe(
       resp => {
         this.sendNotification('Editor', 'Deleted: ' + pathAndName);
@@ -575,12 +575,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         }
         this.errorMessage = <any>error }
     );
+    setTimeout(() => {
+      if (deleteSubscription.closed == false) {
+        this.sendNotification('Editor', 'Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.');
+      }
+    }, 4000);
   }
 
   sendNotification(title: string, message: string): number {
-    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier()
-    let notification = new ZoweNotification(title, message, 1, pluginId)
-    return ZoweZLUX.notificationManager.notify(notification)
+    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier();
+    let notification = new ZoweNotification(title, message, 1, pluginId, "org_zowe_zlux_editor_snackbar");
+    return ZoweZLUX.notificationManager.notify(notification);
   }
 
   levelUp(): void {
