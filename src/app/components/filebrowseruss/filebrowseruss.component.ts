@@ -411,16 +411,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   .subscribe(()=>{
                     if(sub) sub.unsubscribe();
                   });
-}
+  }
 
-  public sleep(milliseconds) {
-      var start = new Date().getTime();
-      for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-          break;
-        }
-      }
-    }
 
   //Adds children to the existing this.data TreeNode array to update tree
   addChild(path: string, $event: any): void {
@@ -569,11 +561,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         if (error.status == '403') { //Forbidden (TODO: Implement ZSS functionality to return a 403 for permissions problems)
           this.sendNotification('Editor', 'Incorrect permissions to delete: ' + pathAndName);
         } else if (error.status == '410') { //Gone (TODO: Implement ZSS functionality to return a 410 for a file/folder that has already been deleted)
-          this.sendNotification('Editor', 'Failed to delete: ' + pathAndName);
+          this.sendNotification('Editor', pathAndName + ' has already been deleted.');
         } else if (error.status == '500') { //Internal Server Error
           this.sendNotification('Editor', 'Failed to delete: ' + pathAndName);
         } else {
           this.sendNotification('Editor', 'Uknown error occured for: ' + pathAndName);
+          this.log.severe(error);
         }
         this.errorMessage = <any>error }
     );
@@ -587,7 +580,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   sendNotification(title: string, message: string): number {
     let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier();
-    let notification = new ZoweNotification(title, message, 1, pluginId, "org_zowe_zlux_editor_snackbar");
+    let notification = new ZoweNotification(title, message, 1, pluginId, "org_zowe_zlux_ng2desktop_snackbar"); // We can specify a different styleClass to theme the notification UI
     return ZoweZLUX.notificationManager.notify(notification);
   }
 
