@@ -12,56 +12,58 @@ mat-dialog-actions {
   justify-content: flex-end;
 }
 
-.mat-properties-table {
-  border: 2px solid #c3c3c3;
-  width: 100%;
-}
-
-.mat-properties-cell {
-  -moz-user-select: text;
-  -khtml-user-select: text;
-  -webkit-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-  padding-left: 5px;
-  padding-right: 5px;
-  border: 2px solid #a3a3a3;
-}
-
-.mat-properties-close {
+.mat-properties-delete {
   padding: 6px;
   width: 85px;
   border-radius: 3px;
   border: solid;
-  color: #3f51b5;
+  color: #e64242;
   border-width: 1.75px;
   box-shadow: transparent;
   background-color: transparent;
   margin-top: 25px;
+  margin-right: -10px;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   font-size: 14px;
   font-weight: 500;
 }
 
-.mat-properties-close:hover {
+.mat-properties-cancel {
+  padding: 6px;
+  width: 85px;
+  border-radius: 3px;
+  border: solid;
+  border-color: transparent;
+  color: #242424;
+  border-width: 1.75px;
+  box-shadow: transparent;
+  background-color: transparent;
+  margin-top: 25px;
+  margin-right: 5px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mat-properties-cancel:hover {
   background-color: #e0e0e0;
   -webkit-transition-duration: .2s;
   transition-duration: .2s;
 }
 
-td.mat-cell:first-child, td.mat-footer-cell:first-child, th.mat-header-cell:first-child {
-  padding-left: 5px;
+.mat-properties-delete:hover {
+  background-color: #fff0f0;
+  -webkit-transition-duration: .2s;
+  transition-duration: .2s;
 }
 
-td.mat-cell:last-child, td.mat-footer-cell:last-child, th.mat-header-cell:last-child {
-  padding-right: 5px;
+.delete-content-body {
+  margin-left: 40px;
+  margin-bottom: -5px;
+  font-size: larger;
+  min-width: 400px;
 }
 
-.file-properties-header {
-  margin-left: 33px; 
-  margin-bottom: 15px;
-  min-width: 500px;
-}
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies

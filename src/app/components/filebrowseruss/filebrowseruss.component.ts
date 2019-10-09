@@ -30,8 +30,10 @@ import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { SearchHistoryService } from '../../services/searchHistoryService';
-import { MatDialog, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
+import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
+import { ZoweNotification } from '../../../../../../../../../zlux-platform/base/src/notification-manager/notification';
 
 @Component({
   selector: 'file-browser-uss',
@@ -59,7 +61,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   newPath: string;
   popUpMenuX: number;
   popUpMenuY: number;
-  rightClickedFile: TreeNode;
+  rightClickedFile: any;
   isLoading: boolean;
   private rightClickPropertiesMap: any;
 
@@ -71,27 +73,29 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
 
   constructor(private elementRef: ElementRef, 
-              private ussSrv: UssCrudService,
-              private utils: UtilsService, 
-              /*private persistentDataService: PersistentDataService,*/
-              private ussSearchHistory:SearchHistoryService,
-              private dialog: MatDialog,
-              @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
-              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
-    //this.componentClass = ComponentClass.FileBrowser;
-    this.initalizeCapabilities();
-    this.ussSearchHistory.onInit('uss');
-    this.addFileDisplay = false;
-    this.addFolderDisplay = false;
-    this.copyDisplay = false;
-    this.renameDisplay = false;
-    this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
-    this.path = this.root;
-    this._uneditedPath = this.path;
-    this.data = []; // Main treeData array (the nodes the Explorer displays)
-    this.hideExplorer = false;
-    this.isLoading = false;
-    this.rightClickPropertiesMap = {};
+    private ussSrv: UssCrudService,
+    private utils: UtilsService, 
+    /*private persistentDataService: PersistentDataService,*/
+    private ussSearchHistory:SearchHistoryService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+    @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
+    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
+      //this.componentClass = ComponentClass.FileBrowser;
+      this.initalizeCapabilities();
+      this.ussSearchHistory.onInit('uss');
+      this.addFileDisplay = false;
+      this.addFolderDisplay = false;
+      this.copyDisplay = false;
+      this.renameDisplay = false;
+      this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
+      this.path = this.root;
+      this._uneditedPath = this.path;
+      this.data = []; // Main treeData array (the nodes the Explorer displays)
+      this.hideExplorer = false;
+      this.isLoading = false;
+      this.rightClickPropertiesMap = {};
   }
 
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -185,10 +189,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   initializeRightClickProperties() {
-    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{ this.showPropertiesDialog(this.rightClickedFile) }}];
+    this.rightClickPropertiesMap = [
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile);
+      }}
+    ];
   }
 
-  showPropertiesDialog(rightClickedFile: TreeNode) {
+  showPropertiesDialog(rightClickedFile: any) {
     const filePropConfig = new MatDialogConfig();
     filePropConfig.data = {
       event: rightClickedFile,
@@ -196,6 +206,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.dialog.open(FilePropertiesModal, filePropConfig);
+  }
+
+  showDeleteDialog(rightClickedFile: any) {
+    const fileDeleteConfig = new MatDialogConfig();
+    fileDeleteConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
+    const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
+      this.deleteFileOrFolder(rightClickedFile.path);
+    });
   }
 
   onClick($event: any): void {
@@ -386,16 +409,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   .subscribe(()=>{
                     if(sub) sub.unsubscribe();
                   });
-}
+  }
 
-  public sleep(milliseconds) {
-      var start = new Date().getTime();
-      for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-          break;
-        }
-      }
-    }
 
   //Adds children to the existing this.data TreeNode array to update tree
   addChild(path: string, $event: any): void {
@@ -524,7 +539,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   delete(e: EventTarget): void {
     this.log.debug('delete:' + this.selectedItem);
-    this.ussSrv.deleteFile(this.selectedItem)
+    this.ussSrv.deleteFileOrFolder(this.selectedItem)
       .subscribe(
         resp => {
           this.updateUss(this.path);
@@ -533,15 +548,48 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  deleteFile(pathAndName: string): void {
-    this.ussSrv.deleteFile(pathAndName)
+  deleteFileOrFolder(pathAndName: string): void {
+    let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
     .subscribe(
       resp => {
-        this.updateUss(this.path);
+        this.sendNotification('Editor', 'Deleted: ' + pathAndName);
+        this.path = pathAndName;
+        this.levelUp();
       },
-      error => this.errorMessage = <any>error
+      error => {
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open('Failed to delete: ' + pathAndName + "' This is probably due to a server agent problem.", 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(pathAndName + ' has already been deleted or does not exist.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          this.path = pathAndName;
+          this.levelUp();
+        } else if (error.status == '403') { //Forbidden
+          this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          //Error info gets printed in uss.crud.service.ts
+        }
+        this.errorMessage = <any>error }
     );
+    setTimeout(() => {
+      if (deleteSubscription.closed == false) {
+        this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+      }
+    }, 4000);
   }
+
+  sendNotification(title: string, message: string): number {
+    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier();
+    // We can specify a different styleClass to theme the notification UI i.e. [...] message, 1, pluginId, "org_zowe_zlux_editor_snackbar"
+    let notification = new ZoweNotification(title, message, 1, pluginId);
+    return ZoweZLUX.notificationManager.notify(notification);
+  }
+
   levelUp(): void {
     //TODO: may want to change this to 'root' depending on mainframe file access security
     //to prevent people from accessing files/folders outside their root dir
@@ -562,18 +610,23 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     } else
       this.updateUss(this.path);
   }
+
   addFileDialog() {
     this.addFileDisplay = true;
   }
+
   addFolderDialog() {
     this.addFolderDisplay = true;
   }
+
   copyDialog() {
     this.copyDisplay = true;
   }
+
   renameDialog() {
     this.renameDisplay = true;
   }
+
   private checkPath(input: string): string {
     return this.utils.filePathEndCheck(this.path) + input;
   }
