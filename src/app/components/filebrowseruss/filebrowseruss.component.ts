@@ -226,8 +226,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
-    const deleteFile = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
-      this.deleteFile(rightClickedFile.path);
+    const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
+      this.deleteFileOrFolder(rightClickedFile.path);
     });
   }
 
@@ -549,7 +549,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   delete(e: EventTarget): void {
     this.log.debug('delete:' + this.selectedItem);
-    this.ussSrv.deleteFile(this.selectedItem)
+    this.ussSrv.deleteFileOrFolder(this.selectedItem)
       .subscribe(
         resp => {
           this.updateUss(this.path);
@@ -558,23 +558,30 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  deleteFile(pathAndName: string): void {
-    let deleteSubscription = this.ussSrv.deleteFile(pathAndName)
+  deleteFileOrFolder(pathAndName: string): void {
+    let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
     .subscribe(
       resp => {
         this.sendNotification('Editor', 'Deleted: ' + pathAndName);
-        this.updateUss(this.path);
+        this.path = pathAndName;
+        this.levelUp();
       },
       error => {
-        if (error.status == '403') { //Forbidden (TODO: Implement ZSS functionality to return a 403 for permissions problems)
-          this.sendNotification('Editor', 'Incorrect permissions to delete: ' + pathAndName);
-        } else if (error.status == '410') { //Gone (TODO: Implement ZSS functionality to return a 410 for a file/folder that has already been deleted)
-          this.sendNotification('Editor', pathAndName + ' has already been deleted.');
-        } else if (error.status == '500') { //Internal Server Error
-          this.sendNotification('Editor', 'Failed to delete: ' + pathAndName);
-        } else {
-          this.sendNotification('Editor', 'Uknown error occured for: ' + pathAndName);
-          //Error gets printed in uss.crud.service.ts
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open('Failed to delete: ' + pathAndName + "' This is probably due to a server agent problem.", 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(pathAndName + ' has already been deleted or does not exist.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          this.path = pathAndName;
+          this.levelUp();
+        } else if (error.status == '403') { //Forbidden
+          this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          //Error info gets printed in uss.crud.service.ts
         }
         this.errorMessage = <any>error }
     );
