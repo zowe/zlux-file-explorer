@@ -587,7 +587,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   sendNotification(title: string, message: string): number {
     let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier();
-    let notification = new ZoweNotification(title, message, 1, pluginId, "org_zowe_zlux_ng2desktop_snackbar"); // We can specify a different styleClass to theme the notification UI
+    // We can specify a different styleClass to theme the notification UI i.e. [...] message, 1, pluginId, "org_zowe_zlux_editor_snackbar"
+    let notification = new ZoweNotification(title, message, 1, pluginId);
     return ZoweZLUX.notificationManager.notify(notification);
   }
 
