@@ -72,8 +72,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   intervalId: any;
   updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
 
-  constructor(
-    private elementRef: ElementRef, 
+  constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
     private utils: UtilsService, 
     /*private persistentDataService: PersistentDataService,*/
@@ -82,8 +81,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     private snackBar: MatSnackBar,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
-    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) 
-    {
+    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
       //this.componentClass = ComponentClass.FileBrowser;
       this.initalizeCapabilities();
       this.ussSearchHistory.onInit('uss');
