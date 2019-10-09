@@ -31,7 +31,7 @@ export class DeleteFileModal {
     this.fileIcon = "fa fa-ban";
   }
 
-  deleteFile() {
+  deleteFileOrFolder() {
     this.onDelete.emit();
   }
 

@@ -55,7 +55,7 @@ export class UssCrudService {
       .catch(this.handleErrorObservable);
   }
 
-  deleteFile(path:string): Observable<any>{
+  deleteFileOrFolder(path:string): Observable<any>{
     let filePath:string = this.utils.filePathCheck(path);
     let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', filePath);
     return this.http.delete(url)

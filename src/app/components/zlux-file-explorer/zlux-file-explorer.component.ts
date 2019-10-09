@@ -114,8 +114,8 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     //   })
   }
 
-  deleteFile(pathAndName: string) {
-    this.ussComponent.deleteFile(pathAndName);
+  deleteFileOrFolder(pathAndName: string) {
+    this.ussComponent.deleteFileOrFolder(pathAndName);
   }
 
   hideExplorers() {
