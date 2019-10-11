@@ -217,7 +217,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
-      this.deleteFileOrFolder(rightClickedFile.path);
+      this.deleteFileOrFolder(rightClickedFile);
     });
   }
 
@@ -548,13 +548,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  deleteFileOrFolder(pathAndName: string): void {
+  deleteFileOrFolder(rightClickedFile: any): void {
+    let pathAndName = rightClickedFile.path;
+    let name = pathAndName.replace(/(^.*)(\/.*\/)/, '');
     let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
     .subscribe(
       resp => {
-        this.sendNotification('Editor', 'Deleted: ' + pathAndName);
-        this.path = pathAndName;
-        this.levelUp();
+        this.sendNotification('Editor', 'Deleted: ' + name);
+        this.removeChild(rightClickedFile);
       },
       error => {
         if (error.status == '500') { //Internal Server Error
@@ -563,8 +564,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(pathAndName + ' has already been deleted or does not exist.', 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
-          this.path = pathAndName;
-          this.levelUp();
+          this.removeChild(rightClickedFile);
         } else if (error.status == '403') { //Forbidden
           this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
@@ -573,14 +573,41 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           //Error info gets printed in uss.crud.service.ts
         }
-        this.errorMessage = <any>error }
+        this.errorMessage = <any>error;
+      }
     );
+
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
       }
     }, 4000);
+  }
+
+  removeChild(node: any) {
+    let parent;
+    let children;
+    if (node.parent) { // If the selected node has a parent,
+      parent = node.parent;
+      children = parent.children; // ...just use the top-most children
+    } else { // The selected node is the top-most node,
+      children = this.data; // ...just use the UI nodes as our children
+    }
+
+    let length = children.length;
+    let i = 0;
+    while (i < length - 1) {
+      if (children[i].path == node.path && children[i].name == node.name) { // If we catch the node we wanted to remove,
+        children.splice(i, 1); // ...remove it
+        if (node.parent && node.parent.children) {
+          node.parent.children = children;
+        } else {
+          this.data = children;
+        }
+      }
+      i++;
+    }
   }
 
   sendNotification(title: string, message: string): number {
