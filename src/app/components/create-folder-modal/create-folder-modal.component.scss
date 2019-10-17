@@ -12,12 +12,12 @@ mat-dialog-actions {
   justify-content: flex-end;
 }
 
-.mat-properties-delete {
+.mat-properties-create {
   padding: 6px;
   width: 85px;
   border-radius: 3px;
   border: solid;
-  color: #e64242;
+  color: #3f51b5;
   border-width: 1.75px;
   box-shadow: transparent;
   background-color: transparent;
@@ -28,31 +28,50 @@ mat-dialog-actions {
   font-weight: 500;
 }
 
-.mat-properties-delete.cancel {
-  border-color: transparent;
+.mat-properties-create.cancel {
   color: #242424;
-  margin-top: 25px;
+  border-color: transparent;
   margin-right: 5px;
 }
 
-.mat-properties-delete.cancel:hover {
+.mat-properties-create.cancel:hover {
   background-color: #e0e0e0;
   -webkit-transition-duration: .2s;
   transition-duration: .2s;
 }
 
-.mat-properties-delete:hover {
-  background-color: #fff0f0;
+.mat-properties-create:hover {
+  background-color: #2c4cff1f;
   -webkit-transition-duration: .2s;
   transition-duration: .2s;
 }
 
-.delete-content-body {
-  margin-left: 40px;
+.create-folder-content-body {
+  margin-left: 45px;
   margin-bottom: -5px;
-  font-size: larger;
+  margin-top: 1px;
+  font-size: 17px;
   min-width: 400px;
 }
+
+.create-folder-clear-button {
+  border-radius: 100%;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.create-folder-clear-button:hover {
+  background-color: rgba(0, 0, 0, 0.12) !important;
+  transition: 0 !important;
+  -webkit-transition-duration: 0 !important;
+  transition-duration: 0 !important;
+}
+
+.create-folder-clear-icon {
+  font-size: 14px;
+  height: 5px;
+}
+
 
 /*
   This program and the accompanying materials are
