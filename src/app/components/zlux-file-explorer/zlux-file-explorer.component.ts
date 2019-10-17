@@ -43,7 +43,8 @@ import { FileBrowserMVSComponent } from '../filebrowsermvs/filebrowsermvs.compon
 import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.component';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
-import { MatDialogModule, MatTableModule, MatSnackBarModule } from '@angular/material';
+import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule } from '@angular/material';
 
 @Component({
   selector: 'zlux-file-explorer',
@@ -277,6 +278,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     ZluxFileExplorerComponent, 
     FilePropertiesModal,
     DeleteFileModal,
+    CreateFolderModal,
     TreeComponent],
   imports: [
     CommonModule, 
@@ -287,10 +289,13 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     DialogModule, 
     ContextMenuModule,
     MatTableModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule
   ],
   exports: [ZluxFileExplorerComponent],
-  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal, DeleteFileModal]
+  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal, DeleteFileModal, CreateFolderModal],
 })
 export class ZluxFileExplorerModule { }
 
