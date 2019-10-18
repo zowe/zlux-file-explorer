@@ -23,7 +23,7 @@ export class CreateFolderModal {
   private folderPathObtainedFromNode = "";
   private hasFolderBeenExpandedBefore = false;
   // Block unallowed characters and "." and ".." etc
-  private folderPattern = /(([^\x00-\x1F!"$'\(\)*,\/:;<>\?\[\\\]\{\|\}\x7F\s]+)([a-zA-Z0-9]*)$)/; 
+  private folderPattern = /(([^\x00-\x1F!"$'\(\)*,\/:;<>\?\[\\\]\{\|\}\x7F\s]+)$)/; 
   onCreate = new EventEmitter();
 
   constructor(

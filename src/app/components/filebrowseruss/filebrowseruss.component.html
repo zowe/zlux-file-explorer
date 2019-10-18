@@ -15,7 +15,8 @@
       style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
     <!-- <svg width="14" height="16" viewBox="0 0 14 16" fill-rule="evenodd" (click)="levelUp()"><path d="M6 3.4V16h2V3.4l4.7 4.9L14 7 7 0 0 7l1.3 1.3z"></path></svg> -->
     <div class="filebrowseruss-search">
-      <input [(ngModel)]="path" list="searchUSSHistory" placeholder="Enter a directory..." class="filebrowseruss-search-input" (keydown.enter)="displayTree(path, false)" [disabled]="isLoading">
+      <input #fileExplorerUSSInput [(ngModel)]="path" list="searchUSSHistory" placeholder="Enter a directory..." class="filebrowseruss-search-input" 
+        (keydown.enter)="displayTree(path, false)" [disabled]="isLoading" (ngModelChange)="checkPathSlash($event)">
       <!-- TODO: make search history a directive to use in both uss and mvs-->
       <datalist id="searchUSSHistory">
         <option *ngFor="let item of ussSearchHistory.searchHistoryVal" [value]="item"></option>
@@ -24,11 +25,11 @@
     <div class="fa fa-spinner fa-spin" [hidden]="!isLoading"></div>
     <div (click)="onClick($event);" [hidden]="hideExplorer" style="height: 100%;">
       <tree-root [treeData]="data" 
-      (clickEvent)="onNodeClick($event)"
-      (dblClickEvent)="onNodeDblClick($event)" 
-      [style]="style"
-      (rightClickEvent)="onNodeRightClick($event)"
-      (panelRightClickEvent)="onPanelRightClick($event)"
+        (clickEvent)="onNodeClick($event)"
+        (dblClickEvent)="onNodeDblClick($event)" 
+        [style]="style"
+        (rightClickEvent)="onNodeRightClick($event)"
+        (panelRightClickEvent)="onPanelRightClick($event)"
       ></tree-root>
     </div>
 </div>
