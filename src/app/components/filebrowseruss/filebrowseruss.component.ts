@@ -69,6 +69,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   ussData: Observable<any>;
   intervalId: any;
   updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
+  @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -308,6 +309,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
      
     if (this.windowActions) {
       let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
+      // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
       if (!didContextMenuSpawn) { // If context menu failed to spawn...
         let heightAdjustment = event.originalEvent.clientY - 25; // Bump it up 25px
         didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
@@ -322,6 +324,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onPanelRightClick(event:any) {
     if (this.windowActions) {
       let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.clientX, event.clientY, this.rightClickPropertiesPanel, true);
+      // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
       if (!didContextMenuSpawn) { // If context menu failed to spawn...
         let heightAdjustment = event.clientY - 25; // Bump it up 25px
         didContextMenuSpawn = this.windowActions.spawnContextMenu(event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
@@ -596,7 +599,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             this.newPath = pathAndName;
           }
         },
-        error => this.errorMessage = <any>error
+        error => { 
+          if (error.status == '500') { //Internal Server Error
+            this.snackBar.open('Failed to create directory: ' + pathAndName + "' This is probably due to a server agent problem.", 
+            'Dismiss', { duration: 5000, panelClass: 'center' });
+          }
+          this.errorMessage = <any>error; 
+        }
       );
   }
 
@@ -735,6 +744,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   private checkPath(input: string): string {
     return this.utils.filePathEndCheck(this.path) + input;
+  }
+
+  checkPathSlash(event: any) {
+    if (this.path == "") {
+      this.path = "/";
+      this.fileExplorerUSSInput.nativeElement.value="/";
+    }
   }
 }
 
