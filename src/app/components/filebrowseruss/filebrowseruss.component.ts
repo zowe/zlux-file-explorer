@@ -582,12 +582,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   }
                   node.children.push(nodeToAdd);
                 } else {
-                  this.updateUss(pathAndName);
+                  this.addChild(node);
                   this.newPath = pathAndName;
                 }
               }); 
           } else {
-            this.updateUss(pathAndName);
+            this.addChild(node);
             this.newPath = pathAndName;
           }
         },
