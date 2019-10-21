@@ -51,7 +51,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
   private data: any;
-  private isLoading: boolean;
+  public isLoading: boolean;
   private rightClickPropertiesMap: any;
 
   constructor(private fileService: FileService, 
