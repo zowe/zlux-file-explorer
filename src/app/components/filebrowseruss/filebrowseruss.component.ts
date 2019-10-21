@@ -56,11 +56,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private root: string;
   private newPath: string;
   private rightClickedFile: any;
-  private isLoading: boolean;
+  public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
-  private deletionQueue: any[];
+  private deletionQueue = new Map();
 
   //TODO:define interface types for uss-data/data
   private data: TreeNode[];
@@ -88,7 +88,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.data = []; // Main treeData array (the nodes the Explorer displays)
       this.hideExplorer = false;
       this.isLoading = false;
-      this.deletionQueue = [];
   }
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -422,7 +421,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 networkArray = tempChildren;
               }
           }
-          else if (dataArray[indexArray[indexArray.length-1]] !== undefined && dataArray[indexArray[indexArray.length-1]].data == 'Folder' && dataArray[indexArray[indexArray.length-1]].children !== undefined && dataArray[indexArray[indexArray.length-1]].children.length !== 0)
+          else if (dataArray[indexArray[indexArray.length-1]] !== undefined && dataArray[indexArray[indexArray.length-1]].data == 'Folder' 
+          && dataArray[indexArray[indexArray.length-1]].children !== undefined && dataArray[indexArray[indexArray.length-1]].children.length !== 0)
           {
             //... if the children of dataArray with index in last element of indexArray are not empty, drill into them!
             parentNode = dataArray[indexArray[indexArray.length-1]];
@@ -655,7 +655,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let pathAndName = rightClickedFile.path;
     let name = this.getNameFromPathAndName(pathAndName);
     this.isLoading = true;
-    this.deletionQueue.push(rightClickedFile);
+    this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
     rightClickedFile.styleClass = "filebrowseruss-node-deleting";
     let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
     .subscribe(
@@ -663,10 +663,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.isLoading = false;
         this.sendNotification('Editor', 'Deleted: ' + name);
         this.removeChild(rightClickedFile);
-        let removeIndex = this.deletionQueue.indexOf(rightClickedFile);
-        if (removeIndex > -1) {
-          this.deletionQueue.splice(removeIndex, 1);
-        }
+        this.deletionQueue.delete(rightClickedFile.path);
         rightClickedFile.styleClass = "";
 
       },
@@ -686,10 +683,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           //Error info gets printed in uss.crud.service.ts
         }
-        let removeIndex = this.deletionQueue.indexOf(rightClickedFile);
-        if (removeIndex > -1) {
-          this.deletionQueue.splice(removeIndex, 1);
-        }
+        this.deletionQueue.delete(rightClickedFile.path);
         this.isLoading = false;
         rightClickedFile.styleClass = "";
         this.errorMessage = <any>error;
@@ -717,7 +711,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let length = children.length;
     let i = 0;
     while (i < length) {
-      if (children[i] && children[i].path == node.path && children[i].name == node.name) { // If we catch the node we wanted to remove,
+      if (children[i] && (children[i].path == node.path) && (children[i].name == node.name)) { // If we catch the node we wanted to remove,
         children.splice(i, 1); // ...remove it
         if (node.parent && node.parent.children) { // Update the children to no longer include removed node
           node.parent.children = children;
