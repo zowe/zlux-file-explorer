@@ -56,7 +56,6 @@ import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule,
 
 export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
-  selectedItem: string;
   currentIndex: number;
   tabs: Array<tab>;
 
