@@ -44,16 +44,14 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities:Array<Capability>;
   public hideExplorer: boolean;
-  path: string;
-  lastPath: string;
-  errorMessage: String;
-  intervalId: any;
-  updateInterval: number = 300000;
+  private path: string;
+  private lastPath: string;
+  private errorMessage: String;
+  private intervalId: any;
+  private updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
-  data: any;
-  private dataMap: any;
-  dsData: Observable<any>;
-  isLoading: boolean;
+  private data: any;
+  public isLoading: boolean;
   private rightClickPropertiesMap: any;
 
   constructor(private fileService: FileService, 
@@ -71,7 +69,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.lastPath = "";
     this.hideExplorer = false;
     this.isLoading = false;
-    this.dataMap = {};
     this.rightClickPropertiesMap = {};
   }
   @Input() style: any;
@@ -84,7 +81,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           let newData = response[0];
           //Only update if data sets are added/removed
           if(this.data.length != newData.length){
-            this.dataMap = response[1];
             let expandedFolders = this.data.filter(dataObj => dataObj.expanded);
             //checks if the query response contains the same PDS' that are currently expanded
             let newDataHasExpanded = newData.filter(dataObj => expandedFolders.some(expanded => expanded.label === dataObj.label));
