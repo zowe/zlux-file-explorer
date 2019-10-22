@@ -13,9 +13,7 @@
 <nav data-tabs class="fileexplorer-tabs" role="navigation">
   <div class="fileexplorer-tabs-trigger" tabindex="-1">
     <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
-    <!-- <svg width="10" height="5" viewBox="0 0 10 5" fill-rule="evenodd">
-      <path d="M10 0L5 5 0 0z"></path>
-    </svg> -->
+
   </div>
   <ul class="fileexplorer-tabs-list" role="tablist">
     <li *ngFor="let tab of tabs;" [ngClass]="tab.index == currentIndex ? 'fileexplorer-tab-selected' : 'fileexplorer-tab'" (click)="setIndex(tab.index)" id="tab-{{tab.index}}" role="presentation">
