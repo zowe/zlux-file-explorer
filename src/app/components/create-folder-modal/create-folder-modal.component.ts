@@ -21,9 +21,8 @@ export class CreateFolderModal {
   private folderName = "";
   private folderPath = "";
   private folderPathObtainedFromNode = "";
-  private hasFolderBeenExpandedBefore = false;
   // Block unallowed characters and "." and ".." etc
-  private folderPattern = /(([^\x00-\x1F!"$'\(\)*,\/:;<>\?\[\\\]\{\|\}\x7F\s]+)$)/; 
+  public folderPattern = /(([^\x00-\x1F!"$'\(\)*,\/:;<>\?\[\\\]\{\|\}\x7F\s]+)$)/; 
   onCreate = new EventEmitter();
 
   constructor(
@@ -37,18 +36,20 @@ export class CreateFolderModal {
       this.folderPath = "";
     }
     this.folderPathObtainedFromNode = this.folderPath;
-    if (node.expanded) {
-      this.hasFolderBeenExpandedBefore = true;
-    }
   }
 
   createFolder() {
-    if (this.folderPath != this.folderPathObtainedFromNode || this.hasFolderBeenExpandedBefore == false) { 
+    let onCreateResponse = new Map();
+
+    onCreateResponse.set("pathAndName", this.folderPath + "/" + this.folderName);
+    if (this.folderPath != this.folderPathObtainedFromNode) { 
       //If the user changed the path obtained from the node or the node has never been opened...
-      this.onCreate.emit([this.folderPath + "/" + this.folderName, false]); //then we can't update the tree.
+      onCreateResponse.set("updateExistingTree", false); //then we can't update the tree.
     } else { //If the user kept the path obtained from the node...
-      this.onCreate.emit([this.folderPath + "/" + this.folderName, true]); //then we can add that new folder into the existing node.
+      onCreateResponse.set("updateExistingTree", true); //then we can add that new folder into the existing node.
     }
+
+    this.onCreate.emit(onCreateResponse); //then we can't update the tree.
   }
 
 }
