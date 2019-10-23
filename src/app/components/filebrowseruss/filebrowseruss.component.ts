@@ -573,8 +573,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           let someData = this.ussSrv.getFileMetadata(pathAndName);
           someData.subscribe(
             result => {
-              // If 'node' is a valid node
-              if (node.expanded && node.children) {
+              // If the right-clicked 'node' is the correct, valid node
+              if ((node.expanded && node.children) && (node.path == path)) {
                 let nodeToAdd = {
                   id: node.children.length,
                   children: [],
