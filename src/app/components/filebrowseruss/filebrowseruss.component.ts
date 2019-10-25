@@ -220,6 +220,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showDeleteDialog(rightClickedFile: any) {
+    if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "This is already being deleted.") == true) {
+      return;
+    }
+
     const fileDeleteConfig = new MatDialogConfig();
     fileDeleteConfig.data = {
       event: rightClickedFile,
@@ -233,6 +237,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showCreateFolderDialog(rightClickedFile: any) {
+    if (rightClickedFile.path) { // If this came from a node object
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "Cannot create a directory inside a directory queued for deletion.") == true) {
+        return;
+      }  
+    } else { // Or if this is just a path
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile, "Cannot create a directory inside a directory queued for deletion.") == true) {
+        return;
+      }
+    }
+
     const folderCreateConfig = new MatDialogConfig();
     folderCreateConfig.data = {
       event: rightClickedFile,
@@ -240,12 +254,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     let fileDeleteRef = this.dialog.open(CreateFolderModal, folderCreateConfig);
-    const deleteFileOrFolder = fileDeleteRef.componentInstance.onCreate.subscribe(result => {
-      if (result[1] == true) { //If the user wishes to add a folder to a node...
-        this.createFolder(result[0], this.rightClickedFile, true);
-      } else {
-        this.createFolder(result[0], this.rightClickedFile, false);
-      }
+    const createFolder = fileDeleteRef.componentInstance.onCreate.subscribe(onCreateResponse => {
+      /* pathAndName - Path and name obtained from create folder prompt
+      updateExistingTree - Should the existing tree update or fetch a new one */
+      this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
     });
   }
 
@@ -557,45 +569,42 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       .subscribe(
         resp => {
           this.log.debug('Created: ' + pathAndName);
-          if (update) {
-            let someData = this.ussSrv.getFileMetadata(pathAndName);
-            someData.subscribe(
-              result => {
-                if (result) {
-                  let nodeToAdd = {
-                    id: node.children.length,
-                    label: this.getNameFromPathAndName(pathAndName),
-                    mode: result.mode,
-                    createdAt: result.createdAt,
-                    data: "Folder",
-                    directory: true,
-                    expandedIcon: "fa fa-folder-open",
-                    collapsedIcon: "fa fa-folder",
-                    name: this.getNameFromPathAndName(pathAndName),
-                    parent: node,
-                    path: pathAndName,
-                    size: result.size
-                  }
-                  node.children.push(nodeToAdd);
-                } else {
-                  let path = this.getPathFromPathAndName(pathAndName);
-                  if (path == this.path) { // If we are creating a folder at the top-most level
-                    this.displayTree(this.path, true); // addChild only works for children.
-                  } else {
-                    this.addChild(node);
-                  }
-                  this.newPath = pathAndName;
+          let path = this.getPathFromPathAndName(pathAndName);
+          let someData = this.ussSrv.getFileMetadata(pathAndName);
+          someData.subscribe(
+            result => {
+              // If the right-clicked 'node' is the correct, valid node
+              if ((node.expanded && node.children) && (node.path == path)) {
+                let nodeToAdd = {
+                  id: node.children.length,
+                  children: [],
+                  label: this.getNameFromPathAndName(pathAndName),
+                  mode: result.mode,
+                  createdAt: result.createdAt,
+                  data: "Folder",
+                  directory: true,
+                  expandedIcon: "fa fa-folder-open",
+                  collapsedIcon: "fa fa-folder",
+                  name: this.getNameFromPathAndName(pathAndName),
+                  parent: node,
+                  path: pathAndName,
+                  size: result.size
                 }
-              }); 
-          } else {
-            let path = this.getPathFromPathAndName(pathAndName);
-            if (path == this.path) { // If we are creating a folder at the top-most level
-              this.displayTree(this.path, true); // addChild only works for children.
-            } else {
-              this.addChild(node);
+                node.children.push(nodeToAdd); //Add node to right clicked node
+              }
+              // ..otherwise treat folder creation without any context.
+              else {
+                if (path == this.path) { // If we are creating a folder at the parent level
+                  this.displayTree(path, true);
+                } else if (update) { // If we want to update the tree
+                  this.addChild(node);
+                } else { // If we want a fresh fetch of the tree
+                  this.displayTree(pathAndName, false); // ...plop the Explorer into the newly created location.
+                }
+                this.newPath = pathAndName;
+              }
             }
-            this.newPath = pathAndName;
-          }
+          ); 
         },
         error => { 
           if (error.status == '500') { //Internal Server Error
@@ -654,7 +663,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.path);
         rightClickedFile.styleClass = "";
-
       },
       error => {
         if (error.status == '500') { //Internal Server Error
@@ -758,6 +766,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.path = "/";
       this.fileExplorerUSSInput.nativeElement.value="/";
     }
+  }
+
+  checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
+    if (this.deletionQueue.has(pathAndName)) {
+      this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
+            'Dismiss', { duration: 5000, panelClass: 'center' });
+      return true;
+    } 
+    return false;
   }
 }
 
