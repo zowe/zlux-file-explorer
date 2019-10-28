@@ -45,6 +45,7 @@ import { FilePropertiesModal } from '../file-properties-modal/file-properties-mo
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
 import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule } from '@angular/material';
+import { DatasetPropertiesModal } from '@zlux/file-explorer/src/app/components/dataset-properties-modal/dataset-properties-modal.component';
 
 @Component({
   selector: 'zlux-file-explorer',
@@ -284,6 +285,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     FileBrowserUSSComponent, 
     ZluxFileExplorerComponent, 
     FilePropertiesModal,
+    DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
     TreeComponent],
@@ -302,7 +304,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     MatInputModule
   ],
   exports: [ZluxFileExplorerComponent],
-  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal, DeleteFileModal, CreateFolderModal],
+  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
 })
 export class ZluxFileExplorerModule { }
 
