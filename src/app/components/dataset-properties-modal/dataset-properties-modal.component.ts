@@ -43,17 +43,23 @@ export class DatasetPropertiesModal implements OnInit {
       const data = node.data;
       this.datasetName = data.fileName;
       this.datasetCSIEntryType = data.datasetAttrs.csiEntryType;
-      if (data.datasetAttrs.dsorg.isPDSDir) {
-        this.datasetIsPDS = "✓";
+      if (data.datasetAttrs.dsorg) {
+        if (data.datasetAttrs.dsorg.isPDSDir) {
+          if (data.datasetAttrs.dsorg.isPDSE) {
+            this.datasetIsPDS = "✓ (PDS/E)";
+          } else {
+            this.datasetIsPDS = "✓";
+          }
+        }
+        this.datasetOrganization = data.datasetAttrs.dsorg.organization;
+        this.datasetBlockSize = data.datasetAttrs.dsorg.totalBlockSize;
+        this.datasetCarriageControl = data.datasetAttrs.recfm.carriageControl;
+        if (data.datasetAttrs.recfm.isBlocked) {
+          this.datasetIsBlocked = "✓";
+        }
+        this.datasetRecordLength = data.datasetAttrs.recfm.recordLength;
+        this.datasetVolser = data.datasetAttrs.volser;
       }
-      this.datasetOrganization = data.datasetAttrs.dsorg.organization;
-      this.datasetBlockSize = data.datasetAttrs.dsorg.totalBlockSize;
-      this.datasetCarriageControl = data.datasetAttrs.recfm.carriageControl;
-      if (data.datasetAttrs.recfm.isBlocked) {
-        this.datasetIsBlocked = "✓";
-      }
-      this.datasetRecordLength = data.datasetAttrs.recfm.recordLength;
-      this.datasetVolser = data.datasetAttrs.volser;
     }
     if (node.icon) {
       this.datasetIcon = node.icon;
