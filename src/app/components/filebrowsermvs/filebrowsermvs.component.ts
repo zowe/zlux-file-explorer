@@ -24,6 +24,8 @@ import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
 import { SearchHistoryService } from '../../services/searchHistoryService';
+import { MatDialog, MatDialogConfig } from '@angular/material';
+import { DatasetPropertiesModal } from '@zlux/file-explorer/src/app/components/dataset-properties-modal/dataset-properties-modal.component';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -52,7 +54,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //TODO:define interface types for mvs-data/data
   private data: any;
   public isLoading: boolean;
-  private rightClickPropertiesMap: any;
+  private rightClickedFile: any;
+  private rightClickPropertiesDataset: ContextMenuItem[];
 
   constructor(private fileService: FileService, 
               private elementRef:ElementRef,
@@ -60,7 +63,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               // private persistentDataService: PersistentDataService,
               private mvsSearchHistory:SearchHistoryService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
-              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
+              private dialog: MatDialog
              ) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
@@ -69,11 +73,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.lastPath = "";
     this.hideExplorer = false;
     this.isLoading = false;
-    this.rightClickPropertiesMap = {};
   }
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){
@@ -120,8 +124,25 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }*/
 
   initializeRightClickProperties() {
-    //TODO: Add Dataset properties
-    this.rightClickPropertiesMap = [{text: "Properties", action:()=>{this.log.debug('Properties activated!');}}];
+    this.rightClickPropertiesDataset = [
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }},
+
+      // TODO: Add deletion support to Datasets
+      // { text: "Delete", action:() => { 
+      //   this.showDeleteDialog(this.rightClickedFile); }
+      // }
+    ];
+  }
+
+  showPropertiesDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    this.dialog.open(DatasetPropertiesModal, filePropConfig);
   }
 
   browsePath(path: string): void{
@@ -155,8 +176,20 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onNodeRightClick(event:any) {
     let node = event.node;
-    // TODO: Add right click properties menu to Datasets via Editor/Explorer interaction    
-    this.log.debug(`Node right click at ${event.clientX},${event.clientY}, off=${event.offsetX},${event.offsetY}, node=`,node);
+    let rightClickProperties = this.rightClickPropertiesDataset;
+
+    if (this.windowActions) {
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
+      // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
+      if (!didContextMenuSpawn) { // If context menu failed to spawn...
+        let heightAdjustment = event.originalEvent.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
+      }
+    }
+
+    this.rightClickedFile = node;
+    this.rightClick.emit(event.node);
+    event.originalEvent.preventDefault(); 
   }
 
   updateTreeView(path: string): void {
