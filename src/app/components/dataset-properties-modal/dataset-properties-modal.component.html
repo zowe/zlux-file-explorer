@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 -->
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
-<i class="{{datasetIcon}}" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 15px;"></i>
+<i class="{{datasetIcon}}" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 10px;"></i>
 <h2 mat-dialog-title class="dataset-properties-header">{{datasetName}} - Properties</h2>
 
 <!-- Main properties -->
@@ -20,6 +20,7 @@
             <mat-list-item>CSI Entry Type: </mat-list-item>
             <mat-list-item>Organization: </mat-list-item>
             <mat-list-item>Record Format: </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat">Record Length: </mat-list-item>
         </mat-list>
     </div>
     <div class="dataset-properties-column">
@@ -28,6 +29,7 @@
             <mat-list-item>{{datasetCSIEntryType}}</mat-list-item>
             <mat-list-item>{{datasetOrganization}}</mat-list-item>
             <mat-list-item>{{datasetRecordFormat}}</mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat">{{datasetMaxRecordLen}}</mat-list-item>
         </mat-list>
     </div>
 </div>
