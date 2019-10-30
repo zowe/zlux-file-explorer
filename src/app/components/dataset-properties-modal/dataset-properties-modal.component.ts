@@ -32,10 +32,6 @@ export class DatasetPropertiesModal implements OnInit {
   public datasetVolser = '';
   public datasetIcon = '';
   public datasetSummary = '';
-  public DATA: any[] = [];
-  public displayedColumns: string[];
-  public dataSource;
-  public sizeType: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
