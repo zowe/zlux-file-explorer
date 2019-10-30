@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatTableDataSource } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'dataset-properties-modal',
@@ -26,9 +26,12 @@ export class DatasetPropertiesModal implements OnInit {
   public datasetBlockSize = 0;
   public datasetCarriageControl = '';
   public datasetIsBlocked = '';
-  public datasetRecordLength = '';
+  public datasetIsSpanned = '';
+  public datasetIsStandard = '';
+  public datasetRecordFormat = '';
   public datasetVolser = '';
   public datasetIcon = '';
+  public datasetSummary = '';
   public DATA: any[] = [];
   public displayedColumns: string[];
   public dataSource;
@@ -42,7 +45,7 @@ export class DatasetPropertiesModal implements OnInit {
     if (node.data) {
       const data = node.data;
       this.datasetName = data.fileName;
-      this.datasetCSIEntryType = data.datasetAttrs.csiEntryType;
+      this.datasetCSIEntryType = this.formatCSIEntryType(data.datasetAttrs.csiEntryType);
       if (data.datasetAttrs.dsorg) {
         if (data.datasetAttrs.dsorg.isPDSDir) {
           if (data.datasetAttrs.dsorg.isPDSE) {
@@ -51,13 +54,20 @@ export class DatasetPropertiesModal implements OnInit {
             this.datasetIsPDS = "✓";
           }
         }
-        this.datasetOrganization = data.datasetAttrs.dsorg.organization;
+        this.datasetOrganization = this.formatOrganization(data.datasetAttrs.dsorg.organization);
         this.datasetBlockSize = data.datasetAttrs.dsorg.totalBlockSize;
         this.datasetCarriageControl = data.datasetAttrs.recfm.carriageControl;
         if (data.datasetAttrs.recfm.isBlocked) {
           this.datasetIsBlocked = "✓";
         }
-        this.datasetRecordLength = data.datasetAttrs.recfm.recordLength;
+        if (data.datasetAttrs.recfm.isSpanned) {
+          this.datasetIsSpanned = "✓";
+        }
+        if (data.datasetAttrs.recfm.isStandard) {
+          this.datasetIsStandard = "✓";
+        }
+        this.datasetRecordFormat = this.formatRecordFormat(data.datasetAttrs.recfm.recordLength);
+        this.datasetMaxRecordLen = data.datasetAttrs.dsorg.maxRecordLen;
         this.datasetVolser = data.datasetAttrs.volser;
       }
     }
@@ -66,28 +76,129 @@ export class DatasetPropertiesModal implements OnInit {
     } else if (node.collapsedIcon) {
       this.datasetIcon = node.collapsedIcon;
     }
-
-    this.DATA = [
-      { datasetCSIEntryType: this.datasetCSIEntryType, 
-        datasetIsPDS: this.datasetIsPDS, 
-        datasetOrganization: this.datasetOrganization,
-        datasetBlockSize: this.datasetBlockSize,
-        datasetCarriageControl: this.datasetCarriageControl,
-        datasetIsBlocked: this.datasetIsBlocked,
-        datasetRecordLength: this.datasetRecordLength,
-        datasetVolser: this.datasetVolser
-      },
-    ]
-    this.displayedColumns = ['datasetCSIEntryType', 'datasetIsPDS', 'datasetOrganization', 'datasetBlockSize',
-    'datasetCarriageControl', 'datasetIsBlocked', 'datasetRecordLength', 'datasetVolser'];
-    this.dataSource = new MatTableDataSource(this.DATA);
+    this.datasetSummary = this.formatSummary(this.datasetOrganization, this.datasetRecordFormat, this.datasetMaxRecordLen);
   }
 
   ngOnInit() {
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  formatRecordFormat(recordFormat: string): string {
+    switch(recordFormat) {
+      case "U":
+        recordFormat = "U - Undefined"
+        break;
+      case "F":
+        recordFormat = "F - Fixed"
+        break;
+      case "V":
+        recordFormat = "V - Variable"
+        break;
+    }
+    return recordFormat;
+  }
+
+  formatSummary(org: string, recfm: string, reclen: number): string {
+    let summary = "N/A";
+    if (org.substring(0, 2) == "PS") {
+      if (recfm[0] == 'F') {
+        if (reclen == 80) {
+          summary = "FB80";
+        } else if (reclen == 256) {
+          summary = "FB256";
+        }
+      } else if (recfm[0] == 'V') {
+        if (reclen == 80) {
+          summary = "VB80";
+        } else if (reclen == 256) {
+          summary = "VB256";
+        }
+      }
+    } else if (org.substring(0, 2) == "PO") {
+      if (this.datasetIsPDS.length == 0) { //PDS is false
+        summary = "HFS";
+      } else if (this.datasetIsPDS.length == 1) { //PDS is true
+        if (reclen == 80) {
+          summary = "PDS80";
+        } else if (reclen == 256) {
+          summary = "PDS256";
+        }
+      } else { // PDS/E is true
+        if (reclen == 80) {
+          summary = "PDSE80";
+        } else if (reclen == 256) {
+          summary = "PDSE256";
+        }
+      }
+    } else if (org.substring(0, 2) == "VS") {
+      summary = "VSAM";
+    } else if (org.substring(0, 2) == "DA") {
+      summary = "DA";
+    }
+    return summary;
+  }
+
+  formatOrganization(organization?: string): string {
+    if (organization) {
+      switch(organization) {
+        case "sequential":
+          organization = "PS - Sequential"
+          break;
+        case "hfs":
+          organization = "PO - Partitioned"
+          break;
+        case "partitioned":
+          organization = "PO - Partitioned"
+          break;
+        case "vsam":
+          organization = "VS - VSAM"
+          break;
+      }
+    } else {
+      organization = "DA - Direct Access";
+    }
+    return organization;
+  }
+
+  formatCSIEntryType(CSIEntryType: string): string {
+    switch(CSIEntryType) {
+      case "A":
+        CSIEntryType = "A - non-VSAM data set"
+        break;
+      case "B":
+        CSIEntryType = "B - Generation data group"
+        break;
+      case "C":
+        CSIEntryType = "C - VSAM Cluster"
+        break;
+      case "D":
+        CSIEntryType = "D - VSAM Data"
+        break;
+      case "G":
+        CSIEntryType = "G - Alternate index"
+        break;
+      case "H":
+        CSIEntryType = "H - Generation data set"
+        break;
+      case "I":
+        CSIEntryType = "I - VSAM Index"
+        break;
+      case "L":
+        CSIEntryType = "L - Tape volume catalog library"
+        break;
+      case "R":
+        CSIEntryType = "R - VSAM Path"
+        break;
+      case "U":
+        CSIEntryType = "U - User catalog connector"
+        break;
+      case "W":
+        CSIEntryType = "W - Tape volume catalog volume"
+        break;
+      case "X":
+        CSIEntryType = "X - Alias"
+        break;
+    }
+    return CSIEntryType;
   }
 
 }

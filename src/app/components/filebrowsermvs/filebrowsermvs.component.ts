@@ -139,7 +139,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     const filePropConfig = new MatDialogConfig();
     filePropConfig.data = {
       event: rightClickedFile,
-      width: '600px'
+      width: '375px',
+      height: '475px'
     }
 
     this.dialog.open(DatasetPropertiesModal, filePropConfig);
