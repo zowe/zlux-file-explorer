@@ -10,67 +10,62 @@
 -->
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <i class="{{datasetIcon}}" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 3px;"></i>
-<h2 mat-dialog-title class="file-properties-header">{{datasetName}} - Properties</h2>
+<h2 mat-dialog-title class="dataset-properties-header">{{datasetName}} - Properties</h2>
 
+<!-- Main properties -->
+<div class="dataset-properties-row">
+    <div class="dataset-properties-column">
+        <mat-list>
+            <mat-list-item>Summary: </mat-list-item>
+            <mat-list-item>CSI Entry Type: </mat-list-item>
+            <mat-list-item>Organization: </mat-list-item>
+            <mat-list-item>Record Format: </mat-list-item>
+        </mat-list>
+    </div>
+    <div class="dataset-properties-column">
+        <mat-list>
+            <mat-list-item>{{datasetSummary}}</mat-list-item>
+            <mat-list-item>{{datasetCSIEntryType}}</mat-list-item>
+            <mat-list-item>{{datasetOrganization}}</mat-list-item>
+            <mat-list-item>{{datasetRecordFormat}}</mat-list-item>
+        </mat-list>
+    </div>
+</div>
 
-<!-- Possible future filter code -->
-<!-- <mat-form-field>
-  <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-</mat-form-field> -->
+<hr style="margin-top: 5px; margin-bottom: 5px;">
 
-<table mat-table [dataSource]="dataSource" class="mat-properties-table">
+<!-- Other properties -->
+<div class="dataset-properties-row">
+    <div class="dataset-properties-column">
+        <mat-list>
+            <mat-list-item>Block Size: </mat-list-item>
+            <mat-list-item *ngIf="datasetIsPDS.length > 0">PDS: </mat-list-item>
+            <mat-list-item>Blocked: </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat == 'variable'">Spanned: </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat == 'fixed'">Standard: </mat-list-item>
+            <mat-list-item>Carriage Control: </mat-list-item>
+            <mat-list-item>Volume Serial: </mat-list-item>
+        </mat-list>
+    </div>
+    <div class="dataset-properties-column">
+        <mat-list>
+            <mat-list-item>{{datasetBlockSize}}</mat-list-item>
+            <mat-list-item *ngIf="datasetIsPDS.length > 0">{{datasetIsPDS}}</mat-list-item>
+            <mat-list-item>{{datasetIsBlocked}}</mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat == 'variable'"
+              title="Find out more at https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.idad400/span.htm">
+              {{datasetIsSpanned}}
+            </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat == 'fixed'"
+              title="Find out more at https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/fixstan.htm">
+              {{datasetIsStandard}}
+            </mat-list-item>
+            <mat-list-item>{{datasetCarriageControl}}</mat-list-item>
+            <mat-list-item>{{datasetVolser}}</mat-list-item>
+        </mat-list>
+    </div>
+</div>
 
-  <!-- CSI Entry Type Column -->
-  <ng-container matColumnDef="datasetCSIEntryType">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">CSI Entry Type: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetCSIEntryType}} </td>
-  </ng-container>
-
-  <!-- PDS Column -->
-  <ng-container matColumnDef="datasetIsPDS">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Is PDS Dir? </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetIsPDS}} </td>
-  </ng-container>
-
-  <!-- Organization Column -->
-  <ng-container matColumnDef="datasetOrganization">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Organization: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetOrganization}} </td>
-  </ng-container>
-
-  <!-- Block Size Column -->
-  <ng-container matColumnDef="datasetBlockSize">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Total Block Size: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetBlockSize}}</td>
-  </ng-container>
-
-  <!-- Carriage Control Column -->
-  <ng-container matColumnDef="datasetCarriageControl">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Carriage Control: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetCarriageControl}}</td>
-  </ng-container>
-
-  <!-- Blocked Column -->
-  <ng-container matColumnDef="datasetIsBlocked">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Is Blocked? </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetIsBlocked}}</td>
-  </ng-container>
-
-  <!-- Record Length Column -->
-  <ng-container matColumnDef="datasetRecordLength">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Record Length: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetRecordLength}}</td>
-  </ng-container>
-
-  <!-- Volser Column -->
-  <ng-container matColumnDef="datasetVolser">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Volser: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.datasetVolser}}</td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="mat-properties-close">Close</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
