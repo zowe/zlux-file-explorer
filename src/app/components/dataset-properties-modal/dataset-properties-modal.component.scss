@@ -42,8 +42,6 @@ td.mat-cell:last-child, td.mat-footer-cell:last-child, th.mat-header-cell:last-c
 }
 
 .dataset-properties-header {
-  margin-left: 45px;
-  margin-bottom: 15px;
   min-width: 375px;
 }
 
@@ -57,6 +55,12 @@ td.mat-cell:last-child, td.mat-footer-cell:last-child, th.mat-header-cell:last-c
   content: "";
   display: table;
   clear: both;
+}
+
+.dataset-properties-title {
+  text-align: center;
+  vertical-align: middle;
+  float: left;
 }
 /*
   This program and the accompanying materials are
