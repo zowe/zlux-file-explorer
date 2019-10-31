@@ -55,7 +55,7 @@ export class DatasetPropertiesModal implements OnInit {
         this.datasetCarriageControl = data.datasetAttrs.recfm.carriageControl;
         if (data.datasetAttrs.recfm.isBlocked) {
           this.datasetIsBlocked = "✓";
-        } else if (data.datasetAttrs.recfm.isBlocked) {
+        } else {
           this.datasetIsBlocked = "No";
         }
         if (data.datasetAttrs.recfm.isSpanned) {

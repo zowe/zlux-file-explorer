@@ -15,7 +15,7 @@
 </div>
 
 <!-- Main properties -->
-<div class="dataset-properties-row">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'">
     <div class="dataset-properties-column">
         <mat-list>
             <mat-list-item>Summary: </mat-list-item>
@@ -36,10 +36,26 @@
     </div>
 </div>
 
+<!-- If the dataset is an Alias (X) type -->
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] == 'X'">
+  <div class="dataset-properties-column">
+      <mat-list>
+          <mat-list-item>Dataset Name: </mat-list-item>
+          <mat-list-item>CSI Entry Type: </mat-list-item>
+      </mat-list>
+  </div>
+  <div class="dataset-properties-column">
+      <mat-list>
+          <mat-list-item>Not supported yet</mat-list-item>
+          <mat-list-item>{{datasetCSIEntryType}}</mat-list-item>
+      </mat-list>
+  </div>
+</div>
+
 <hr style="margin-top: 5px; margin-bottom: 5px;">
 
 <!-- Other properties -->
-<div class="dataset-properties-row">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'">
     <div class="dataset-properties-column">
         <mat-list>
             <mat-list-item>Block Size: </mat-list-item>
