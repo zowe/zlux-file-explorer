@@ -15,7 +15,7 @@
 </div>
 
 <!-- Main properties -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X' && datasetVolser != 'MIGRAT'">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X' && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
     <div class="dataset-properties-column">
         <mat-list>
             <mat-list-item>
@@ -57,7 +57,7 @@
 </div>
 
 <!-- If the dataset is an Alias (X) type -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] == 'X' && datasetVolser != 'MIGRAT'">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] == 'X' && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
   <div class="dataset-properties-column">
       <mat-list>
           <mat-list-item>
@@ -80,8 +80,8 @@
   </div>
 </div>
 
-<!-- If the dataset is Migrate status -->
-<div class="dataset-properties-row" *ngIf="datasetVolser == 'MIGRAT'">
+<!-- If the dataset is Migrate/Archive status -->
+<div class="dataset-properties-row" *ngIf="datasetVolser == 'MIGRAT' && datasetVolser == 'ARCIVE'">
   <div class="dataset-properties-column">
       <mat-list>
           <mat-list-item>
@@ -107,7 +107,7 @@
 <hr style="margin-top: 5px; margin-bottom: 5px;">
 
 <!-- Other properties -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'  && datasetVolser != 'MIGRAT'">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'  && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
     <div class="dataset-properties-column">
         <mat-list>
             <mat-list-item>
