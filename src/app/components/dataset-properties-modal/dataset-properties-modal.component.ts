@@ -66,8 +66,8 @@ export class DatasetPropertiesModal implements OnInit {
         }
         this.datasetRecordFormat = this.formatRecordFormat(data.datasetAttrs.recfm.recordLength);
         this.datasetMaxRecordLen = data.datasetAttrs.dsorg.maxRecordLen;
-        this.datasetVolser = data.datasetAttrs.volser;
       }
+      this.datasetVolser = data.datasetAttrs.volser;
     }
     if (node.icon) {
       this.datasetIcon = node.icon;
@@ -99,38 +99,50 @@ export class DatasetPropertiesModal implements OnInit {
     let summary = "N/A";
     if (org.substring(0, 2) == "PS") {
       if (recfm[0] == 'F') {
-        if (reclen == 80) {
-          summary = "FB80";
-        } else if (reclen == 256) {
-          summary = "FB256";
+        if (reclen > 0) {
+          summary = "FB" + reclen;
+        } else {
+          summary = "FB";
         }
       } else if (recfm[0] == 'V') {
-        if (reclen == 80) {
-          summary = "VB80";
-        } else if (reclen == 256) {
-          summary = "VB256";
+        if (reclen > 0) {
+          summary = "VB" + reclen;
+        } else {
+          summary = "VB";
         }
       }
     } else if (org.substring(0, 2) == "PO") {
       if (this.datasetIsPDS.length == 0) { //PDS is false
-        summary = "HFS";
+        if (reclen > 0) {
+          summary = "HFS" + reclen;
+        } else {
+          summary = "HFS";
+        }
       } else if (this.datasetIsPDS.length == 1) { //PDS is true
-        if (reclen == 80) {
-          summary = "PDS80";
-        } else if (reclen == 256) {
-          summary = "PDS256";
+        if (reclen > 0) {
+          summary = "PDS" + reclen;
+        } else {
+          summary = "PDS";
         }
       } else { // PDS/E is true
-        if (reclen == 80) {
-          summary = "PDSE80";
-        } else if (reclen == 256) {
-          summary = "PDSE256";
+        if (reclen > 0) {
+          summary = "PDSE" + reclen;
+        } else {
+          summary = "PDSE";
         }
       }
     } else if (org.substring(0, 2) == "VS") {
-      summary = "VSAM";
+      if (reclen > 0) {
+        summary = "VSAM" + reclen;
+      } else {
+        summary = "VSAM";
+      }
     } else if (org.substring(0, 2) == "DA") {
-      summary = "DA";
+      if (reclen > 0) {
+        summary = "DA" + reclen;
+      } else {
+        summary = "DA";
+      }
     }
     return summary;
   }
