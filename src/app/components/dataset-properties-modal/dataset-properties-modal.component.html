@@ -11,43 +11,95 @@
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <div class="dataset-properties-title">
   <i class="{{datasetIcon}}" style="font-size:24px; margin-top: 4px; margin-left: 10px; float: left;"></i>
-  <h2 mat-dialog-title class="dataset-properties-header">{{datasetName}} - Properties</h2>
+  <h2 mat-dialog-title class="dataset-properties-header selectable-text">{{datasetName}} - Properties</h2>
 </div>
 
 <!-- Main properties -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X' && datasetVolser != 'MIGRAT'">
     <div class="dataset-properties-column">
         <mat-list>
-            <mat-list-item>Summary: </mat-list-item>
-            <mat-list-item>CSI Entry Type: </mat-list-item>
-            <mat-list-item>Organization: </mat-list-item>
-            <mat-list-item>Record Format: </mat-list-item>
-            <mat-list-item *ngIf="datasetRecordFormat">Record Length: </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Summary: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">CSI Entry Type: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Organization: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Record Format: </div>
+            </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat">
+              <div class="selectable-text">Record Length: </div>
+            </mat-list-item>
         </mat-list>
     </div>
     <div class="dataset-properties-column">
         <mat-list>
-            <mat-list-item>{{datasetSummary}}</mat-list-item>
-            <mat-list-item>{{datasetCSIEntryType}}</mat-list-item>
-            <mat-list-item>{{datasetOrganization}}</mat-list-item>
-            <mat-list-item>{{datasetRecordFormat}}</mat-list-item>
-            <mat-list-item *ngIf="datasetRecordFormat">{{datasetMaxRecordLen}}</mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetSummary}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetCSIEntryType}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetOrganization}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetRecordFormat}}</div>
+            </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat">
+              <div class="selectable-text">{{datasetMaxRecordLen}}</div>
+            </mat-list-item>
         </mat-list>
     </div>
 </div>
 
 <!-- If the dataset is an Alias (X) type -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] == 'X'">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] == 'X' && datasetVolser != 'MIGRAT'">
   <div class="dataset-properties-column">
       <mat-list>
-          <mat-list-item>Dataset Name: </mat-list-item>
-          <mat-list-item>CSI Entry Type: </mat-list-item>
+          <mat-list-item>
+            <div class="selectable-text">Dataset Name: </div>
+          </mat-list-item>
+          <mat-list-item>
+            <div class="selectable-text">CSI Entry Type: </div>
+          </mat-list-item>
       </mat-list>
   </div>
   <div class="dataset-properties-column">
       <mat-list>
-          <mat-list-item>Not supported yet</mat-list-item>
-          <mat-list-item>{{datasetCSIEntryType}}</mat-list-item>
+          <mat-list-item>
+            <div class="selectable-text">Not supported yet</div>
+          </mat-list-item>
+          <mat-list-item>
+            <div class="selectable-text">{{datasetCSIEntryType}}</div>
+          </mat-list-item>
+      </mat-list>
+  </div>
+</div>
+
+<!-- If the dataset is Migrate status -->
+<div class="dataset-properties-row" *ngIf="datasetVolser == 'MIGRAT'">
+  <div class="dataset-properties-column">
+      <mat-list>
+          <mat-list-item>
+            <div class="selectable-text">CSI Entry Type: </div>
+          </mat-list-item>
+          <mat-list-item>
+            <div class="selectable-text">Volume Serial: </div>
+          </mat-list-item>
+      </mat-list>
+  </div>
+  <div class="dataset-properties-column">
+      <mat-list>
+          <mat-list-item>
+            <div class="selectable-text">{{datasetCSIEntryType}}</div>
+          </mat-list-item>
+          <mat-list-item>
+            <div class="selectable-text">{{datasetVolser}}</div>
+          </mat-list-item>
       </mat-list>
   </div>
 </div>
@@ -55,33 +107,57 @@
 <hr style="margin-top: 5px; margin-bottom: 5px;">
 
 <!-- Other properties -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'">
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'  && datasetVolser != 'MIGRAT'">
     <div class="dataset-properties-column">
         <mat-list>
-            <mat-list-item>Block Size: </mat-list-item>
-            <mat-list-item *ngIf="datasetIsPDS.length > 0">PDS: </mat-list-item>
-            <mat-list-item>Blocked: </mat-list-item>
-            <mat-list-item *ngIf="datasetRecordFormat == 'variable'">Spanned: </mat-list-item>
-            <mat-list-item *ngIf="datasetRecordFormat == 'fixed'">Standard: </mat-list-item>
-            <mat-list-item>Carriage Control: </mat-list-item>
-            <mat-list-item>Volume Serial: </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Block Size: </div>
+            </mat-list-item>
+            <mat-list-item *ngIf="datasetIsPDS.length > 0">
+              <div class="selectable-text">PDS: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Blocked: </div>
+            </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat == 'variable'">
+              <div class="selectable-text">Spanned: </div>
+            </mat-list-item>
+            <mat-list-item *ngIf="datasetRecordFormat == 'fixed'">
+              <div class="selectable-text">Standard: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Carriage Control: </div>
+             </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Volume Serial: </div>
+            </mat-list-item>
         </mat-list>
     </div>
     <div class="dataset-properties-column">
         <mat-list>
-            <mat-list-item>{{datasetBlockSize}}</mat-list-item>
-            <mat-list-item *ngIf="datasetIsPDS.length > 0">{{datasetIsPDS}}</mat-list-item>
-            <mat-list-item>{{datasetIsBlocked}}</mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetBlockSize}}</div>
+            </mat-list-item>
+            <mat-list-item *ngIf="datasetIsPDS.length > 0">
+              <div class="selectable-text">{{datasetIsPDS}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetIsBlocked}}</div>
+            </mat-list-item>
             <mat-list-item *ngIf="datasetRecordFormat == 'variable'"
               title="Find out more at https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.idad400/span.htm">
-              {{datasetIsSpanned}}
+              <div class="selectable-text">{{datasetIsSpanned}}</div>
             </mat-list-item>
             <mat-list-item *ngIf="datasetRecordFormat == 'fixed'"
               title="Find out more at https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/fixstan.htm">
-              {{datasetIsStandard}}
+              <div class="selectable-text">{{datasetIsStandard}}</div>
             </mat-list-item>
-            <mat-list-item>{{datasetCarriageControl}}</mat-list-item>
-            <mat-list-item>{{datasetVolser}}</mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetCarriageControl}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetVolser}}</div>
+            </mat-list-item>
         </mat-list>
     </div>
 </div>
