@@ -10,7 +10,7 @@
 -->
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <div class="dataset-properties-title">
-  <i class="{{datasetIcon}}" style="font-size:24px; margin-top: 4px; margin-left: 10px; float: left;">
+  <i class="{{datasetIcon}} dataset-properties-main-icon">
       <h2 mat-dialog-title class="dataset-properties-header selectable-text">{{datasetName}} - Properties</h2>
   </i>
 </div>
@@ -144,13 +144,19 @@
               <div class="selectable-text">{{datasetIsPDS}}</div>
             </mat-list-item>
             <mat-list-item>
-              <div class="selectable-text">{{datasetIsBlocked}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/da.htm" target="_blank">(?) </a></div>
+              <div class="selectable-text">{{datasetIsBlocked}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/da.htm" target="_blank">
+                <i class="fa fa-question-circle dataset-properties-question-circle"></i>
+              </a></div>
             </mat-list-item>
             <mat-list-item *ngIf="datasetRecordFormat == 'variable'">
-              <div class="selectable-text">{{datasetIsSpanned}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.idad400/span.htm" target="_blank">(?) </a></div>
+              <div class="selectable-text">{{datasetIsSpanned}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.idad400/span.htm" target="_blank">
+                <i class="fa fa-question-circle dataset-properties-question-circle"></i>
+              </a></div>
             </mat-list-item>
             <mat-list-item *ngIf="datasetRecordFormat == 'fixed'">
-              <div class="selectable-text">{{datasetIsStandard}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/fixstan.htm" target="_blank">(?) </a></div>
+              <div class="selectable-text">{{datasetIsStandard}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/fixstan.htm" target="_blank">
+                <i class="fa fa-question-circle dataset-properties-question-circle"></i>
+              </a></div>
             </mat-list-item>
             <mat-list-item>
               <div class="selectable-text">{{datasetCarriageControl}}</div>

@@ -65,6 +65,21 @@ mat-dialog-actions {
   user-select: text !important;
 }
 
+.dataset-properties-question-circle {
+  font-size: 24px;
+  color: #5e9cff;
+  margin-left: 8px;
+  margin-top: -1px;
+  position: absolute;
+}
+
+.dataset-properties-main-icon {
+  font-size: 24px; 
+  margin-top: 4px; 
+  margin-left: 10px; 
+  float: left;
+}
+
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
