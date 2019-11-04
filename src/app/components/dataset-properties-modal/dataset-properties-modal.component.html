@@ -117,6 +117,7 @@
             <mat-list-item *ngIf="datasetIsPDS.length > 0">
               <div class="selectable-text">PDS: </div>
             </mat-list-item>
+            <!-- We use target="_blank" here to redirect links to a new blank tab -->
             <mat-list-item>
               <div class="selectable-text">Blocked: </div>
             </mat-list-item>
@@ -143,15 +144,13 @@
               <div class="selectable-text">{{datasetIsPDS}}</div>
             </mat-list-item>
             <mat-list-item>
-              <div class="selectable-text">{{datasetIsBlocked}}</div>
+              <div class="selectable-text">{{datasetIsBlocked}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/da.htm" target="_blank">(?) </a></div>
             </mat-list-item>
-            <mat-list-item *ngIf="datasetRecordFormat == 'variable'"
-              title="Find out more at https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.idad400/span.htm">
-              <div class="selectable-text">{{datasetIsSpanned}}</div>
+            <mat-list-item *ngIf="datasetRecordFormat == 'variable'">
+              <div class="selectable-text">{{datasetIsSpanned}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.2.0/com.ibm.zos.v2r2.idad400/span.htm" target="_blank">(?) </a></div>
             </mat-list-item>
-            <mat-list-item *ngIf="datasetRecordFormat == 'fixed'"
-              title="Find out more at https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/fixstan.htm">
-              <div class="selectable-text">{{datasetIsStandard}}</div>
+            <mat-list-item *ngIf="datasetRecordFormat == 'fixed'">
+              <div class="selectable-text">{{datasetIsStandard}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/fixstan.htm" target="_blank">(?) </a></div>
             </mat-list-item>
             <mat-list-item>
               <div class="selectable-text">{{datasetCarriageControl}}</div>
