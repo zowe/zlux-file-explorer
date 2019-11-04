@@ -18,17 +18,17 @@ import { MAT_DIALOG_DATA, MatTableDataSource } from '@angular/material';
 })
 export class FilePropertiesModal implements OnInit {
 
-  private fileName = '';
-  private fileCreatedAt = '';
-  private fileType = '';
-  private filePath = '';
-  private fileMode = 0;
-  private fileSize = '';
-  private fileIcon = '';
-  private DATA: any[] = [];
-  private displayedColumns: string[];
-  private dataSource;
-  private sizeType: string;
+  public fileName = '';
+  public fileCreatedAt = '';
+  public fileType = '';
+  public filePath = '';
+  public fileMode = 0;
+  public fileSize = '';
+  public fileIcon = '';
+  public DATA: any[] = [];
+  public displayedColumns: string[];
+  public dataSource;
+  public sizeType: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
