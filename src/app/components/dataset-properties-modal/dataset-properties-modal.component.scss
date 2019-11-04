@@ -35,6 +35,9 @@ mat-dialog-actions {
 
 .dataset-properties-header {
   min-width: 375px;
+  white-space: nowrap;
+  margin-top: -28px;
+  margin-left: 40px;
 }
 
 .dataset-properties-column {
@@ -50,7 +53,6 @@ mat-dialog-actions {
 }
 
 .dataset-properties-title {
-  text-align: center;
   vertical-align: middle;
   float: left;
 }
