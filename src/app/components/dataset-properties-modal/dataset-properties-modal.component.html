@@ -10,8 +10,9 @@
 -->
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <div class="dataset-properties-title">
-  <i class="{{datasetIcon}}" style="font-size:24px; margin-top: 4px; margin-left: 10px; float: left;"></i>
-  <h2 mat-dialog-title class="dataset-properties-header selectable-text">{{datasetName}} - Properties</h2>
+  <i class="{{datasetIcon}}" style="font-size:24px; margin-top: 4px; margin-left: 10px; float: left;">
+      <h2 mat-dialog-title class="dataset-properties-header selectable-text">{{datasetName}} - Properties</h2>
+  </i>
 </div>
 
 <!-- Main properties -->
@@ -81,7 +82,7 @@
 </div>
 
 <!-- If the dataset is Migrate/Archive status -->
-<div class="dataset-properties-row" *ngIf="datasetVolser == 'MIGRAT' && datasetVolser == 'ARCIVE'">
+<div class="dataset-properties-row" *ngIf="datasetVolser == 'MIGRAT' || datasetVolser == 'ARCIVE'">
   <div class="dataset-properties-column">
       <mat-list>
           <mat-list-item>
