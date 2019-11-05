@@ -15,8 +15,8 @@
   </i>
 </div>
 
-<!-- Main properties -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X' && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
+<!-- Main properties (non X type, non C (VSAM) type, non MIGRAT/ARCIVE status) -->
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X' && datasetCSIEntryType[0] != 'C' && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
     <div class="dataset-properties-column">
         <mat-list>
             <mat-list-item>
@@ -72,7 +72,7 @@
   <div class="dataset-properties-column">
       <mat-list>
           <mat-list-item>
-            <div class="selectable-text">Not supported yet</div>
+            <div class="selectable-text" style="color: #c6c6c6;">Not implemented yet</div>
           </mat-list-item>
           <mat-list-item>
             <div class="selectable-text">{{datasetCSIEntryType}}</div>
@@ -105,10 +105,29 @@
   </div>
 </div>
 
+<!-- If the dataset is a C type (VSAM) -->
+<!-- TODO: Enhance ZSS API to allow for greater VSAM property support -->
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] == 'C' && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
+    <div class="dataset-properties-column">
+        <mat-list>
+            <mat-list-item>
+              <div class="selectable-text">CSI Entry Type: </div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+    <div class="dataset-properties-column">
+        <mat-list>
+            <mat-list-item>
+              <div class="selectable-text">{{datasetCSIEntryType}}</div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+  </div>
+
 <hr style="margin-top: 5px; margin-bottom: 5px;">
 
-<!-- Other properties -->
-<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X'  && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
+<!-- Other properties (non X type, non C (VSAM) type, non MIGRAT/ARCIVE status) -->
+<div class="dataset-properties-row" *ngIf="datasetCSIEntryType[0] != 'X' && datasetCSIEntryType[0] != 'C' && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
     <div class="dataset-properties-column">
         <mat-list>
             <mat-list-item>
@@ -117,7 +136,6 @@
             <mat-list-item *ngIf="datasetIsPDS.length > 0">
               <div class="selectable-text">PDS: </div>
             </mat-list-item>
-            <!-- We use target="_blank" here to redirect links to a new blank tab -->
             <mat-list-item>
               <div class="selectable-text">Blocked: </div>
             </mat-list-item>
@@ -143,6 +161,7 @@
             <mat-list-item *ngIf="datasetIsPDS.length > 0">
               <div class="selectable-text">{{datasetIsPDS}}</div>
             </mat-list-item>
+            <!-- We use target="_blank" here to redirect links to a new blank tab -->
             <mat-list-item>
               <div class="selectable-text">{{datasetIsBlocked}} <a href="https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.idad400/da.htm" target="_blank">
                 <i class="fa fa-question-circle dataset-properties-question-circle"></i>
