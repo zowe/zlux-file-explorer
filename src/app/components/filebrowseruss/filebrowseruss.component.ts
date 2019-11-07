@@ -33,7 +33,6 @@ import { SearchHistoryService } from '../../services/searchHistoryService';
 import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
-import { ZoweNotification } from '../../../../../../../../../zlux-platform/base/src/notification-manager/notification';
 import { CreateFolderModal } from '@zlux/file-explorer/src/app/components/create-folder-modal/create-folder-modal.component';
 
 @Component({
@@ -734,7 +733,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   sendNotification(title: string, message: string): number {
     let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier();
     // We can specify a different styleClass to theme the notification UI i.e. [...] message, 1, pluginId, "org_zowe_zlux_editor_snackbar"
-    let notification = new ZoweNotification(title, message, 1, pluginId);
+    let notification = ZoweZLUX.notificationManager.createNotification(title, message, 1, pluginId);
     return ZoweZLUX.notificationManager.notify(notification);
   }
 
