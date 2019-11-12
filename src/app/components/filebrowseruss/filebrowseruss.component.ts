@@ -291,7 +291,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
   
   onNodeClick($event: any): void {
-    this.path = this.path.replace(/\/$/, ''); 
+    this.path = this.path.replace(/\/$/, '');
 
     if ($event.node.data === 'Folder') {
       if (this.checkIfInDeletionQueueAndMessage($event.node.path, "Cannot open a directory queued for deletion.") == true) {
@@ -674,11 +674,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
     .subscribe(
       resp => {
-        setTimeout(() => {this.isLoading = false;
-          this.sendNotification('Editor', 'Deleted: ' + name);
-          this.removeChild(rightClickedFile);
-          this.deletionQueue.delete(rightClickedFile.path);
-          rightClickedFile.styleClass = ""; }, 5000);
+        this.isLoading = false;
+        this.sendNotification('Editor', 'Deleted: ' + name);
+        this.removeChild(rightClickedFile);
+        this.deletionQueue.delete(rightClickedFile.path);
       },
       error => {
         if (error.status == '500') { //Internal Server Error
