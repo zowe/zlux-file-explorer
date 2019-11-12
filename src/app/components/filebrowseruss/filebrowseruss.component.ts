@@ -283,10 +283,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.path = this.path.replace(/\/$/, '');
 
     if ($event.node.data === 'Folder') {
+      if (this.checkIfInDeletionQueueAndMessage($event.node.path, "Cannot open a directory queued for deletion.") == true) {
+        return;
+      } 
       this.addChild($event.node);
       this.nodeClick.emit($event.node);
     }
     else {
+      if (this.checkIfInDeletionQueueAndMessage($event.node.path, "Cannot open a file queued for deletion.") == true) {
+        return;
+      } 
       this.nodeClick.emit($event.node);
     }
   }
