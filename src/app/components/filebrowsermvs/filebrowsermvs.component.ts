@@ -136,6 +136,137 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       // }
     ];
   }
+  showDeleteDialog(rightClickedFile: any) {
+    // if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "This is already being deleted.") == true) {
+    //   return;
+    // }
+
+    const fileDeleteConfig = new MatDialogConfig();
+    fileDeleteConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
+    const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
+      let vsamCSITypes = ['R', 'D', 'G', 'I', 'C'];
+      console.log(vsamCSITypes.indexOf(rightClickedFile.data.datasetAttrs.csiEntryType))
+      if (vsamCSITypes.indexOf(rightClickedFile.data.datasetAttrs.csiEntryType) != -1) {
+        this.deleteVsamDataset(rightClickedFile);
+      } else {
+        this.deleteNonVsamDataset(rightClickedFile);
+      }
+    });
+  }
+
+  deleteNonVsamDataset(rightClickedFile: any): void {
+    this.isLoading = true;
+    this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
+    rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
+    console.log("yeeyt")
+    let deleteSubscription = this.datasetService.deleteNonVsamDatasetOrMember(rightClickedFile)
+    .subscribe(
+      resp => {
+        console.log(resp)
+        this.isLoading = false;
+        // this.sendNotification('Editor', 'Deleted: ' + name);
+        this.snackBar.open(resp.msg,
+        'Dismiss', { duration: 5000,   panelClass: 'center' });
+        this.removeChild(rightClickedFile);
+        this.deletionQueue.delete(rightClickedFile.path);
+        rightClickedFile.styleClass = "";
+      },
+      error => {
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open('Failed to delete: ' + rightClickedFile.path + "' This is probably due to a server agent problem.",
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(rightClickedFile.path + ' has already been deleted or does not exist.',
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          this.removeChild(rightClickedFile);
+        } else if (error.status == '400') { //Bad Request
+          this.snackBar.open("Failed to delete '" + rightClickedFile.path + "' This is probably due to a permission problem.",
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.path,
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          // Error info gets printed in uss.crud.service.ts
+        }
+        this.deletionQueue.delete(rightClickedFile.path);
+        this.isLoading = false;
+        rightClickedFile.styleClass = "";
+        this.errorMessage = <any>error;
+      }
+    );
+
+    // setTimeout(() => {
+      // if (deleteSubscription.closed == false) {
+        // this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.',
+          // 'Dismiss', { duration: 5000,   panelClass: 'center' });
+      // }
+    // }, 4000);
+  }
+
+  deleteVsamDataset(rightClickedFile: any): void {
+    this.isLoading = true;
+    this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
+    rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
+    console.log("yeeyt")
+    let deleteSubscription = this.datasetService.deleteVsamDataset(rightClickedFile)
+    .subscribe(
+      resp => {
+        console.log(resp)
+        this.isLoading = false;
+        // this.sendNotification('Editor', 'Deleted: ' + name);
+        this.snackBar.open(resp.Response,
+        'Dismiss', { duration: 5000,   panelClass: 'center' });
+        this.removeChild(rightClickedFile);
+        this.deletionQueue.delete(rightClickedFile.path);
+        rightClickedFile.styleClass = "";
+      },
+      error => {
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open('Failed to delete: ' + rightClickedFile.path + "' This is probably due to a server agent problem.",
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(rightClickedFile.path + ' has already been deleted or does not exist.',
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          this.removeChild(rightClickedFile);
+        } else if (error.status == '400') { //Bad Request
+          this.snackBar.open("Failed to delete '" + rightClickedFile.path + "' This is probably due to a permission problem.",
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.path,
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          //Error info gets printed in uss.crud.service.ts
+        }
+        this.deletionQueue.delete(rightClickedFile.path);
+        this.isLoading = false;
+        rightClickedFile.styleClass = "";
+        this.errorMessage = <any>error;
+      }
+    );
+
+    // setTimeout(() => {
+      // if (deleteSubscription.closed == false) {
+        // this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.',
+          // 'Dismiss', { duration: 5000,   panelClass: 'center' });
+      // }
+    // }, 4000);
+  }
+
+  removeChild(node: any) {
+    let nodes = this.data;
+    if (node.parent) {
+      let parent = node.parent;
+      parent.children.splice(parent.children.indexOf(node), 1);
+      nodes[nodes.indexOf(node.parent)] = parent;
+      this.data = nodes;
+    } else {
+      nodes.splice(nodes.indexOf(node), 1);
+      this.data = nodes;
+    }
+  }
 
   showPropertiesDialog(rightClickedFile: any) {
     const filePropConfig = new MatDialogConfig();
@@ -313,6 +444,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.path = this.path.replace(regex, '.*')
     }
     this.updateTreeView(this.path);
+  }
+
+  checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
+    if (this.deletionQueue.has(pathAndName)) {
+      this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message,
+            'Dismiss', { duration: 5000, panelClass: 'center' });
+      return true;
+    }
+    return false;
   }
 }
 

@@ -11,10 +11,12 @@
 */
 
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class DatasetCrudService {
-  constructor(){}
+  constructor(private http: Http){}
 
   //addfolder
   addfolder():void{
@@ -57,6 +59,25 @@ export class DatasetCrudService {
   renamefile():void{
 
   }
+
+  deleteNonVsamDatasetOrMember(rightClickedFile: any): Observable<any>{
+    console.log("NONVSAM");
+    console.log(ZoweZLUX.uriBroker.datasetContentsUri(rightClickedFile.data.path))
+    let url = ZoweZLUX.uriBroker.datasetContentsUri(rightClickedFile.data.path);
+    return this.http.delete(url)
+    .map(res=>res.json())
+    .catch(this.handleErrorObservable);
+  }
+
+  deleteVsamDataset(rightClickedFile: any): Observable<any> {
+    console.log("VSAM");
+    console.log(ZoweZLUX.uriBroker.VSAMdatasetContentsUri(rightClickedFile.data.path))
+    let url = ZoweZLUX.uriBroker.VSAMdatasetContentsUri(rightClickedFile.data.path);
+    return this.http.delete(url)
+    .map(res => res.json())
+    .catch(this.handleErrorObservable);
+  }
+
 }
 
 /*
