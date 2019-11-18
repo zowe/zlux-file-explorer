@@ -10,7 +10,8 @@
 -->
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <i class="{{fileIcon}}" style="font-size: 30px; position: absolute; margin-top: 2px; margin-left: 3px; color: #e64242;"></i>
-<h2 mat-dialog-title class="delete-content-body">Are you sure you wish to delete {{fileName}}?</h2>
+<h2 mat-dialog-title class="delete-content-body">Are you sure you wish to delete</h2>
+<h2 mat-dialog-title class="delete-content-body">{{getFileName()}}?</h2>
 
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="mat-properties-delete cancel">Cancel</button>

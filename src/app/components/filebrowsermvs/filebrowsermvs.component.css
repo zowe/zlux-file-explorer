@@ -35,7 +35,9 @@
   height: 0px;
 }
 
-
+.filebrowsermvs-node-deleting {
+  opacity: .5;
+}
 
 /*
   This program and the accompanying materials are
