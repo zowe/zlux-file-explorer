@@ -18,6 +18,11 @@ import { Observable } from 'rxjs/Observable';
 export class DatasetCrudService {
   constructor(private http: Http){}
 
+  private handleErrorObservable (error: Response | any) {
+    console.error(error.message || error);
+    return Observable.throw(error.message || error);
+  }
+  
   //addfolder
   addfolder():void{
 
