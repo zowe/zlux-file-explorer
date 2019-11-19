@@ -132,17 +132,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesDataset = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
-
-      // TODO: Add deletion support to Datasets
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }
       }
     ];
   }
   showDeleteDialog(rightClickedFile: any) {
-    // if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "This is already being deleted.") == true) {
-    //   return;
-    // }
+    if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.data.path, "This is already being deleted.") == true) {
+      return;
+    }
 
     const fileDeleteConfig = new MatDialogConfig();
     fileDeleteConfig.data = {
@@ -153,7 +151,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       let vsamCSITypes = ['R', 'D', 'G', 'I', 'C'];
-      console.log(vsamCSITypes.indexOf(rightClickedFile.data.datasetAttrs.csiEntryType))
       if (vsamCSITypes.indexOf(rightClickedFile.data.datasetAttrs.csiEntryType) != -1) {
         this.deleteVsamDataset(rightClickedFile);
       } else {
@@ -164,98 +161,93 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   deleteNonVsamDataset(rightClickedFile: any): void {
     this.isLoading = true;
-    this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
+    this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
     rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
-    console.log("yeeyt")
     let deleteSubscription = this.datasetService.deleteNonVsamDatasetOrMember(rightClickedFile)
     .subscribe(
       resp => {
-        console.log(resp)
         this.isLoading = false;
-        // this.sendNotification('Editor', 'Deleted: ' + name);
         this.snackBar.open(resp.msg, 
         'Dismiss', { duration: 5000,   panelClass: 'center' });
         this.removeChild(rightClickedFile);
-        this.deletionQueue.delete(rightClickedFile.path);
+        this.deletionQueue.delete(rightClickedFile.data.path);
         rightClickedFile.styleClass = "";
       },
       error => {
         if (error.status == '500') { //Internal Server Error
-          this.snackBar.open('Failed to delete: ' + rightClickedFile.path + "' This is probably due to a server agent problem.", 
+          this.snackBar.open('Failed to delete: ' + rightClickedFile.data.path + "' This is probably due to a server agent problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else if (error.status == '404') { //Not Found
-          this.snackBar.open(rightClickedFile.path + ' has already been deleted or does not exist.', 
+          this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
-          this.snackBar.open("Failed to delete '" + rightClickedFile.path + "' This is probably due to a permission problem.", 
+          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.path, 
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           // Error info gets printed in uss.crud.service.ts
         }
-        this.deletionQueue.delete(rightClickedFile.path);
+        this.deletionQueue.delete(rightClickedFile.data.path);
         this.isLoading = false;
         rightClickedFile.styleClass = "";
         this.errorMessage = <any>error;
       }
     );
 
-    // setTimeout(() => {
-      // if (deleteSubscription.closed == false) {
-        // this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-          // 'Dismiss', { duration: 5000,   panelClass: 'center' });
-      // }
-    // }, 4000);
+    setTimeout(() => {
+      if (deleteSubscription.closed == false) {
+        this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+      }
+    }, 4000);
   }
 
   deleteVsamDataset(rightClickedFile: any): void {
     this.isLoading = true;
-    this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
+    this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
     rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
-    console.log("yeeyt")
     let deleteSubscription = this.datasetService.deleteVsamDataset(rightClickedFile)
     .subscribe(
       resp => {
-        console.log(resp)
         this.isLoading = false;
         // this.sendNotification('Editor', 'Deleted: ' + name);
         this.snackBar.open(resp.Response, 
         'Dismiss', { duration: 5000,   panelClass: 'center' });
         this.removeChild(rightClickedFile);
-        this.deletionQueue.delete(rightClickedFile.path);
+        this.deletionQueue.delete(rightClickedFile.data.path);
         rightClickedFile.styleClass = "";
       },
       error => {
         if (error.status == '500') { //Internal Server Error
-          this.snackBar.open('Failed to delete: ' + rightClickedFile.path + "' This is probably due to a server agent problem.", 
+          this.snackBar.open('Failed to delete: ' + rightClickedFile.data.path + "' This is probably due to a server agent problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else if (error.status == '404') { //Not Found
-          this.snackBar.open(rightClickedFile.path + ' has already been deleted or does not exist.', 
+          this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
-          this.snackBar.open("Failed to delete '" + rightClickedFile.path + "' This is probably due to a permission problem.", 
+          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.path, 
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           //Error info gets printed in uss.crud.service.ts
         }
-        this.deletionQueue.delete(rightClickedFile.path);
+        this.deletionQueue.delete(rightClickedFile.data.path);
         this.isLoading = false;
         rightClickedFile.styleClass = "";
         this.errorMessage = <any>error;
       }
     );
 
-    // setTimeout(() => {
-      // if (deleteSubscription.closed == false) {
-        // this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-          // 'Dismiss', { duration: 5000,   panelClass: 'center' });
-      // }
-    // }, 4000);
+    setTimeout(() => {
+      if (deleteSubscription.closed == false) {
+        this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+      }
+    }, 4000);
   }
 
   removeChild(node: any) {
