@@ -254,12 +254,22 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     let nodes = this.data;
     if (node.parent) {
       let parent = node.parent;
-      parent.children.splice(parent.children.indexOf(node), 1);
-      nodes[nodes.indexOf(node.parent)] = parent;
-      this.data = nodes;
+      let index = parent.children.indexOf(node);
+      if (index == -1) {
+        return;
+      } else {
+        parent.children.splice(index, 1);
+        nodes[nodes.indexOf(node.parent)] = parent;
+        this.data = nodes;
+      }
     } else {
-      nodes.splice(nodes.indexOf(node), 1);
-      this.data = nodes;
+      let index = nodes.indexOf(node);
+      if (index == -1) {
+        return;
+      } else {
+        nodes.splice(nodes.indexOf(node), 1);
+        this.data = nodes;
+      }
     }
   }
 
