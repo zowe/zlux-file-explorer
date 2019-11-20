@@ -209,10 +209,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     .subscribe(
       resp => {
         this.isLoading = false;
-        // this.sendNotification('Editor', 'Deleted: ' + name);
-        this.snackBar.open(resp.Response,
+        this.snackBar.open(resp.Response, 
         'Dismiss', { duration: 5000,   panelClass: 'center' });
-        this.removeChild(rightClickedFile);
+        //Update vs removing node since symbolicly linked data/index of vsam can be named anything
+        this.updateTreeView(this.path);
         this.deletionQueue.delete(rightClickedFile.data.path);
         rightClickedFile.styleClass = "";
       },
