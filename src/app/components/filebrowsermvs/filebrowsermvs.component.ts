@@ -167,7 +167,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     .subscribe(
       resp => {
         this.isLoading = false;
-        this.snackBar.open(resp.msg, 
+        this.snackBar.open(resp.msg,
         'Dismiss', { duration: 5000,   panelClass: 'center' });
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.data.path);
@@ -212,7 +212,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     .subscribe(
       resp => {
         this.isLoading = false;
-        this.snackBar.open(resp.Response, 
+        this.snackBar.open(resp.msg,
         'Dismiss', { duration: 5000,   panelClass: 'center' });
         //Update vs removing node since symbolicly linked data/index of vsam can be named anything
         this.updateTreeView(this.path);
