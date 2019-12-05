@@ -21,7 +21,7 @@ export class DeleteFileModal {
   private fileName = '';
   private fileIcon = '';
   onDelete = new EventEmitter();
-  node: any;
+  private node: any;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
