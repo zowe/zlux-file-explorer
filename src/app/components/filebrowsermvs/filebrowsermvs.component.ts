@@ -15,7 +15,6 @@ import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, Eve
 import { Observable } from 'rxjs/Observable';
 import { take } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-import { FileService } from '../../services/file.service';
 import { UtilsService } from '../../services/utils.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
@@ -41,7 +40,7 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService, DatasetCrudService, /*PersistentDataService,*/ SearchHistoryService ]
+  providers: [DatasetCrudService, /*PersistentDataService,*/ SearchHistoryService ]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
@@ -60,8 +59,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesDataset: ContextMenuItem[];
   private deletionQueue = new Map();
 
-  constructor(private fileService: FileService, 
-              private elementRef:ElementRef,
+  constructor(private elementRef:ElementRef,
               private utils:UtilsService,
               // private persistentDataService: PersistentDataService,
               private mvsSearchHistory:SearchHistoryService,
@@ -343,7 +341,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.isLoading = true;
-      this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
+      this.datasetService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
         let parentMap = {};
         this.lastPath = path;

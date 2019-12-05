@@ -24,7 +24,6 @@ import { FormsModule } from '@angular/forms';
 import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
-import { FileService } from '../../services/file.service';
 import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
@@ -52,7 +51,7 @@ import { DatasetPropertiesModal } from '@zlux/file-explorer/src/app/components/d
   templateUrl: './zlux-file-explorer.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./zlux-file-explorer.component.css'],
-  providers: [FileService, UtilsService/*, PersistentDataService*/]
+  providers: [UtilsService/*, PersistentDataService*/]
 })
 
 export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
@@ -66,8 +65,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserMVSComponent)
   private mvsComponent: FileBrowserMVSComponent;
 
-  constructor(private fileService: FileService,
-    /*private persistentDataService: PersistentDataService,*/
+  constructor(/*private persistentDataService: PersistentDataService,*/
     private utils: UtilsService, private elemRef: ElementRef,
     private cd: ChangeDetectorRef)
   {
