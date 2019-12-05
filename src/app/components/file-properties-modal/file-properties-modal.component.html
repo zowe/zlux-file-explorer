@@ -18,41 +18,47 @@
   <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
 </mat-form-field> -->
 
-<table mat-table [dataSource]="dataSource" class="mat-properties-table">
+<div class="file-properties-row">
+    <div class="file-properties-column" style="width: 30%;">
+        <mat-list>
+            <mat-list-item>
+              <div class="selectable-text">Created: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Type: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Path: </div>
+            </mat-list-item>
+            <mat-list-item>
+                <div class="selectable-text">Mode: </div>
+              </mat-list-item>
+            <mat-list-item *ngIf="fileType != 'Folder'">
+              <div class="selectable-text">Size: </div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+    <div class="file-properties-column">
+        <mat-list>
+            <mat-list-item>
+              <div class="selectable-text">{{fileCreatedAt}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{fileType}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{filePath}}</div>
+            </mat-list-item>
+            <mat-list-item>
+                <div class="selectable-text">{{fileMode}}</div>
+              </mat-list-item>
+            <mat-list-item *ngIf="fileType != 'Folder'">
+              <div class="selectable-text">{{fileSize}} {{sizeType}}</div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+</div>
 
-  <!-- Date/Time created Column -->
-  <ng-container matColumnDef="fileCreatedAt">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Created: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.fileCreatedAt}} </td>
-  </ng-container>
-
-  <!-- Type Column -->
-  <ng-container matColumnDef="fileType">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Type: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.fileType}} </td>
-  </ng-container>
-
-  <!-- Path Column -->
-  <ng-container matColumnDef="filePath">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Path: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.filePath}} </td>
-  </ng-container>
-
-  <!-- Mode (permissions) Column -->
-  <ng-container matColumnDef="fileMode">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Mode: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.fileMode}} </td>
-  </ng-container>
-
-  <!-- Size Column -->
-  <ng-container matColumnDef="fileSize">
-    <th mat-header-cell *matHeaderCellDef class="mat-properties-cell">Size: </th>
-    <td mat-cell *matCellDef="let element" class="mat-properties-cell"> {{element.fileSize}} {{sizeType}}</td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="mat-properties-close">Close</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->

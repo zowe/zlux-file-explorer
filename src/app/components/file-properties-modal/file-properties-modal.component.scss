@@ -12,20 +12,30 @@ mat-dialog-actions {
   justify-content: flex-end;
 }
 
-.mat-properties-table {
-  border: 2px solid #c3c3c3;
-  width: 100%;
+.file-properties-column {
+  float: left;
+  width: 50%;
 }
 
-.mat-properties-cell {
-  -moz-user-select: text;
-  -khtml-user-select: text;
-  -webkit-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-  padding-left: 5px;
-  padding-right: 5px;
-  border: 2px solid #a3a3a3;
+/* Clear floats after the columns */
+.file-properties-row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.file-properties-title {
+  vertical-align: middle;
+  float: left;
+}
+
+.selectable-text {
+  -moz-user-select: text !important;
+  -khtml-user-select: text !important;
+  -webkit-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  min-width: 200px;
 }
 
 .mat-properties-close {
@@ -49,18 +59,9 @@ mat-dialog-actions {
   transition-duration: .2s;
 }
 
-td.mat-cell:first-child, td.mat-footer-cell:first-child, th.mat-header-cell:first-child {
-  padding-left: 5px;
-}
-
-td.mat-cell:last-child, td.mat-footer-cell:last-child, th.mat-header-cell:last-child {
-  padding-right: 5px;
-}
-
 .file-properties-header {
   margin-left: 33px; 
   margin-bottom: 15px;
-  min-width: 500px;
 }
 /*
   This program and the accompanying materials are

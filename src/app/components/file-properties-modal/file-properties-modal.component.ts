@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatTableDataSource } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'file-properties-modal',
@@ -25,9 +25,6 @@ export class FilePropertiesModal implements OnInit {
   public fileMode = 0;
   public fileSize = '';
   public fileIcon = '';
-  public DATA: any[] = [];
-  public displayedColumns: string[];
-  public dataSource;
   public sizeType: string;
 
   constructor(
@@ -61,29 +58,12 @@ export class FilePropertiesModal implements OnInit {
       this.fileIcon = node.collapsedIcon;
     }
     this.fileCreatedAt = this.fileCreatedAt.replace('T', ' ');
-
-    this.DATA = [
-      { fileCreatedAt: this.fileCreatedAt, 
-        fileType: this.fileType, 
-        filePath: this.filePath,
-        fileMode: this.fileMode,
-        fileSize: this.fileSize,
-      },
-    ]
-    // TODO: Make ZSS return recursive "Folder" size, as the current size is misleading so we hide it
-    if (this.fileType == 'Folder') {
-      this.displayedColumns = ['fileCreatedAt', 'fileType', 'filePath', 'fileMode'];
-    } else {
-      this.displayedColumns = ['fileCreatedAt', 'fileType', 'filePath', 'fileMode', 'fileSize'];
-    }
-    this.dataSource = new MatTableDataSource(this.DATA);
   }
 
   ngOnInit() {
   }
 
   applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
 }
