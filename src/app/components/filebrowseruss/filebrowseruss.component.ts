@@ -224,7 +224,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     const filePropConfig = new MatDialogConfig();
     filePropConfig.data = {
       event: rightClickedFile,
-      width: '600px'
+      width: '350px'
     }
 
     this.dialog.open(FilePropertiesModal, filePropConfig);
