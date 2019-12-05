@@ -218,7 +218,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       },
       error => {
         if (error.status == '500') { //Internal Server Error
-          this.snackBar.open('Failed to delete: ' + rightClickedFile.data.path + "' This is probably due to a server agent problem.", 
+          this.snackBar.open("Failed to delete: '" + rightClickedFile.data.path + "' This is probably due to a server agent problem.",
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
