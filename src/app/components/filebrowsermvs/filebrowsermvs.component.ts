@@ -223,7 +223,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
-          this.deletionQueue.delete(rightClickedFile.data.path);
+          this.updateTreeView(this.path);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
