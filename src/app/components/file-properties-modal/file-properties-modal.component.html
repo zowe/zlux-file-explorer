@@ -18,9 +18,8 @@
   <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
 </mat-form-field> -->
 
-<!-- To cut down on CSS code duplication, we will use the same CSS names as the DS properties modal -->
-<div class="dataset-properties-row">
-    <div class="dataset-properties-column">
+<div class="file-properties-row">
+    <div class="file-properties-column" style="width: 30%;">
         <mat-list>
             <mat-list-item>
               <div class="selectable-text">Created: </div>
@@ -39,7 +38,7 @@
             </mat-list-item>
         </mat-list>
     </div>
-    <div class="dataset-properties-column">
+    <div class="file-properties-column">
         <mat-list>
             <mat-list-item>
               <div class="selectable-text">{{fileCreatedAt}}</div>

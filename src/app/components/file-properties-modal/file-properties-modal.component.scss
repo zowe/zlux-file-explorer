@@ -12,26 +12,19 @@ mat-dialog-actions {
   justify-content: flex-end;
 }
 
-.dataset-properties-header {
-  min-width: 375px;
-  white-space: nowrap;
-  margin-top: -28px;
-  margin-left: 40px;
-}
-
-.dataset-properties-column {
+.file-properties-column {
   float: left;
   width: 50%;
 }
 
 /* Clear floats after the columns */
-.dataset-properties-row:after {
+.file-properties-row:after {
   content: "";
   display: table;
   clear: both;
 }
 
-.dataset-properties-title {
+.file-properties-title {
   vertical-align: middle;
   float: left;
 }
@@ -42,6 +35,7 @@ mat-dialog-actions {
   -webkit-user-select: text !important;
   -ms-user-select: text !important;
   user-select: text !important;
+  min-width: 200px;
 }
 
 .mat-properties-close {
@@ -68,7 +62,6 @@ mat-dialog-actions {
 .file-properties-header {
   margin-left: 33px; 
   margin-bottom: 15px;
-  min-width: 500px;
 }
 /*
   This program and the accompanying materials are
