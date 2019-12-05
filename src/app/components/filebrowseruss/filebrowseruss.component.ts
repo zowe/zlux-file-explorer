@@ -98,6 +98,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -313,8 +314,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.displayTree($event.node.path, updateTree);
   }
 
-  onNodeRightClick(event:any) {
-    let node = event.node;
+  onNodeRightClick($event: any) {
+    let node = $event.node;
     let rightClickProperties;
 
     if (node.directory) {
@@ -324,28 +325,32 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
      
     if (this.windowActions) {
-      let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu($event.originalEvent.clientX, $event.originalEvent.clientY, rightClickProperties, true);
       // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
       if (!didContextMenuSpawn) { // If context menu failed to spawn...
-        let heightAdjustment = event.originalEvent.clientY - 25; // Bump it up 25px
-        didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
+        let heightAdjustment = $event.originalEvent.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu($event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
       }
     }
 
     this.rightClickedFile = node;
-    this.rightClick.emit(event.node);
-    event.originalEvent.preventDefault(); 
+    this.rightClick.emit($event.node);
+    $event.originalEvent.preventDefault(); 
   }
 
-  onPanelRightClick(event:any) {
+  onPanelRightClick($event: any) {
     if (this.windowActions) {
-      let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.clientX, event.clientY, this.rightClickPropertiesPanel, true);
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, $event.clientY, this.rightClickPropertiesPanel, true);
       // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
       if (!didContextMenuSpawn) { // If context menu failed to spawn...
-        let heightAdjustment = event.clientY - 25; // Bump it up 25px
-        didContextMenuSpawn = this.windowActions.spawnContextMenu(event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
+        let heightAdjustment = $event.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
       }
     }
+  }
+
+  onPathChanged($event: any): void {
+    this.pathChanged.emit($event);
   }
 
   onRenameClick($event: any): void {
@@ -460,6 +465,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.log.debug(tempChildren);
       this.data = tempChildren;
       this.path = path;
+      this.onPathChanged(this.path);
 
       // this.persistentDataService.getData()
       //       .subscribe(data => {
@@ -469,15 +475,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       //         this.persistentDataService.setData(this.dataObject)
       //           .subscribe((res: any) => { });
       //       })
-        },
-        error => {
-          this.isLoading = false;
-          this.errorMessage = <any>error;
-        }
-      );
-
-      this.refreshHistory(this.path);
-    }
+      },
+      error => {
+        this.isLoading = false;
+        this.errorMessage = <any>error;
+      }
+    );
+    this.refreshHistory(this.path);
+  }
 
   private refreshHistory(path:string) {
     const sub = this.ussSearchHistory

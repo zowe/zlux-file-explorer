@@ -17,7 +17,7 @@
       style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
     <div class="filebrowseruss-search">
       <input #fileExplorerUSSInput [(ngModel)]="path" list="searchUSSHistory" placeholder="Enter a directory..." class="filebrowseruss-search-input" 
-        (keydown.enter)="displayTree(path, false)" [disabled]="isLoading" (ngModelChange)="checkPathSlash($event)">
+        (keydown.enter)="displayTree(path, false); onPathChanged(path);" [disabled]="isLoading" (ngModelChange)="checkPathSlash($event)">
       <!-- TODO: make search history a directive to use in both uss and mvs-->
       <datalist id="searchUSSHistory">
         <option *ngFor="let item of ussSearchHistory.searchHistoryVal" [value]="item"></option>

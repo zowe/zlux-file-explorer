@@ -174,6 +174,14 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     }
   }
 
+  getActiveDirectory(): string {
+    if (this.currentIndex == 0) {
+      return this.ussComponent.getSelectedPath();
+    } else { //Datasets do not yet have an active directory context
+      return null;
+    }
+  }
+
   hideExplorers() {
     if (this.ussComponent) {
       this.ussComponent.hideExplorer = true;
