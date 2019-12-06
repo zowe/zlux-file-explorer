@@ -229,8 +229,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else if (error.status == '403') { //Bad Request
-          console.log(error)
-          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'",
+          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'" + ". " + JSON.parse(error._body)['msg'],
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
