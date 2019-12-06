@@ -177,7 +177,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
-          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.", 
+          this.snackBar.open(error.msg,
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
