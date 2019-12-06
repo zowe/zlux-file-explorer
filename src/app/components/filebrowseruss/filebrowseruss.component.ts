@@ -669,7 +669,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     .subscribe(
       resp => {
         this.isLoading = false;
-        this.sendNotification('Editor', 'Deleted: ' + name);
+        this.snackBar.open('Deleted: ' + name,
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.path);
         rightClickedFile.styleClass = "";

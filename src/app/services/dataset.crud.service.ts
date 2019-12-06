@@ -11,11 +11,18 @@
 */
 
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class DatasetCrudService {
-  constructor(){}
+  constructor(private http: Http){}
 
+  private handleErrorObservable (error: Response | any) {
+    console.error(error.message || error);
+    return Observable.throw(error.message || error);
+  }
+  
   //addfolder
   addfolder():void{
 
@@ -57,6 +64,41 @@ export class DatasetCrudService {
   renamefile():void{
 
   }
+
+  deleteNonVsamDatasetOrMember(rightClickedFile: any): Observable<any>{
+    let url = ZoweZLUX.uriBroker.datasetContentsUri(rightClickedFile.data.path);
+    return this.http.delete(url)
+    .map(res=>res.json())
+    .catch(this.handleErrorObservable);
+  }
+
+  deleteVsamDataset(rightClickedFile: any): Observable<any> {
+    let url = ZoweZLUX.uriBroker.VSAMdatasetContentsUri(rightClickedFile.data.path);
+    return this.http.delete(url)
+    .map(res => res.json())
+    .catch(this.handleErrorObservable);
+  }
+
+  queryDatasets(query:string, detail?: boolean): Observable<any>  {
+    let url:string;
+    if (!query.includes('.')){
+      url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ) + '*');
+    }
+    else{
+      url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), detail.toString(), undefined, true);
+    }
+    return this.http.get(url)
+    .map(res=>res.json())
+    .catch(this.handleErrorObservable);
+  }
+
+  getDataset(path:string) {
+    let url:string = ZoweZLUX.uriBroker.datasetContentsUri(path.trim().toUpperCase());
+    return this.http.get(url)
+    .map(res=>res.json())
+    .catch(this.handleErrorObservable);
+  }
+
 }
 
 /*

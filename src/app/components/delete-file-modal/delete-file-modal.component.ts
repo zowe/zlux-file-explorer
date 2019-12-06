@@ -21,18 +21,28 @@ export class DeleteFileModal {
   private fileName = '';
   private fileIcon = '';
   onDelete = new EventEmitter();
+  private node: any;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
   ) 
   {
     const node = data.event;
+    this.node = data.event;
     this.fileName = node.name;
     this.fileIcon = "fa fa-ban";
   }
 
   deleteFileOrFolder() {
     this.onDelete.emit();
+  }
+  
+  getFileName() {
+    if (this.node.data.path) {
+      return this.node.data.path;
+    } else {
+      return this.node.path;
+    }
   }
 
 }
