@@ -33,6 +33,9 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
 */
 //Commented out to fix compilation errors from zlux-platform changes, does not affect program
 //TODO: Implement new capabilities from zlux-platform
+
+const SNACKBAR_DUR: number = 5000;
+
 @Component({
   selector: 'file-browser-mvs',
   templateUrl: './filebrowsermvs.component.html',
@@ -163,7 +166,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       resp => {
         this.isLoading = false;
         this.snackBar.open(resp.msg,
-        'Dismiss', { duration: 5000,   panelClass: 'center' });
+        'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.data.path);
         rightClickedFile.styleClass = "";
@@ -171,17 +174,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       error => {
         if (error.status == '500') { //Internal Server Error
           this.snackBar.open("Failed to delete: '" + rightClickedFile.data.path + "' This is probably due to a server agent problem.",
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
           // Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.data.path);
@@ -194,7 +197,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
       }
     }, 4000);
   }
@@ -208,7 +211,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       resp => {
         this.isLoading = false;
         this.snackBar.open(resp.msg,
-        'Dismiss', { duration: 5000,   panelClass: 'center' });
+        'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         //Update vs removing node since symbolicly linked data/index of vsam can be named anything
         this.updateTreeView(this.path);
         this.deletionQueue.delete(rightClickedFile.data.path);
@@ -217,20 +220,20 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       error => {
         if (error.status == '500') { //Internal Server Error
           this.snackBar.open("Failed to delete: '" + rightClickedFile.data.path + "' This is probably due to a server agent problem.",
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
           this.updateTreeView(this.path);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         } else if (error.status == '403') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'" + ". " + JSON.parse(error._body)['msg'],
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
           //Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.data.path);
@@ -243,7 +246,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
       }
     }, 4000);
   }
@@ -451,8 +454,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
     if (this.deletionQueue.has(pathAndName)) {
-      this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message,
-            'Dismiss', { duration: 5000, panelClass: 'center' });
+      this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
+            'Dismiss', { duration: SNACKBAR_DUR, panelClass: 'center' });
       return true;
     }
     return false;
