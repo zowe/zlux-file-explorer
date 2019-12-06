@@ -179,10 +179,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
           'Dismiss', { duration: 5000,   panelClass: 'center' });
-        } else if (error.status == '403') { //Bad Request
-          console.log(error)
-          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'",
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
@@ -228,6 +224,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.updateTreeView(this.path);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else if (error.status == '403') { //Bad Request
+          console.log(error)
+          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'",
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
