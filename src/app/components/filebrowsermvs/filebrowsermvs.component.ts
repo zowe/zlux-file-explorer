@@ -61,6 +61,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickedFile: any;
   private rightClickPropertiesDataset: ContextMenuItem[];
   private deletionQueue = new Map();
+  private additionalQualifiers: boolean;
 
   constructor(private elementRef:ElementRef,
               private utils:UtilsService,
@@ -79,6 +80,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.lastPath = "";
     this.hideExplorer = false;
     this.isLoading = false;
+    this.additionalQualifiers = true;
   }
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -347,7 +349,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.isLoading = true;
-      this.datasetService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
+      this.datasetService.queryDatasets(path, true, this.additionalQualifiers).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
         let parentMap = {};
         this.lastPath = path;
