@@ -81,12 +81,12 @@ export class DatasetCrudService {
 
   queryDatasets(query:string, detail?: boolean, includeAdditionalQualifiers?: boolean): Observable<any>  {
     let url:string;
-    if (!query.includes('.')){
-      url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ) + '*');
-    }
-    else{
+    // if (!query.includes('.')){
+    //   url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ) + '*');
+    // }
+    // else{
       url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), detail.toString(), undefined, true, undefined, undefined, undefined, undefined, undefined, includeAdditionalQualifiers.toString());
-    }
+    //}
     return this.http.get(url)
     .map(res=>res.json())
     .catch(this.handleErrorObservable);
