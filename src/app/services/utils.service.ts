@@ -15,6 +15,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class UtilsService {
   constructor(){}
+
   filePathCheck(path:string):string{
     if (path.charAt(0) === '/') {
         return path.substring(1);
