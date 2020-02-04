@@ -1,19 +1,19 @@
 
-<!--
+<!-- 
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-
+  
   SPDX-License-Identifier: EPL-2.0
-
+  
   Copyright Contributors to the Zowe Project.
 -->
 
 <div style="height: 100%;">
 
     <!-- Tabs, searchbar, and loading indicator -->
-    <img src="../../../assets/explorer-uparrow.png"
-      data-toggle="tooltip" title="Go up to the parent level" (click)="levelUp()"
+    <img src="../../../assets/explorer-uparrow.png" 
+      data-toggle="tooltip" title="Go up to the parent level" (click)="levelUp()" 
       style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
     <div class="filebrowseruss-search">
       <input #fileExplorerUSSInput [(ngModel)]="path" list="searchUSSHistory" placeholder="Enter an absolute path..." class="filebrowseruss-search-input"
@@ -27,9 +27,9 @@
 
     <!-- Main tree -->
     <div (click)="onClick($event);" [hidden]="hideExplorer" style="height: 100%;">
-      <tree-root [treeData]="data"
+      <tree-root [treeData]="data" 
         (clickEvent)="onNodeClick($event)"
-        (dblClickEvent)="onNodeDblClick($event)"
+        (dblClickEvent)="onNodeDblClick($event)" 
         [style]="style"
         (rightClickEvent)="onNodeRightClick($event)"
         (panelRightClickEvent)="onPanelRightClick($event)"
@@ -37,12 +37,12 @@
     </div>
 </div>
 
-<!--
+<!-- 
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-
+  
   SPDX-License-Identifier: EPL-2.0
-
+  
   Copyright Contributors to the Zowe Project.
--->
+-->``
