@@ -68,6 +68,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private intervalId: any;
   private updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
   @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
+  private noResultMsg: String;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -453,6 +454,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.log.debug("Tree has been updated.");
       this.log.debug(tempChildren);
       this.data = tempChildren;
+      if (this.data.length == 0) {
+        this.data = null;
+        this.noResultMsg = "Folder exists but is empty";
+      }
       this.path = path;
       this.onPathChanged(this.path);
 
@@ -466,6 +471,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       //       })
       },
       error => {
+        this.data = null;
+        this.noResultMsg = "Folder does not exist"
         this.isLoading = false;
         this.errorMessage = <any>error;
       }
