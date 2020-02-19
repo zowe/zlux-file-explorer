@@ -659,13 +659,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  deleteFileOrFolder(rightClickedFile: any): void {
+  deleteFileOrFolder(rightClickedFile: any): Observable<any> {
     let pathAndName = rightClickedFile.path;
     let name = this.getNameFromPathAndName(pathAndName);
     this.isLoading = true;
     this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
     rightClickedFile.styleClass = "filebrowseruss-node-deleting";
-    let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
+    let deleteObservable = this.ussSrv.deleteFileOrFolder(pathAndName);
+    let deleteSubscription = deleteObservable
     .subscribe(
       resp => {
         this.isLoading = false;
@@ -687,7 +688,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+          this.snackBar.open("Unknown error '" + error.status + "' occured for: " + pathAndName, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           //Error info gets printed in uss.crud.service.ts
         }
@@ -704,6 +705,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           'Dismiss', { duration: 5000,   panelClass: 'center' });
       }
     }, 4000);
+
+    return deleteObservable;
   }
 
   removeChild(node: any) {

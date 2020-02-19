@@ -113,8 +113,8 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     //   })
   }
 
-  deleteFileOrFolder(pathAndName: string) {
-    this.ussComponent.deleteFileOrFolder(pathAndName);
+  deleteFileOrFolder(pathAndName: string): Observable<any> {
+    return this.ussComponent.deleteFileOrFolder(pathAndName);
   }
 
   createDirectory(pathAndName?: string) {
