@@ -68,7 +68,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private intervalId: any;
   private updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
   @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
-  private noResultMsg: String;
+  private noResultMsg: string;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
