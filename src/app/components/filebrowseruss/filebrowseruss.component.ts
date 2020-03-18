@@ -14,7 +14,7 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject, Optional, ViewChild
 } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -232,7 +232,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
-      this.deleteFileOrFolder(rightClickedFile);
+      const event = {
+        file: rightClickedFile
+      };
+      this.onDeleteClick(event);
     });
   }
 
@@ -659,14 +662,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  deleteFileOrFolder(rightClickedFile: any): Observable<any> {
+  deleteFileOrFolder(rightClickedFile: any): Subject<any> {
     let pathAndName = rightClickedFile.path;
     let name = this.getNameFromPathAndName(pathAndName);
     this.isLoading = true;
     this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
     rightClickedFile.styleClass = "filebrowseruss-node-deleting";
-    let deleteObservable = this.ussSrv.deleteFileOrFolder(pathAndName);
-    let deleteSubscription = deleteObservable
+    const deleteObservable = this.ussSrv.deleteFileOrFolder(pathAndName);
+    const subject = new Subject<any>();
+    deleteObservable.subscribe({
+      complete: () => subject.complete(),
+      error: (err) => subject.error(err),
+      next: (resp) => subject.next(resp)
+    });
+    let deleteSubscription = subject
     .subscribe(
       resp => {
         this.isLoading = false;
@@ -706,7 +715,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     }, 4000);
 
-    return deleteObservable;
+    return subject;
   }
 
   removeChild(node: any) {
