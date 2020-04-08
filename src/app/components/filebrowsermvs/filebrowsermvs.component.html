@@ -22,10 +22,11 @@
         <option *ngFor="let item of mvsSearchHistory.searchHistoryVal" [value]="item"></option>
       </datalist>
     </div>
-    <label>
-      Include Additional Qualifiers <input type="checkbox" [(ngModel)]="additionalQualifiers">
-    </label>
     <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
+    <label style="margin-bottom: 0px;">
+      Include Additional Qualifiers <mat-checkbox style="margin-left: 3px;" color="primary" [(ngModel)]="additionalQualifiers"></mat-checkbox>
+      <!-- <input type="checkbox" [(ngModel)]="additionalQualifiers"> -->
+    </label>
 
     <!-- Main tree -->
     <div [hidden]="hideExplorer" style="height: 100%;">
