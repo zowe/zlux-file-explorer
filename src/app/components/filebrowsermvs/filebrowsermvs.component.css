@@ -52,7 +52,7 @@
 
 .qualButton:not(.mat-button-toggle-checked) {
   background-color: #464646;
-  color:white;
+  color:#757575;
 }
 
 /*
