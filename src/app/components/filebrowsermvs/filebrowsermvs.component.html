@@ -14,18 +14,20 @@
     <!-- Tabs, searchbar, and loading indicator -->
     <img src="../../../assets/explorer-uparrow.png" 
       data-toggle="tooltip" title="Go up to the parent level" (click)="levelUp()" 
-      style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;">
+      style="width: 20px; height: 20px; filter: brightness(3); cursor: pointer;" />
     <div class="filebrowsermvs-search">
-      <input [(ngModel)]="path" list="searchMVSHistory" placeholder="Enter a dataset query..." class="filebrowsermvs-search-input" (keydown.enter)="updateTreeView(path);">
-      <!-- TODO: make search history a directive to use in both uss and mvs-->
-      <datalist id="searchMVSHistory">
-        <option *ngFor="let item of mvsSearchHistory.searchHistoryVal" [value]="item"></option>
-      </datalist>
-      <mat-button-toggle-group #group="matButtonToggleGroup">
-        <mat-button-toggle [checked]="additionalQualifiers" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers">
-          <strong>.**</strong>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
+      <div class="searchRowFlex">
+        <input [(ngModel)]="path" list="searchMVSHistory" placeholder="Enter a dataset query..." class="filebrowsermvs-search-input" (keydown.enter)="updateTreeView(path);">
+        <!-- TODO: make search history a directive to use in both uss and mvs-->
+        <mat-button-toggle-group id="qualToggle" #group="matButtonToggleGroup">
+          <mat-button-toggle [checked]="additionalQualifiers" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers">
+            <strong>.**</strong>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        <datalist id="searchMVSHistory">
+          <option *ngFor="let item of mvsSearchHistory.searchHistoryVal" [value]="item"></option>
+        </datalist>
+      </div>
     </div>
     <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
 
