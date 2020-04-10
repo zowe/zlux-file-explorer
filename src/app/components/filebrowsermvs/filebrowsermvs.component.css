@@ -10,6 +10,11 @@
   Copyright Contributors to the Zowe Project.
 */
 
+.searchRowFlex {
+  display: flex;
+  flex-direction: row;
+}
+
 .filebrowsermvs-search {
   width: fit-content;
   min-width: 250px;
@@ -28,6 +33,7 @@
   color: white;
   padding-left: 5px;
   border: 0px;
+  flex-grow: 2;
 }
 
 .ui-tree-empty-message {
@@ -37,6 +43,11 @@
 
 .filebrowsermvs-node-deleting {
   opacity: .5;
+}
+
+#qualToggle {
+  max-height: 35px;
+  min-height: 30px;
 }
 
 /*
