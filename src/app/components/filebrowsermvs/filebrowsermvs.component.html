@@ -19,8 +19,8 @@
       <div class="searchRowFlex">
         <input [(ngModel)]="path" list="searchMVSHistory" placeholder="Enter a dataset query..." class="filebrowsermvs-search-input" (keydown.enter)="updateTreeView(path);">
         <!-- TODO: make search history a directive to use in both uss and mvs-->
-        <mat-button-toggle-group id="qualToggle" #group="matButtonToggleGroup">
-          <mat-button-toggle [checked]="additionalQualifiers" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers">
+        <mat-button-toggle-group id="qualGroup" #group="matButtonToggleGroup">
+          <mat-button-toggle [checked]="additionalQualifiers" class="qualButton" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers" title="Include Additional Qualifiers">
             <strong>.**</strong>
           </mat-button-toggle>
         </mat-button-toggle-group>
