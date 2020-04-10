@@ -24,11 +24,9 @@
     </div>
     <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
     <label style="margin-bottom: 0px;">
-      <!-- Include Additional Qualifiers <mat-checkbox style="margin-left: 3px;" color="primary" [(ngModel)]="additionalQualifiers"></mat-checkbox> -->
-      <button mat-button (click)="additionalQualifiers = !additionalQualifiers">Click</button>
       <mat-button-toggle-group #group="matButtonToggleGroup">
         <mat-button-toggle value=".**" [checked]="additionalQualifiers" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers">
-          .**
+          <strong>.**</strong>
         </mat-button-toggle>
       </mat-button-toggle-group>
       <!-- <input type="checkbox" [(ngModel)]="additionalQualifiers"> -->
