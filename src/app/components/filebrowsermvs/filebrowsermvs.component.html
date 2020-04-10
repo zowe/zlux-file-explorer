@@ -21,16 +21,13 @@
       <datalist id="searchMVSHistory">
         <option *ngFor="let item of mvsSearchHistory.searchHistoryVal" [value]="item"></option>
       </datalist>
-    </div>
-    <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
-    <label style="margin-bottom: 0px;">
       <mat-button-toggle-group #group="matButtonToggleGroup">
-        <mat-button-toggle value=".**" [checked]="additionalQualifiers" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers">
+        <mat-button-toggle [checked]="additionalQualifiers" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers">
           <strong>.**</strong>
         </mat-button-toggle>
       </mat-button-toggle-group>
-      <!-- <input type="checkbox" [(ngModel)]="additionalQualifiers"> -->
-    </label>
+    </div>
+    <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
 
     <!-- Main tree -->
     <div [hidden]="hideExplorer" style="height: 100%;">
