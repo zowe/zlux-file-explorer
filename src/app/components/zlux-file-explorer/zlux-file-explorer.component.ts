@@ -331,4 +331,3 @@ export interface ZluxFileExplorerStyle { //TODO: We can specify which UI things 
   
   Copyright Contributors to the Zowe Project.
 */
-

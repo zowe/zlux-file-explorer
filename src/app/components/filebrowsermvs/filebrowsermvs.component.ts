@@ -23,8 +23,10 @@ import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
 import { SearchHistoryService } from '../../services/searchHistoryService';
-import { MatDialog, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
 import { DatasetPropertiesModal } from '@zlux/file-explorer/src/app/components/dataset-properties-modal/dataset-properties-modal.component';
+import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
+import { DatasetCrudService } from '../../services/dataset.crud.service';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -63,7 +65,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   constructor(private elementRef:ElementRef,
               private utils:UtilsService,
-    // private persistentDataService: PersistentDataService,
+              // private persistentDataService: PersistentDataService,
+              private mvsSearchHistory:SearchHistoryService,
+              private snackBar: MatSnackBar,
+              private datasetService: DatasetCrudService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
               private dialog: MatDialog
@@ -460,7 +465,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
             'Dismiss', { duration: SNACKBAR_DUR, panelClass: 'center' });
       return true;
-    }
+    } 
     return false;
   }
 }
@@ -477,4 +482,3 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   Copyright Contributors to the Zowe Project.
 */
-
