@@ -11,18 +11,22 @@
 */
 
 
-import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { take } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-import { FileService } from '../../services/file.service';
+import { UtilsService } from '../../services/utils.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
 //import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
 import { SearchHistoryService } from '../../services/searchHistoryService';
+import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
+import { DatasetPropertiesModal } from '@zlux/file-explorer/src/app/components/dataset-properties-modal/dataset-properties-modal.component';
+import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
+import { DatasetCrudService } from '../../services/dataset.crud.service';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -31,43 +35,52 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
 */
 //Commented out to fix compilation errors from zlux-platform changes, does not affect program
 //TODO: Implement new capabilities from zlux-platform
+
+const SNACKBAR_DUR: number = 5000;
+
 @Component({
   selector: 'file-browser-mvs',
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService, /*PersistentDataService,*/ SearchHistoryService ]
+  providers: [DatasetCrudService, /*PersistentDataService,*/ SearchHistoryService ]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities:Array<Capability>;
   public hideExplorer: boolean;
-  path: string;
-  lastPath: string;
-  rtClickDisplay: boolean;
-  errorMessage: String;
-  intervalId: any;
-  timeVar: number = 15000;
-  updateInterval: number = 300000;
+  private path: string;
+  private lastPath: string;
+  private errorMessage: String;
+  private intervalId: any;
+  private updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
-  data: any;
-  dsData: Observable<any>;
-  isLoading: boolean;
+  private data: any;
+  public isLoading: boolean;
+  private rightClickedFile: any;
+  private rightClickPropertiesDataset: ContextMenuItem[];
+  private deletionQueue = new Map();
+  private additionalQualifiers: boolean;
 
-  constructor(private fileService: FileService, 
-    private elementRef:ElementRef, 
-    // private persistentDataService: PersistentDataService,
-    private mvsSearchHistory:SearchHistoryService,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
+  constructor(private elementRef:ElementRef,
+              private utils:UtilsService,
+              // private persistentDataService: PersistentDataService,
+              private mvsSearchHistory:SearchHistoryService,
+              private snackBar: MatSnackBar,
+              private datasetService: DatasetCrudService,
+              @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
+              private dialog: MatDialog
+             ) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
     this.mvsSearchHistory.onInit('mvs');
     this.path = "";
     this.lastPath = "";
-    this.rtClickDisplay = false;
     this.hideExplorer = false;
     this.isLoading = false;
+    this.additionalQualifiers = true;
   }
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -75,11 +88,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){
-        this.getTreeForQueryAsync(this.lastPath).then((res: TreeNode[]) => {
-          let newData = res;
+        this.getTreeForQueryAsync(this.lastPath).then((response: any) => {
+          let newData = response[0];
           //Only update if data sets are added/removed
           if(this.data.length != newData.length){
             let expandedFolders = this.data.filter(dataObj => dataObj.expanded);
@@ -105,6 +119,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         });
       }
     }, this.updateInterval);
+    this.initializeRightClickProperties();
   }
 
   ngOnDestroy(){
@@ -118,6 +133,166 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.capabilities.push(FileBrowserCapabilities.FileBrowser);
     this.capabilities.push(FileBrowserCapabilities.FileBrowserMVS);
   }*/
+
+  initializeRightClickProperties() {
+    this.rightClickPropertiesDataset = [
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile); }
+      }
+    ];
+  }
+  showDeleteDialog(rightClickedFile: any) {
+    if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.data.path, "This is already being deleted.") == true) {
+      return;
+    }
+
+    const fileDeleteConfig = new MatDialogConfig();
+    fileDeleteConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
+    const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
+      let vsamCSITypes = ['R', 'D', 'G', 'I', 'C'];
+      if (vsamCSITypes.indexOf(rightClickedFile.data.datasetAttrs.csiEntryType) != -1) {
+        this.deleteVsamDataset(rightClickedFile);
+      } else {
+        this.deleteNonVsamDataset(rightClickedFile);
+      }
+    });
+  }
+
+  deleteNonVsamDataset(rightClickedFile: any): void {
+    this.isLoading = true;
+    this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
+    rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
+    let deleteSubscription = this.datasetService.deleteNonVsamDatasetOrMember(rightClickedFile)
+    .subscribe(
+      resp => {
+        this.isLoading = false;
+        this.snackBar.open(resp.msg,
+        'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        this.removeChild(rightClickedFile);
+        this.deletionQueue.delete(rightClickedFile.data.path);
+        rightClickedFile.styleClass = "";
+      },
+      error => {
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open("Failed to delete: '" + rightClickedFile.data.path + "' This is probably due to a server agent problem.",
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          this.removeChild(rightClickedFile);
+        } else if (error.status == '400') { //Bad Request
+          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          // Error info gets printed in uss.crud.service.ts
+        }
+        this.deletionQueue.delete(rightClickedFile.data.path);
+        this.isLoading = false;
+        rightClickedFile.styleClass = "";
+        this.errorMessage = <any>error;
+      }
+    );
+
+    setTimeout(() => {
+      if (deleteSubscription.closed == false) {
+        this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+      }
+    }, 4000);
+  }
+
+  deleteVsamDataset(rightClickedFile: any): void {
+    this.isLoading = true;
+    this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
+    rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
+    let deleteSubscription = this.datasetService.deleteVsamDataset(rightClickedFile)
+    .subscribe(
+      resp => {
+        this.isLoading = false;
+        this.snackBar.open(resp.msg,
+        'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        //Update vs removing node since symbolicly linked data/index of vsam can be named anything
+        this.updateTreeView(this.path);
+        this.deletionQueue.delete(rightClickedFile.data.path);
+        rightClickedFile.styleClass = "";
+      },
+      error => {
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open("Failed to delete: '" + rightClickedFile.data.path + "' This is probably due to a server agent problem.",
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          this.updateTreeView(this.path);
+        } else if (error.status == '400') { //Bad Request
+          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        } else if (error.status == '403') { //Bad Request
+          this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'" + ". " + JSON.parse(error._body)['msg'],
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          //Error info gets printed in uss.crud.service.ts
+        }
+        this.deletionQueue.delete(rightClickedFile.data.path);
+        this.isLoading = false;
+        rightClickedFile.styleClass = "";
+        this.errorMessage = <any>error;
+      }
+    );
+
+    setTimeout(() => {
+      if (deleteSubscription.closed == false) {
+        this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+      }
+    }, 4000);
+  }
+
+  removeChild(node: any) {
+    let nodes = this.data;
+    if (node.parent) {
+      let parent = node.parent;
+      let index = parent.children.indexOf(node);
+      if (index == -1) {
+        return;
+      } else {
+        parent.children.splice(index, 1);
+        nodes[nodes.indexOf(node.parent)] = parent;
+        this.data = nodes;
+      }
+    } else {
+      let index = nodes.indexOf(node);
+      if (index == -1) {
+        return;
+      } else {
+        nodes.splice(nodes.indexOf(node), 1);
+        this.data = nodes;
+      }
+    }
+  }
+
+  showPropertiesDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile,
+      width: 'fit-content',
+      maxWidth: '1100px',
+      height: '475px'
+    }
+
+    this.dialog.open(DatasetPropertiesModal, filePropConfig);
+  }
 
   browsePath(path: string): void{
     this.path = path;
@@ -148,12 +323,22 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  onRightClick($event:any):void{
-      this.log.debug('right click!')
-      this.rtClickDisplay =!this.rtClickDisplay;
-      //currently not supported and and *ngIf is currently blocking this pending dataSet api service injection
-      this.log.debug('right click CRUD menu not supported for Datasets, yet (MVD-1614)!')
-      setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
+  onNodeRightClick(event:any) {
+    let node = event.node;
+    let rightClickProperties = this.rightClickPropertiesDataset;
+
+    if (this.windowActions) {
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
+      // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
+      if (!didContextMenuSpawn) { // If context menu failed to spawn...
+        let heightAdjustment = event.originalEvent.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
+      }
+    }
+
+    this.rightClickedFile = node;
+    this.rightClick.emit(event.node);
+    event.originalEvent.preventDefault(); 
   }
 
   updateTreeView(path: string): void {
@@ -167,8 +352,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.isLoading = true;
-      this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
+      this.datasetService.queryDatasets(path, true, this.additionalQualifiers).pipe(take(1)).subscribe((res) => {
         let parents: TreeNode[] = [];
+        let parentMap = {};
         this.lastPath = path;
         if(res.datasets.length > 0){
           for(let i:number = 0; i < res.datasets.length; i++){
@@ -214,10 +400,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               currentNode.type = 'file';
             }
             parents.push(currentNode);
+            parentMap[currentNode.label] = currentNode;
           }
           this.isLoading = false;
         } else {
           //data set probably doesnt exist
+          this.isLoading = false;
         }
         resolve(parents);
       }, (err) => {
@@ -270,6 +458,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.path = this.path.replace(regex, '.*')
     }
     this.updateTreeView(this.path);
+  }
+
+  checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
+    if (this.deletionQueue.has(pathAndName)) {
+      this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
+            'Dismiss', { duration: SNACKBAR_DUR, panelClass: 'center' });
+      return true;
+    } 
+    return false;
   }
 }
 
