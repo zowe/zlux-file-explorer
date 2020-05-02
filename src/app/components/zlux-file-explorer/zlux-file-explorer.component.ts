@@ -21,7 +21,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
+import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../../components/tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
@@ -331,4 +331,3 @@ export interface ZluxFileExplorerStyle { //TODO: We can specify which UI things 
   
   Copyright Contributors to the Zowe Project.
 */
-

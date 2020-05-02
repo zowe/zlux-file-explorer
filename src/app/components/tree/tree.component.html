@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 -->
 
-<div class="fileexplorer-tree-panel" [ngStyle]="treeStyle">
+<div class="fileexplorer-tree-panel" #fileExplorerPTree [ngStyle]="treeStyle">
   <!-- {{treeData | json}} -->
   <!-- <p-tree
     styleClass="rs-com-css-file-navigator"
@@ -27,7 +27,9 @@
     selectionMode="single"
     [(selection)]="selectedNode"
     (onNodeSelect)="nodeSelect($event)"
+    (onNodeContextMenuSelect)="nodeRightClickSelect($event)"
     [ngStyle]="treeStyle"
+    [contextMenu]="dummy"
   >
   <!-- add [filter]="true" with latest prime version (new feature March 2019) -->
   </p-tree>

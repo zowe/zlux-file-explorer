@@ -14,7 +14,7 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject, Optional, ViewChild
 } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -29,6 +29,11 @@ import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
+import { SearchHistoryService } from '../../services/searchHistoryService';
+import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
+import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
+import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
+import { CreateFolderModal } from '@zlux/file-explorer/src/app/components/create-folder-modal/create-folder-modal.component';
 
 @Component({
   selector: 'file-browser-uss',
@@ -57,29 +62,31 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private deletionQueue = new Map();
 
   //TODO:define interface types for uss-data/data
-  data: TreeNode[];
-  dataObject: UssDataObject;
-  ussData: Observable<any>;
-  intervalId: any;
-  timeVar: number = 10000;//time represents in ms how fast tree updates changes from mainframe
+  private data: TreeNode[];
+  private dataObject: UssDataObject;
+  private ussData: Observable<any>;
+  private intervalId: any;
+  private updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
+  @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
     private utils: UtilsService, 
     /*private persistentDataService: PersistentDataService,*/
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
-    //this.componentClass = ComponentClass.FileBrowser;
-    this.initalizeCapabilities();
-    this.rtClickDisplay = false;
-    this.addFileDisplay = false;
-    this.addFolderDisplay = false;
-    this.copyDisplay = false;
-    this.renameDisplay = false;
-    this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
-    this.path = this.root;
-    this.data = []; // Main treeData array (the nodes the Explorer displays)
-    this.hideExplorer = false;
-    this.isLoading = false;
+    private ussSearchHistory:SearchHistoryService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+    @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
+    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
+      //this.componentClass = ComponentClass.FileBrowser;
+      this.initalizeCapabilities();
+      this.ussSearchHistory.onInit('uss');
+      this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
+      this.path = this.root;
+      this.data = []; // Main treeData array (the nodes the Explorer displays)
+      this.hideExplorer = false;
+      this.isLoading = false;
   }
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -91,12 +98,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() inputStyle: any;
   @Input() searchStyle: any;
   @Input() treeStyle: any;
-  @Input() style: any;
   @Input()
   set fileEdits(input: any) {
     if (input && input.action && input.action === "save-file") {
@@ -113,6 +118,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   ngOnInit() {
     this.loadUserHomeDirectory();
+    this.initializeRightClickProperties();
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
@@ -123,8 +129,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //     this.displayTree(this.root, false);
     //   })
       // this.intervalId = setInterval(() => {
-      //   this.updateUss(this.path);
-      // }, this.timeVar);
+        this.updateUss(this.path);
+      // }, this.updateInterval);
   }
 
   ngOnDestroy() {
@@ -361,8 +367,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
     this.pathChanged.emit(path);
-    if (path === undefined || path == '') {
+    if (path === undefined || path === '') {
       path = this.root; 
+    }
+    if (path === '') {
+      this.log.warn("Please enter a valid path. For example: '/'");
+      this.data = [];
+      return;
     }
     this.isLoading = true;
     this.ussData = this.ussSrv.getFile(path); 
@@ -455,12 +466,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       //         this.persistentDataService.setData(this.dataObject)
       //           .subscribe((res: any) => { });
       //       })
-        },
-        error => {
-          this.isLoading = false;
-          this.errorMessage = <any>error;
-        }
-      );
+      },
+      error => {
+        this.isLoading = false;
+        this.errorMessage = <any>error;
+      }
+    );
+    this.refreshHistory(this.path);
+  }
 
   private refreshHistory(path:string) {
     const sub = this.ussSearchHistory
@@ -511,8 +524,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             tempChildren.push(files.entries[i]);
 
           }
-          $event.node.children = tempChildren;
-          $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
+          node.children = tempChildren;
+          node.expandedIcon = "fa fa-folder-open"; node.collapsedIcon = "fa fa-folder";
           this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
           while (node.parent !== undefined) {
@@ -520,7 +533,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             newChild.children[node.id] = node;
             newChild.expanded = true;
             newChild.expandedIcon = "fa fa-folder-open"; newChild.collapsedIcon = "fa fa-folder";
-            $event.node = newChild;
+            node = newChild;
           }
 
           let index = -1;
@@ -788,4 +801,3 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   Copyright Contributors to the Zowe Project.
 */
-

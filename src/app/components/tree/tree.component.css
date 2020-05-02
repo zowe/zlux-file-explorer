@@ -63,8 +63,8 @@
   cursor: pointer !important;
 }
 
-.ui-treenode-label {
-  padding-left: 3px !important;
+.ui-treenode-content{
+  display: table;
 }
 
 .ui-treenode-label {
@@ -104,4 +104,3 @@
   
   Copyright Contributors to the Zowe Project.
 */
-

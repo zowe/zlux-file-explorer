@@ -18,7 +18,7 @@ import { take } from 'rxjs/operators';
 import { UtilsService } from '../../services/utils.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
-// import { PersistentDataService } from '../../services/persistentData.service';
+//import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
@@ -43,7 +43,7 @@ const SNACKBAR_DUR: number = 5000;
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService/*, PersistentDataService*/]
+  providers: [DatasetCrudService, /*PersistentDataService,*/ SearchHistoryService ]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
@@ -63,10 +63,16 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
 
-  constructor(private fileService: FileService, 
-    private elementRef:ElementRef, 
-    // private persistentDataService: PersistentDataService,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
+  constructor(private elementRef:ElementRef,
+              private utils:UtilsService,
+              // private persistentDataService: PersistentDataService,
+              private mvsSearchHistory:SearchHistoryService,
+              private snackBar: MatSnackBar,
+              private datasetService: DatasetCrudService,
+              @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
+              private dialog: MatDialog
+             ) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
     this.mvsSearchHistory.onInit('mvs');
@@ -476,4 +482,3 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   Copyright Contributors to the Zowe Project.
 */
-
