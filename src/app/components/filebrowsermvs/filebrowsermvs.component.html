@@ -21,7 +21,13 @@
     
   <div class="filebrowsermvs-search" [ngStyle] = "searchStyle">
     <div class="searchRowFlex">
-      <input [(ngModel)]="path" list="searchMVSHistory" placeholder="Enter a dataset query..." class="filebrowsermvs-search-input" (keydown.enter)="updateTreeView(path);" [ngStyle] = "inputStyle">
+      <input 
+        [(ngModel)]="path" 
+        list="searchMVSHistory" 
+        placeholder="Enter a dataset query..." 
+        class="filebrowsermvs-search-input" 
+        (keydown.enter)="updateTreeView(path);" 
+        [ngStyle] = "inputStyle">
       <!-- TODO: make search history a directive to use in both uss and mvs-->
       <mat-button-toggle-group id="qualGroup" #group="matButtonToggleGroup">
         <mat-button-toggle [checked]="additionalQualifiers" class="qualButton" (click)="additionalQualifiers = !additionalQualifiers" aria-label="Include additional qualifiers" title="Include Additional Qualifiers">
@@ -44,20 +50,25 @@
       (rightClickEvent)="onNodeRightClick($event)">
     </tree-root>
   </div>
-</div>
-<div class="fa fa-spinner fa-spin" [hidden]="!isLoading"></div>
-<div [hidden]="hideExplorer" style="height: 100%;">
-    <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
-      (dblClickEvent)="onNodeDblClick($event)" [style]="style"
-      (contextmenu)="$event.preventDefault(); onRightClick($event);">
-    </tree-root>
-</div>
-<div [hidden]="hideExplorer" style="height: 100%;">
-    <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)"
-      (dblClickEvent)="onNodeDblClick($event)" [ngStyle]="treeStyle"
-      (contextmenu)="$event.preventDefault(); onRightClick($event);">
-    </tree-root>
-</div>
+  <div class="fa fa-spinner fa-spin" [hidden]="!isLoading"></div>
+  <div [hidden]="hideExplorer" style="height: 100%;">
+      <tree-root 
+        [treeData]="data" 
+        (clickEvent)="onNodeClick($event)"
+        (dblClickEvent)="onNodeDblClick($event)" 
+        [style]="style"
+        (contextmenu)="$event.preventDefault(); onRightClick($event);">
+      </tree-root>
+  </div>
+  <div [hidden]="hideExplorer" style="height: 100%;">
+      <tree-root 
+        [treeData]="data" 
+        (clickEvent)="onNodeClick($event)"
+        (dblClickEvent)="onNodeDblClick($event)" 
+        [ngStyle]="treeStyle"
+        (contextmenu)="$event.preventDefault(); onRightClick($event);">
+      </tree-root>
+  </div>
 </div>
 <!-- 
 This program and the accompanying materials are
