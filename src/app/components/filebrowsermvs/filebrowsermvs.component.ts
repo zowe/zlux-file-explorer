@@ -82,6 +82,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.isLoading = false;
     this.additionalQualifiers = true;
   }
+  @Input() inputStyle: any;
+  @Input() searchStyle: any;
+  @Input() treeStyle: any;
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -479,4 +482,3 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   Copyright Contributors to the Zowe Project.
 */
-

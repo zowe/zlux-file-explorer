@@ -89,6 +89,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.isLoading = false;
   }
 
+  @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
@@ -97,9 +98,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
 
-  @Input() style: any;
+  @Input() inputStyle: any;
+  @Input() searchStyle: any;
+  @Input() treeStyle: any;
   @Input()
   set fileEdits(input: any) {
     if (input && input.action && input.action === "save-file") {
@@ -137,6 +139,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  browsePath(path: string): void {
+    this.path = path;
+  }
+
+  getDOMElement(): HTMLElement {
+    return this.elementRef.nativeElement;
+  }
+
+  getSelectedPath(): string {
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this.path;
+  }
+
   loadUserHomeDirectory(): void {
     this.isLoading = true;
     const observable: Observable<any> = this.ussSrv.getUserHomeFolder()
@@ -144,10 +159,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
-            if (this.path.length == 0 || this.path.charAt(0) != '/') {
-              this.path = '/';
-            }
-          } else {
+          }else{
             this.path = '/';
           }
           this.displayTree(this.path, true);
@@ -162,15 +174,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.isLoading = false;
       subscription.unsubscribe();
     }, 2000);
-  }
-
-  getDOMElement(): HTMLElement {
-    return this.elementRef.nativeElement;
-  }
-
-  getSelectedPath(): string {
-    //TODO:how do we want to want to handle caching vs message to app to open said path
-    return this.path;
   }
 
   initalizeCapabilities() {
@@ -279,7 +282,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNewFolderClick($event: any): void {
     this.newFolderClick.emit($event);
   }
-
+  
   onNodeClick($event: any): void {
     this.path = this.path.replace(/\/$/, '');
 
@@ -365,7 +368,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
-    if (path === undefined) {
+    this.pathChanged.emit(path);
+    if (path === undefined || path === '') {
       path = this.root; 
     }
     if (path === '') {
@@ -799,4 +803,3 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   Copyright Contributors to the Zowe Project.
 */
-

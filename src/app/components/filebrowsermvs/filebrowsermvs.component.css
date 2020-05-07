@@ -36,6 +36,13 @@
   flex-grow: 2;
 }
 
+.filebrowsermvs-pointer-logo {
+  width: 20px; 
+  height: 20px; 
+  filter: brightness(3); 
+  cursor: pointer;
+}
+
 .ui-tree-empty-message {
   color: transparent;
   height: 0px;
