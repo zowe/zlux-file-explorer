@@ -39,8 +39,8 @@
       </datalist>
     </div>
   </div>
-  <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
 
+  <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
   <!-- Main tree -->
   <div [hidden]="hideExplorer" style="height: 100%;">
     <tree-root [treeData]="data" 
@@ -49,25 +49,6 @@
       [style]="style"
       (rightClickEvent)="onNodeRightClick($event)">
     </tree-root>
-  </div>
-  <div class="fa fa-spinner fa-spin" [hidden]="!isLoading"></div>
-  <div [hidden]="hideExplorer" style="height: 100%;">
-      <tree-root 
-        [treeData]="data" 
-        (clickEvent)="onNodeClick($event)"
-        (dblClickEvent)="onNodeDblClick($event)" 
-        [style]="style"
-        (contextmenu)="$event.preventDefault(); onRightClick($event);">
-      </tree-root>
-  </div>
-  <div [hidden]="hideExplorer" style="height: 100%;">
-      <tree-root 
-        [treeData]="data" 
-        (clickEvent)="onNodeClick($event)"
-        (dblClickEvent)="onNodeDblClick($event)" 
-        [ngStyle]="treeStyle"
-        (contextmenu)="$event.preventDefault(); onRightClick($event);">
-      </tree-root>
   </div>
 </div>
 <!-- 
