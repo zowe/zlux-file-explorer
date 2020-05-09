@@ -45,6 +45,7 @@ import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.componen
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
 import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatCheckboxModule, MatButtonModule, MatButtonToggleModule } from '@angular/material';
 import { DatasetPropertiesModal } from '@zlux/file-explorer/src/app/components/dataset-properties-modal/dataset-properties-modal.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'zlux-file-explorer',
@@ -160,8 +161,8 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     //   })
   }
 
-  deleteFileOrFolder(pathAndName: string) {
-    this.ussComponent.deleteFileOrFolder(pathAndName);
+  deleteFileOrFolder(pathAndName: string): Subject<any> {
+    return this.ussComponent.deleteFileOrFolder(pathAndName);
   }
 
   createDirectory(pathAndName?: string) {

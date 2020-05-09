@@ -14,7 +14,7 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject, Optional, ViewChild
 } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -235,7 +235,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
-      this.deleteFileOrFolder(rightClickedFile);
+      const event = {
+        file: rightClickedFile
+      };
+      this.onDeleteClick(event);
     });
   }
 
@@ -663,13 +666,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  deleteFileOrFolder(rightClickedFile: any): void {
+  deleteFileOrFolder(rightClickedFile: any): Subject<any> {
     let pathAndName = rightClickedFile.path;
     let name = this.getNameFromPathAndName(pathAndName);
     this.isLoading = true;
     this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
     rightClickedFile.styleClass = "filebrowseruss-node-deleting";
-    let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
+    const deleteObservable = this.ussSrv.deleteFileOrFolder(pathAndName);
+    const subject = new Subject<any>();
+    deleteObservable.subscribe({
+      complete: () => subject.complete(),
+      error: (err) => subject.error(err),
+      next: (resp) => subject.next(resp)
+    });
+    let deleteSubscription = subject
     .subscribe(
       resp => {
         this.isLoading = false;
@@ -691,7 +701,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
         } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+          this.snackBar.open("Unknown error '" + error.status + "' occured for: " + pathAndName, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
           //Error info gets printed in uss.crud.service.ts
         }
@@ -708,6 +718,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           'Dismiss', { duration: 5000,   panelClass: 'center' });
       }
     }, 4000);
+
+    return subject;
   }
 
   removeChild(node: any) {
