@@ -30,10 +30,10 @@ import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { SearchHistoryService } from '../../services/searchHistoryService';
-import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
+import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
-import { CreateFolderModal } from '@zlux/file-explorer/src/app/components/create-folder-modal/create-folder-modal.component';
+import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
 
 @Component({
   selector: 'file-browser-uss',
@@ -233,7 +233,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       width: '600px'
     }
 
-    let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
+    let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       this.deleteFileOrFolder(rightClickedFile);
     });
@@ -256,7 +256,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       width: '600px'
     }
 
-    let fileDeleteRef = this.dialog.open(CreateFolderModal, folderCreateConfig);
+    let fileDeleteRef:MatDialogRef<CreateFolderModal>  = this.dialog.open(CreateFolderModal, folderCreateConfig);
     const createFolder = fileDeleteRef.componentInstance.onCreate.subscribe(onCreateResponse => {
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
