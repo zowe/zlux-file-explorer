@@ -30,6 +30,8 @@ node('ibm-jenkins-slave-nvm') {
   )
 
   pipeline.setup(
+    // a dummy entry for packaging
+    packageName: 'org.zowe.zlux-angular-file-tree',
     // we don't need below two features
     disablePax: true,
     installRegistries: [
