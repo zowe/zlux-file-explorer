@@ -23,15 +23,9 @@ node('ibm-jenkins-slave-nvm') {
     string(
       name: 'ZLUX_CORE_ARTIFACTORY_PATTERN',
       description: 'ZLUX Core artifactory download pattern',
-      defaultValue: 'libs-snapshot-local/org/zowe/zlux/zlux-core/*-STAGING/*.tar',
+      defaultValue: 'libs-snapshot-local/org/zowe/zlux/zlux-core/*-STAGING/zlux-core-*.tar',
       trim: true,
       required: true
-    ),
-    string(
-      name: 'ZLUX_CORE_ARTIFACTORY_BUILD',
-      description: 'ZLUX Core artifactory download build',
-      defaultValue: 'zlux-core',
-      trim: true
     )
   )
 
@@ -63,8 +57,9 @@ node('ibm-jenkins-slave-nvm') {
     "pattern": "${params.ZLUX_CORE_ARTIFACTORY_PATTERN}",
     "target": "zlux/",
     "flat": "true",
-    "build": "${params.ZLUX_CORE_ARTIFACTORY_BUILD}",
-    "explode": "true"
+    "sortBy": ["created"],
+    "sortOrder": "desc",
+    "limit": 1
   }]
 }
 """,
