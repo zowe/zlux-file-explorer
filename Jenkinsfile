@@ -90,14 +90,15 @@ node('ibm-jenkins-slave-nvm') {
   )
 
   // we need sonar scan
-  pipeline.sonarScan(
-    scannerTool     : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
-    scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
-    allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
-    // FIXME: temporarily set this to false until we resolve the test coverage failure
-    // failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD
-    failBuild       : false
-  )
+  // the branch name configured is not correct,
+  // pipeline.sonarScan(
+  //   scannerTool     : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
+  //   scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
+  //   allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
+  //   // FIXME: temporarily set this to false until we resolve the test coverage failure
+  //   // failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD
+  //   failBuild       : false
+  // )
 
   // define we need publish stage
   pipeline.publish()
