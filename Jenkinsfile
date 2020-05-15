@@ -35,7 +35,24 @@ node('ibm-jenkins-slave-nvm') {
     ]
   )
 
-  pipeline.build()
+  pipeline.createStage(
+    name          : "Prepare zlux Dependencies",
+    timeout       : [ time: 10, unit: 'MINUTES' ],
+    isSkippable   : true,
+    stage         : {
+      sh "git clone --recursive git@github.com:zowe/zlux.git && cd zlux && git submodule foreach git checkout staging"
+    }
+  )
+
+  pipeline.build(
+    operation: {
+      withEnv([
+        'MVD_DESKTOP_DIR=zlux/zlux-app-manager/virtual-desktop'
+      ]) {
+        sh "npm run build"
+      }
+    }
+  )
 
   pipeline.test(
     name          : 'Unit',
