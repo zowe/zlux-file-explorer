@@ -22,7 +22,7 @@ import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
-import { TreeComponent } from '../../components/tree/tree.component';
+import { TreeComponent } from '../tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
 // import {FileContents} from '../../structures/filecontents';
@@ -47,14 +47,14 @@ import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule,
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 
 @Component({
-  selector: 'zlux-file-explorer',
-  templateUrl: './zlux-file-explorer.component.html',
+  selector: 'zlux-file-tree',
+  templateUrl: './zlux-file-tree.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./zlux-file-explorer.component.css'],
+  styleUrls: ['./zlux-file-tree.component.css'],
   providers: [UtilsService/*, PersistentDataService*/]
 })
 
-export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
+export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
   currentIndex: number;
   tabs: Array<tab>;
@@ -76,11 +76,11 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   }
 
   @Input() selectPath: string;
-  @Input() style: ZluxFileExplorerStyle = {};
-  @Input() headerStyle: ZluxFileExplorerStyle = {};
-  @Input() inputStyle: ZluxFileExplorerStyle = {};
-  @Input() searchStyle: ZluxFileExplorerStyle = {};
-  @Input() treeStyle: ZluxFileExplorerStyle = {};
+  @Input() style: ZluxFileTreeStyle = {};
+  @Input() headerStyle: ZluxFileTreeStyle = {};
+  @Input() inputStyle: ZluxFileTreeStyle = {};
+  @Input() searchStyle: ZluxFileTreeStyle = {};
+  @Input() treeStyle: ZluxFileTreeStyle = {};
   @Input() theme: string;
 
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
@@ -289,7 +289,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 @NgModule({
   declarations: [FileBrowserMVSComponent, 
     FileBrowserUSSComponent, 
-    ZluxFileExplorerComponent, 
+    ZluxFileTreeComponent, 
     FilePropertiesModal,
     DatasetPropertiesModal,
     DeleteFileModal,
@@ -313,12 +313,12 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     MatButtonModule,
     MatButtonToggleModule
   ],
-  exports: [ZluxFileExplorerComponent],
-  entryComponents: [ZluxFileExplorerComponent, FilePropertiesModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
+  exports: [ZluxFileTreeComponent],
+  entryComponents: [ZluxFileTreeComponent, FilePropertiesModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
 })
-export class ZluxFileExplorerModule { }
+export class ZluxFileTreeModule { }
 
-export interface ZluxFileExplorerStyle { //TODO: We can specify which UI things can/cannot be changed.
+export interface ZluxFileTreeStyle { //TODO: We can specify which UI things can/cannot be changed.
 } // For the sake of customizeability, I don't see why there should be restrictions at the moment.
 
 
