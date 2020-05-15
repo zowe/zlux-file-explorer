@@ -40,7 +40,11 @@ node('ibm-jenkins-slave-nvm') {
     timeout       : [ time: 10, unit: 'MINUTES' ],
     isSkippable   : true,
     stage         : {
-      sh "git clone --recursive https://github.com/zowe/zlux.git && cd zlux && git submodule foreach git checkout staging"
+      sh "git clone --recursive https://github.com/zowe/zlux.git && " +
+        "cd zlux && " +
+        "sed -i 's/git@github.com:zowe/https:\/\/github.com\/zowe/g' .gitmodules && " +
+        "cat .gitmodules && " +
+        "git submodule foreach git checkout staging"
     }
   )
 
