@@ -23,8 +23,8 @@ import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
 import { SearchHistoryService } from '../../services/searchHistoryService';
-import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
-import { DatasetPropertiesModal } from '@zlux/file-explorer/src/app/components/dataset-properties-modal/dataset-properties-modal.component';
+import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
+import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
 
@@ -154,7 +154,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       width: '600px'
     }
 
-    let fileDeleteRef = this.dialog.open(DeleteFileModal, fileDeleteConfig);
+    let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       let vsamCSITypes = ['R', 'D', 'G', 'I', 'C'];
       if (vsamCSITypes.indexOf(rightClickedFile.data.datasetAttrs.csiEntryType) != -1) {

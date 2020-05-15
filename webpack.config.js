@@ -26,8 +26,24 @@ var config = {
     'filename': 'main.js',
   },
   'module': {
-    'rules': [
-    ]
+    'rules': [{
+      test: /\.svg$/,
+      loader: 'svg-inline-loader'
+    },
+    {
+      test: /\.scss$/,
+      'use': [
+        'exports-loader?module.exports.toString()',
+        {
+          'loader': 'css-loader',
+          'options': {
+            'sourceMap': false
+          }
+        },
+        'sass-loader'
+      ]
+    }
+  ],
   },
   'plugins': [
     new CopyWebpackPlugin([
@@ -53,4 +69,3 @@ module.exports = new webpackConfig.Config()
   
   Copyright Contributors to the Zowe Project.
 */
-
