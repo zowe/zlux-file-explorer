@@ -18,9 +18,25 @@ node('ibm-jenkins-slave-nvm') {
   pipeline.admins.add("jackjia")
   // pipeline.admins.add("jackjia", "jstruga", "sgrady", "nakul.manchanda")
 
+  // we have extra parameters for integration test
+  pipeline.addBuildParameters(
+    string(
+      name: 'ZLUX_CORE_ARTIFACTORY_PATTERN',
+      description: 'ZLUX Core artifactory download pattern',
+      defaultValue: 'libs-snapshot-local/org/zowe/zlux/zlux-core/*-STAGING/*.tar',
+      trim: true,
+      required: true
+    ),
+    string(
+      name: 'ZLUX_CORE_ARTIFACTORY_BUILD',
+      description: 'ZLUX Core artifactory download build',
+      defaultValue: 'zlux-core',
+      trim: true
+    )
+  )
+
   pipeline.setup(
     // we don't need below two features
-    disableArtifactory: true,
     disablePax: true,
     installRegistries: [
       [
@@ -40,11 +56,23 @@ node('ibm-jenkins-slave-nvm') {
     timeout       : [ time: 10, unit: 'MINUTES' ],
     isSkippable   : true,
     stage         : {
-      sh "git clone https://github.com/zowe/zlux.git && " +
-        "cd zlux && " +
-        "sed -i 's/git@github.com:zowe/https:\\/\\/github.com\\/zowe/g' .gitmodules && " +
-        "cat .gitmodules && " +
-        "git submodule foreach git checkout staging"
+      pipeline.artifactory.download(
+          specContent : """
+{
+  "files": [{
+    "pattern": "${params.ZLUX_CORE_ARTIFACTORY_PATTERN}",
+    "target": "zlux/",
+    "flat": "true",
+    "build": "${params.ZLUX_CORE_ARTIFACTORY_BUILD}",
+    "explode": "true"
+  }]
+}
+""",
+          expected    : 1
+      )
+      dir('zlux') {
+        sh 'tar xvf zlux-core-*.tar'
+      }
     }
   )
 
