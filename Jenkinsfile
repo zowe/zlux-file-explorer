@@ -32,8 +32,11 @@ node('ibm-jenkins-slave-nvm') {
   pipeline.setup(
     // a dummy entry for packaging
     packageName: 'org.zowe.zlux-angular-file-tree',
-    // we don't need below two features
+    // we don't need below pax feature for now
     disablePax: true,
+    // FIXME: these two steps are suggested, we should enable them when we are ready
+    disableLint: true,
+    disableAudit: true,
     installRegistries: [
       [
         email                      : lib.Constants.DEFAULT_LFJ_NPM_PRIVATE_REGISTRY_EMAIL,
