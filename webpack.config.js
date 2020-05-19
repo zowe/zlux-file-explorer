@@ -22,7 +22,7 @@ var config = {
     path.resolve(__dirname, './src/plugin.ts')
   ],
   'output': {
-    'path': path.resolve(__dirname, '../web'),
+    'path': path.resolve(__dirname, 'dist'),
     'filename': 'main.js',
   },
   'module': {
@@ -49,7 +49,7 @@ var config = {
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, './src/assets'),
-        to: path.resolve('../web/assets')
+        to: path.resolve('./lib/assets')
       }
     ])
   ]
