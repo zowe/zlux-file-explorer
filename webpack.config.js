@@ -49,7 +49,7 @@ var config = {
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, './src/assets'),
-        to: path.resolve('./lib/assets')
+        to: path.resolve('./dist/assets')
       }
     ])
   ]
