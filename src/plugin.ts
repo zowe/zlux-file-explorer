@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 */
 
-export { ZluxFileExplorerModule as FileExplorerModule, ZluxFileExplorerComponent as FileExplorerComponent  } from './app/components/zlux-file-explorer/zlux-file-explorer.component';
+export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTreeComponent  } from './app/components/zlux-file-tree/zlux-file-tree.component';
 
 
 /*
