@@ -471,6 +471,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       },
       error => {
         this.isLoading = false;
+        if (error.status == '403') { //Permission denied
+          this.snackBar.open('Failed to open: Permission denied.', 
+          'Dismiss', { duration: 5000, panelClass: 'center' });
+        }
         this.errorMessage = <any>error;
       }
     );
