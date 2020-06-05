@@ -34,6 +34,7 @@ import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { MessageDuration } from '../../shared/message-duration';
 
 @Component({
   selector: 'file-browser-uss',
@@ -473,7 +474,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.isLoading = false;
         if (error.status == '403') { //Permission denied
           this.snackBar.open('Failed to open: Permission denied.', 
-          'Dismiss', { duration: 5000, panelClass: 'center' });
+          'Dismiss', { duration: MessageDuration.Medium, panelClass: 'center' });
         }
         this.errorMessage = <any>error;
       }
