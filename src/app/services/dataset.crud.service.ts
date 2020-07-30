@@ -11,8 +11,9 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Http, Headers } from '@angular/http';
+import { Observable, of } from 'rxjs';
+import { catchError, switchMap, map, retry } from 'rxjs/operators';
 
 @Injectable()
 export class DatasetCrudService {
@@ -92,6 +93,30 @@ export class DatasetCrudService {
     return this.http.get(url)
     .map(res=>res.json())
     .catch(this.handleErrorObservable);
+  }
+
+  recallDataset(datasetName: string): Observable<any> {
+    const contentsURI = ZoweZLUX.uriBroker.datasetContentsUri(datasetName);
+    const metadataURI = ZoweZLUX.uriBroker.datasetMetadataUri(datasetName, undefined, undefined, true);
+    return this.get(contentsURI)
+      .pipe(
+        catchError(_err => of({})),
+        switchMap(() => this.get(metadataURI)),
+        map(data => data.datasets[0]),
+      );
+  }
+
+  get(url: string, options?: any): Observable<any> {
+    let httpOptions = {
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      })
+    };
+    return this.http.get(url, httpOptions)
+      .pipe(
+        retry(3)
+    )
+      .pipe(map(res => res.json()));
   }
 
 }

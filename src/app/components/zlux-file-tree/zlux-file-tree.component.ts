@@ -26,7 +26,6 @@ import { TreeComponent } from '../tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
 import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
 import { ZluxTabbingModule } from '@zlux/widgets';
-
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
@@ -263,6 +262,10 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   updateDSList(query: string) {
     this.showDatasets();
     this.mvsComponent.updateTreeView(query);
+  }
+
+  recallDataset(node: any): Observable<any> {
+    return this.mvsComponent.recallDataset(node);
   }
 
   zluxOnMessage(eventContext: any): Promise<any> {

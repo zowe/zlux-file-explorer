@@ -54,7 +54,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private lastPath: string;
   private errorMessage: String;
   private intervalId: any;
-  private updateInterval: number = 300000;
+  private updateInterval: number;
   //TODO:define interface types for mvs-data/data
   private data: any;
   public isLoading: boolean;
@@ -81,14 +81,18 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.hideExplorer = false;
     this.isLoading = false;
     this.additionalQualifiers = true;
+    this.updateInterval = 300000;
   }
+
   @Input() inputStyle: any;
   @Input() searchStyle: any;
   @Input() treeStyle: any;
   @Input() style: any;
+
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
+
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){
@@ -143,6 +147,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     ];
   }
+
   showDeleteDialog(rightClickedFile: any) {
     if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.data.path, "This is already being deleted.") == true) {
       return;
@@ -433,6 +438,16 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       childNode.data = (childNodeData as ProjectStructure);
       parentNode.children.push(childNode);
     }
+  }
+
+  recallDataset(node: any): Observable<any> {
+    let datasetName;
+    if (node.data && node.data.name) {
+      datasetName = node.data.name
+    } else { // Not a node
+      return null;
+    }
+    return this.datasetService.recallDataset(datasetName);
   }
 
   refreshHistory(path:string) {
