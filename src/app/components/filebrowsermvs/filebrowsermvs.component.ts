@@ -12,11 +12,10 @@
 
 
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { take } from 'rxjs/operators';
+import { take, finalize } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { UtilsService } from '../../services/utils.service';
-import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
+import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes, Member } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
 //import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
@@ -311,6 +310,22 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     if($event.node.type == 'folder'){
       $event.node.expanded = !$event.node.expanded;
     }
+    if (this.utils.isDatasetMigrated($event.node.data.datasetAttrs)) {
+      const path = $event.node.data.path;
+      const snackBarRef = this.snackBar.open(`Recalling dataset '${path}'`,
+        undefined, { panelClass: 'center' });
+      this.datasetService.recallDataset($event.node.data.path)
+        .pipe(finalize(() => snackBarRef.dismiss()))
+        .subscribe(
+          attrs => {
+            this.updateRecalledDatasetNode($event.node, attrs);
+            this.nodeClick.emit($event.node);
+          },
+          _err => this.snackBar.open(`Failed to recall dataset '${path}'`,
+            'Dismiss', { duration: SNACKBAR_DUR, panelClass: 'center' })
+        );
+      return;
+    }
     this.nodeClick.emit($event.node);
   }
     
@@ -378,9 +393,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               } as DatasetAttributes)
             };
             currentNode.data = currentNodeData;
-            let migrated: boolean = (currentNode.data.datasetAttrs.volser
-              && (currentNode.data.datasetAttrs.volser == 'MIGRAT'
-              || currentNode.data.datasetAttrs.volser == 'ARCIVE'));
+            let migrated = this.utils.isDatasetMigrated(currentNode.data.datasetAttrs);
             if(currentNode.data.datasetAttrs.dsorg
                 && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'){
               currentNode.type = 'folder';
@@ -415,7 +428,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     })
   }
 
-  addChildren(parentNode: TreeNode, members: Array<any>): void{
+  addChildren(parentNode: TreeNode, members: Member[]): void{
     for(let i: number = 0; i < members.length; i++){
       let childNode: TreeNode = {};
       childNode.type = 'file';
@@ -432,6 +445,23 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       childNodeData.path = childNodeData.fileName = `${parentNode.label}(${childNode.label})`;
       childNode.data = (childNodeData as ProjectStructure);
       parentNode.children.push(childNode);
+    }
+  }
+
+  updateRecalledDatasetNode(node: TreeNode, datasetAttrs: DatasetAttributes): void {
+    const showAsFolder = Array.isArray(datasetAttrs.members);
+    node.data.datasetAttrs = datasetAttrs;
+    if (showAsFolder) {
+      node.data.hasChildren = true;
+      this.addChildren(node, datasetAttrs.members);
+      node.expandedIcon = 'fa fa-folder-open';
+      node.collapsedIcon = 'fa fa-folder';
+      node.expanded = true;
+      node.icon = undefined;
+      node.type = 'folder';
+    } else {
+      node.icon = 'fa fa-file';
+      node.type = 'file';
     }
   }
 
