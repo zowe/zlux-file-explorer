@@ -5,7 +5,7 @@ this distribution, and is available at https://www.eclipse.org/legal/epl-v20.htm
 SPDX-License-Identifier: EPL-2.0
 
 Copyright Contributors to the Zowe Project.
-# File Explorer
+# File Tree
 
 This is an angular component that can be included in applications for being able to locate & view the hierarchy of files and datasets on z/OS through the Zowe ZSS server APIs.
 
@@ -14,20 +14,60 @@ This is an angular component that can be included in applications for being able
 ## Embedding
 
 Navigate to your application's package.json file. Under devDepencies, add a
-```"@zlux/file-explorer": "git+ssh://git@github.com:zowe/zlux-file-explorer.git",```
-listing. Execute ```npm install``` inside your host application to install File Explorer dependencies.
+```"zlux-angular-file-tree": "git+ssh://git@github.com:zowe/zlux-angular-file-tree.git",```
+listing. Execute ```npm install``` inside your host application to install File Tree dependencies.
 
-Then, navigate to your application's module file. Import the File Explorer module by adding
-```import { FileExplorerModule } from '@zlux/file-explorer/src/plugin';```
-and then, add the File Explorer module into your application's module.
+Then, navigate to your application's module file. Import the File Tree module by adding
+```import { FileTreeModule } from 'zlux-angular-file-tree/src/plugin';```
+and then, add the File Tree module into your application's module.
 ```...,
-FileExplorerModule,
+FileTreeModule,
 ...,
 ```
 
 Now, in your application's HTML file, given they are within the scope of your module, you can import the File Explorer widget as
-```<zlux-file-explorer (nodeClick)="onNodeClick($event)"></zlux-file-explorer>```
+```<zlux-file-tree (nodeClick)="onNodeClick($event)"></zlux-file-tree>```
 with an optional (style) input to specify the color, size, or other properties of the main tree container.
+
+
+## Link locally with zlux-editor for local development      
+
+### Part I- How to link
+
+#### Add npm symlink 
+Note: @zlux/file-explorer is package name in package.json
+```
+cd zlux-file-explorer
+npm link 
+```
+#### Replace dependency in zlux-editor
+```
+cd zlux-editor/webClient
+npm link @zlux/file-explorer
+```
+
+### Part II - Back to normal, how to delink
+
+#### Remove Dependency link
+```
+cd zlux-editor/webClient
+npm unlink
+```
+
+#### Delete npm symlink
+
+```
+cd zlux-file-explorer
+npm uninstall
+```
+
+### node-sass vendor folder not found
+if experience this issue
+```
+node node_modules/node-sass/scripts/install.js
+npm rebuild node-sass
+```
+
 
 
 This program and the accompanying materials are

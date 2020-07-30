@@ -1,0 +1,91 @@
+
+/*
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+  
+  SPDX-License-Identifier: EPL-2.0
+  
+  Copyright Contributors to the Zowe Project.
+*/
+mat-dialog-actions {
+  justify-content: flex-end;
+}
+
+.mat-properties-close {
+  padding: 6px;
+  width: 85px;
+  border-radius: 3px;
+  border: solid;
+  color: #3f51b5;
+  border-width: 1.75px;
+  box-shadow: transparent;
+  background-color: transparent;
+  margin-top: 25px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mat-properties-close:hover {
+  background-color: #e0e0e0;
+  -webkit-transition-duration: .2s;
+  transition-duration: .2s;
+}
+
+.dataset-properties-header {
+  min-width: 375px;
+  white-space: nowrap;
+  margin-top: -28px;
+  margin-left: 40px;
+}
+
+.dataset-properties-column {
+  float: left;
+  width: 50%;
+}
+
+/* Clear floats after the columns */
+.dataset-properties-row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.dataset-properties-title {
+  vertical-align: middle;
+  float: left;
+}
+
+.selectable-text {
+  -moz-user-select: text !important;
+  -khtml-user-select: text !important;
+  -webkit-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+.dataset-properties-question-circle {
+  font-size: 24px;
+  color: #5e9cff;
+  margin-left: 8px;
+  margin-top: -1px;
+  position: absolute;
+}
+
+.dataset-properties-main-icon {
+  font-size: 24px; 
+  margin-top: 4px; 
+  margin-left: 10px; 
+  float: left;
+}
+
+/*
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+  
+  SPDX-License-Identifier: EPL-2.0
+  
+  Copyright Contributors to the Zowe Project.
+*/

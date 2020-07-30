@@ -21,11 +21,12 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
-import { TreeComponent } from '../../components/tree/tree.component';
+import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
+import { TreeComponent } from '../tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
-import { FileService } from '../../services/file.service';
 import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
+import { ZluxTabbingModule } from '@zlux/widgets';
+
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
@@ -41,19 +42,22 @@ import { tab } from '../../structures/tab';
 //TODO: Implement new capabilities from zlux-platform
 import { FileBrowserMVSComponent } from '../filebrowsermvs/filebrowsermvs.component';
 import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.component';
-
+import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
+import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
+import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatCheckboxModule, MatButtonModule, MatButtonToggleModule } from '@angular/material';
+import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 
 @Component({
-  selector: 'zlux-file-explorer',
-  templateUrl: './zlux-file-explorer.component.html',
+  selector: 'zlux-file-tree',
+  templateUrl: './zlux-file-tree.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./zlux-file-explorer.component.css'],
-  providers: [FileService, UtilsService/*, PersistentDataService*/]
+  styleUrls: ['./zlux-file-tree.component.css'],
+  providers: [UtilsService/*, PersistentDataService*/]
 })
 
-export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
+export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
-  selectedItem: string;
   currentIndex: number;
   tabs: Array<tab>;
 
@@ -63,8 +67,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserMVSComponent)
   private mvsComponent: FileBrowserMVSComponent;
 
-  constructor(private fileService: FileService,
-    /*private persistentDataService: PersistentDataService,*/
+  constructor(/*private persistentDataService: PersistentDataService,*/
     private utils: UtilsService, private elemRef: ElementRef,
     private cd: ChangeDetectorRef)
   {
@@ -75,7 +78,12 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   }
 
   @Input() selectPath: string;
-  @Input() style: ZluxFileExplorerStyle = {};
+  @Input() style: ZluxFileTreeStyle = {};
+  @Input() headerStyle: ZluxFileTreeStyle = {};
+  @Input() inputStyle: ZluxFileTreeStyle = {};
+  @Input() searchStyle: ZluxFileTreeStyle = {};
+  @Input() treeStyle: ZluxFileTreeStyle = {};
+  @Input() theme: string;
 
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -86,6 +94,7 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   @Output() datasetSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     // var obj = {
@@ -96,6 +105,48 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     // }
     // this.persistentDataService.setData(obj)
     //   .subscribe((res: any) => { });
+    switch(this.theme) { 
+      case 'carbon': { 
+         this.headerStyle =  {
+          'background-color': '#3d70b2',
+          'color': 'white',
+          'width':'99.7%',
+          'text-align':'right'
+        };
+         this.inputStyle = {
+          'background-color': '#eee', 
+          'color': 'black', 
+          'border':'2px solid #3d70b2',
+          'margin-top': '20px'
+        };
+        this.searchStyle = {
+          'min-width': '250px',
+          'display': 'inline-block',
+          'height': '40px',
+          'width':'90%',
+        };
+  
+        this.treeStyle = {
+          'color':'#646464'
+        };
+  
+        this.style = {
+          'background-color':'#F4F7FB',
+          'margin-top': '10px',
+          'max-height':'320px',
+          'overflow-y': 'scroll',
+          'padding':'0px',   
+          'margin-left':'0px'       
+        };
+  
+         break; 
+      } 
+  
+      default: {
+        this.treeStyle = {'filter': 'brightness(3)', 'color':'white'};
+         break; 
+      } 
+   } 
   }
 
   ngOnDestroy() {
@@ -111,8 +162,24 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
     //   })
   }
 
-  deleteFile(pathAndName: string) {
-    this.ussComponent.deleteFile(pathAndName);
+  deleteFileOrFolder(pathAndName: string) {
+    this.ussComponent.deleteFileOrFolder(pathAndName);
+  }
+
+  createDirectory(pathAndName?: string) {
+    if (pathAndName) {
+      this.ussComponent.showCreateFolderDialog(pathAndName);
+    } else {
+      this.ussComponent.showCreateFolderDialog(this.ussComponent.getSelectedPath());
+    }
+  }
+
+  getActiveDirectory(): string {
+    if (this.currentIndex == 0) {
+      return this.ussComponent.getSelectedPath();
+    } else { //Datasets do not yet have an active directory context
+      return null;
+    }
   }
 
   hideExplorers() {
@@ -141,12 +208,15 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
   }
 
   onNodeClick($event:any){
-    //console.log($event);
     this.nodeClick.emit($event);
   }
 
   onPathChanged($event: any) {
     this.pathChanged.emit($event);
+  }
+
+  onRightClick($event: any) {
+    this.rightClick.emit($event);
   }
 
   // onUssFileLoad($event:FileContents){
@@ -219,14 +289,39 @@ export class ZluxFileExplorerComponent implements OnInit, OnDestroy {
 }
 
 @NgModule({
-  declarations: [FileBrowserMVSComponent, FileBrowserUSSComponent, ZluxFileExplorerComponent, TreeComponent],
-  imports: [CommonModule, FormsModule, TreeModule, MenuModule, DialogModule],
-  exports: [ZluxFileExplorerComponent],
-  entryComponents: [ZluxFileExplorerComponent]
+  declarations: [FileBrowserMVSComponent, 
+    FileBrowserUSSComponent, 
+    ZluxFileTreeComponent, 
+    FilePropertiesModal,
+    DatasetPropertiesModal,
+    DeleteFileModal,
+    CreateFolderModal,
+    TreeComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    TreeModule, 
+    MenuModule, 
+    MatDialogModule,
+    DialogModule, 
+    ContextMenuModule,
+    MatTableModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatCheckboxModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    ZluxTabbingModule
+  ],
+  exports: [ZluxFileTreeComponent],
+  entryComponents: [ZluxFileTreeComponent, FilePropertiesModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
 })
-export class ZluxFileExplorerModule { }
+export class ZluxFileTreeModule { }
 
-export interface ZluxFileExplorerStyle { //TODO: We can specify which UI things can/cannot be changed.
+export interface ZluxFileTreeStyle { //TODO: We can specify which UI things can/cannot be changed.
 } // For the sake of customizeability, I don't see why there should be restrictions at the moment.
 
 
@@ -239,4 +334,3 @@ export interface ZluxFileExplorerStyle { //TODO: We can specify which UI things 
   
   Copyright Contributors to the Zowe Project.
 */
-

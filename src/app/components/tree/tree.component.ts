@@ -10,7 +10,7 @@
 */
 
 declare var require:any;
-import { Component, Input, Output, EventEmitter, ViewEncapsulation} from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, ViewChild, AfterContentInit, OnDestroy} from '@angular/core';
 import { TreeNode } from 'primeng/primeng';
 import { childEvent } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
@@ -36,14 +36,18 @@ import { FileNode } from '../../structures/file-node';
  *
  * @return [description]
  */
-export class TreeComponent {
+export class TreeComponent implements AfterContentInit, OnDestroy {
   @Input() treeData: TreeNode;
   @Input() style: any;
+  @Input() treeStyle: any;
   @Output() clickEvent = new EventEmitter<childEvent>();
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
+  @Output() rightClickEvent = new EventEmitter<MouseEvent>();
+  @Output() panelRightClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
   lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
   lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
+  @ViewChild('fileExplorerPTree') fileExplorerTree: ElementRef;
   constructor() {
     this.lastClickedNodeName = null;
   }
@@ -63,6 +67,28 @@ export class TreeComponent {
         this.dblClickEvent.emit(_event);
       }
     }
+  }
+
+  nodeRightClickSelect(_event?: any) {
+    if (_event){
+      this.rightClickEvent.emit(_event);
+      _event.originalEvent.stopPropagation();
+    }
+  }
+
+  panelRightClickSelect(_event?: any) {
+    if (_event){
+      _event.preventDefault();
+      this.panelRightClickEvent.emit(_event);
+    }
+  }
+
+  ngAfterContentInit() { // PrimeNG as of 6.0 has no native right click support for its tree
+    this.fileExplorerTree.nativeElement.addEventListener('contextmenu', this.panelRightClickSelect.bind(this));
+  }
+
+  ngOnDestroy() { // PrimeNG as of 6.0 has no native right click support for its tree
+    this.fileExplorerTree.nativeElement.removeEventListener('contextmenu', this.panelRightClickSelect.bind(this));
   }
 
   /**
@@ -117,4 +143,3 @@ export class TreeComponent {
   
   Copyright Contributors to the Zowe Project.
 */
-

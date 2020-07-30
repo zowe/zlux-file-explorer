@@ -22,18 +22,34 @@ var config = {
     path.resolve(__dirname, './src/plugin.ts')
   ],
   'output': {
-    'path': path.resolve(__dirname, '../web'),
+    'path': path.resolve(__dirname, 'dist'),
     'filename': 'main.js',
   },
   'module': {
-    'rules': [
-    ]
+    'rules': [{
+      test: /\.svg$/,
+      loader: 'svg-inline-loader'
+    },
+    {
+      test: /\.scss$/,
+      'use': [
+        'exports-loader?module.exports.toString()',
+        {
+          'loader': 'css-loader',
+          'options': {
+            'sourceMap': false
+          }
+        },
+        'sass-loader'
+      ]
+    }
+  ],
   },
   'plugins': [
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, './src/assets'),
-        to: path.resolve('../web/assets')
+        to: path.resolve('./dist/assets')
       }
     ])
   ]
@@ -53,4 +69,3 @@ module.exports = new webpackConfig.Config()
   
   Copyright Contributors to the Zowe Project.
 */
-
