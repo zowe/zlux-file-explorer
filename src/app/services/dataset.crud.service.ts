@@ -13,10 +13,17 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { DatasetAttributes } from '../structures/editor-project';
+import { catchError, switchMap, map } from 'rxjs/operators';
+import { UtilsService } from './utils.service';
+import { of, throwError } from 'rxjs';
 
 @Injectable()
 export class DatasetCrudService {
-  constructor(private http: Http){}
+  constructor(
+    private http: Http,
+    private utils: UtilsService
+  ){}
 
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
@@ -92,6 +99,33 @@ export class DatasetCrudService {
     return this.http.get(url)
     .map(res=>res.json())
     .catch(this.handleErrorObservable);
+  }
+
+  recallDataset(path: string): Observable<DatasetAttributes> {
+    const datasetName = path.trim().toUpperCase();
+    const contentsURI = ZoweZLUX.uriBroker.datasetContentsUri(datasetName);
+    const detail = String(true);
+    const types = undefined;
+    const listMembers = true;
+    const workAreaSize = undefined;
+    const includeMigrated = true;
+    const metadataURI = ZoweZLUX.uriBroker.datasetMetadataUri(datasetName, detail, types, listMembers, workAreaSize, includeMigrated);
+    return this.http.get(contentsURI)
+      .pipe(
+        // dataset contents service may return an error, e.g. if dataset has RECFM=U
+        // recall should happen inspite of the error
+        catchError(_err => of('')),
+        // get metadata to ensure that the dataset has successfully recalled
+        switchMap(() => this.http.get(metadataURI)),
+        map(res => res.json()),
+        map(data => data.datasets[0] as DatasetAttributes),
+        switchMap(
+          // ensure that dataset is recalled, otherwise throw an error
+          datasetAttrs =>
+            this.utils.isDatasetMigrated(datasetAttrs) ?
+              throwError(new Error('Unable to recall dataset')) : of(datasetAttrs)
+        )
+      );
   }
 
 }
