@@ -12,9 +12,10 @@
 
 import { Injectable } from '@angular/core';
 import { Http} from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/throw';
 
 @Injectable()
 export class FileService {
@@ -25,13 +26,13 @@ export class FileService {
 
   constructor(private http: Http){}
 
-    queryDatasets(query:string): Observable<any>  {
+    queryDatasets(query:string, detail?: boolean): Observable<any>  {
         let url:string;
         if (!query.includes('.')){
           url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ) + '*');
         }
         else{
-          url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), undefined, undefined, true);
+          url = ZoweZLUX.uriBroker.datasetMetadataUri(query.toUpperCase( ).replace(/\.$/, ''), detail.toString(), undefined, true);
         }
         return this.http.get(url)
         .map(res=>res.json())

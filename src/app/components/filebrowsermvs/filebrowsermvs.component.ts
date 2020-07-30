@@ -12,13 +12,17 @@
 
 
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import { take } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileService } from '../../services/file.service';
+import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes } from '../../structures/editor-project';
 import { childEvent } from '../../structures/child-event';
-// import { PersistentDataService } from '../../services/persistentData.service';
+//import { PersistentDataService } from '../../services/persistentData.service';
 import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { TreeNode } from 'primeng/primeng';
+import { SearchHistoryService } from '../../services/searchHistoryService';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -32,7 +36,7 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
   templateUrl: './filebrowsermvs.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowsermvs.component.css'],
-  providers: [FileService/*, PersistentDataService*/]
+  providers: [FileService, /*PersistentDataService,*/ SearchHistoryService ]
 })
 export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
   //componentClass:ComponentClass;
@@ -40,41 +44,64 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   //capabilities:Array<Capability>;
   public hideExplorer: boolean;
   path: string;
+  lastPath: string;
   rtClickDisplay: boolean;
   errorMessage: String;
   intervalId: any;
   timeVar: number = 15000;
+  updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
   data: any;
   dsData: Observable<any>;
+  isLoading: boolean;
 
   constructor(private fileService: FileService, 
     private elementRef:ElementRef, 
     // private persistentDataService: PersistentDataService,
+    private mvsSearchHistory:SearchHistoryService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
+    this.mvsSearchHistory.onInit('mvs');
     this.path = "";
+    this.lastPath = "";
     this.rtClickDisplay = false;
     this.hideExplorer = false;
+    this.isLoading = false;
   }
   @Input() style: any;
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
-
+  @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
-
-    // this.persistentDataService.getData()
-    //   .subscribe(data => {
-    //     if(data.contents.mvsInput){
-    //       this.path = data.contents.mvsInput;
-    //     }
-    //     data.contents.mvsData.length == 0 ? this.updateDs() : (this.data = data.contents.mvsData, this.path = data.contents.mvsInput)
-    //   }
-    // )
     this.intervalId = setInterval(() => {
-      this.updateDs();
-    }, this.timeVar);
-    this.updateDs();
+      if(this.data){
+        this.getTreeForQueryAsync(this.lastPath).then((res: TreeNode[]) => {
+          let newData = res;
+          //Only update if data sets are added/removed
+          if(this.data.length != newData.length){
+            let expandedFolders = this.data.filter(dataObj => dataObj.expanded);
+            //checks if the query response contains the same PDS' that are currently expanded
+            let newDataHasExpanded = newData.filter(dataObj => expandedFolders.some(expanded => expanded.label === dataObj.label));
+            //Keep currently expanded datasets expanded after update
+            if(newDataHasExpanded.length > 0){
+              let expandedNewData = newData.map((obj) => {
+                let retObj = {};
+                newDataHasExpanded.forEach((expandedObj) => {
+                  if(obj.label == expandedObj.label){
+                    obj.expanded = true;
+                  }
+                  retObj = obj;
+                })
+                return retObj;
+              })
+              this.data = expandedNewData;
+            } else {
+              this.data = newData;
+            }
+          }
+        });
+      }
+    }, this.updateInterval);
   }
 
   ngOnDestroy(){
@@ -102,15 +129,20 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return this.path;
   }
 
-  /*getCapabilities(): Capability[]
-  {
-    return this.capabilities;
-  }*/
-
-  clickInEventHandler($event:any):void{
-      //TODO:need to assess the Datasets drill in behavior
-      this.path = $event.node.label + ".";
-      this.updateDs();
+  onNodeClick($event: any): void{
+    if($event.node.type == 'folder'){
+      $event.node.expanded = !$event.node.expanded;
+    }
+    this.nodeClick.emit($event.node);
+  }
+    
+  onNodeDblClick($event: any): void{
+    if($event.node.data.hasChildren && $event.node.children.length > 0){
+      this.path = $event.node.data.path;
+      this.getTreeForQueryAsync($event.node.data.path).then((res) => {
+        this.data = res[0].children;
+      });
+    }
   }
 
   onRightClick($event:any):void{
@@ -121,67 +153,122 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       setTimeout(function(){this.rtClickDisplay =!this.rtClickDisplay;  }, 5000)
   }
 
-  updateDs():void{
-    this.dsData = this.fileService.queryDatasets(this.path);
-    this.dsData.subscribe(
-      ds =>{
-        //TODO: move this to a UtilsService
-        let temp:any = [];
-        let currentNode:any = {};
-        for(let i:number= 0; i< ds.datasets.length; i++){
-          currentNode = {};
-          //TODO: assuming parent entries come first always??? Need to validate this?
-          if (/C|X/.test(ds.datasets[i].csiEntryType)){
-            currentNode.children = [];
-            currentNode.data = "Documents Folder";
-            currentNode.expandedIcon = "fa fa-folder-open";
-            currentNode.collapsedIcon = "fa fa-database";
-          }
-          else {
-            currentNode.items = {};
-            currentNode.icon= "fa fa-cube";
-          }
-          currentNode.label = ds.datasets[i].name.replace(/^\s+|\s+$/, '');
-          temp.push(currentNode);
-        }
-        this.data = temp;
-
-        let dataObject:MvsDataObject;
-        // this.persistentDataService.getData()
-        //   .subscribe(data => {
-        //     dataObject = data.contents;
-        //     dataObject.mvsInput = this.path;
-        //     dataObject.mvsData = this.data;
-        //     //this.log.debug(JSON.stringify(dataObject));
-        //     this.persistentDataService.setData(dataObject)
-        //       .subscribe((res: any) => { });
-        //   })
-
-      },
-      error => this.errorMessage = <any>error
-    );
+  updateTreeView(path: string): void {
+    this.getTreeForQueryAsync(path).then((res) => {
+      this.data = res;
+    });
+    
+    this.refreshHistory(path);
   }
 
+  getTreeForQueryAsync(path: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.isLoading = true;
+      this.fileService.queryDatasets(path, true).pipe(take(1)).subscribe((res) => {
+        let parents: TreeNode[] = [];
+        this.lastPath = path;
+        if(res.datasets.length > 0){
+          for(let i:number = 0; i < res.datasets.length; i++){
+            let currentNode:TreeNode = {};
+            currentNode.children = [];
+            currentNode.label = res.datasets[i].name.replace(/^\s+|\s+$/, '');
+            //data.id attribute is not used by either parent or child, but required as part of the ProjectStructure interface
+            let resAttr = res.datasets[i];
+            let currentNodeData: ProjectStructure = {
+              id: String(i),
+              name: currentNode.label,
+              fileName: currentNode.label,
+              path: currentNode.label,
+              hasChildren: false,
+              isDataset: true,
+              datasetAttrs: ({
+                csiEntryType: resAttr.csiEntryType,
+                dsorg: resAttr.dsorg,
+                recfm: resAttr.recfm,
+                volser: resAttr.volser
+              } as DatasetAttributes)
+            };
+            currentNode.data = currentNodeData;
+            let migrated: boolean = (currentNode.data.datasetAttrs.volser
+              && (currentNode.data.datasetAttrs.volser == 'MIGRAT'
+              || currentNode.data.datasetAttrs.volser == 'ARCIVE'));
+            if(currentNode.data.datasetAttrs.dsorg
+                && currentNode.data.datasetAttrs.dsorg.organization === 'partitioned'){
+              currentNode.type = 'folder';
+              currentNode.expanded = false;
+              if(migrated){
+                currentNode.icon = 'fa fa-clock-o';
+              } else {
+                currentNode.expandedIcon = 'fa fa-folder-open';
+                currentNode.collapsedIcon = 'fa fa-folder';
+              }
+              if(res.datasets[i].members){
+                currentNode.data.hasChildren = true;
+                this.addChildren(currentNode, res.datasets[i].members);
+              }
+            } else {
+              currentNode.icon = (migrated) ? 'fa fa-clock-o' : 'fa fa-file';
+              currentNode.type = 'file';
+            }
+            parents.push(currentNode);
+          }
+          this.isLoading = false;
+        } else {
+          //data set probably doesnt exist
+        }
+        resolve(parents);
+      }, (err) => {
+        this.isLoading = false;
+        reject(err);
+      })
+    })
+  }
+
+  addChildren(parentNode: TreeNode, members: Array<any>): void{
+    for(let i: number = 0; i < members.length; i++){
+      let childNode: TreeNode = {};
+      childNode.type = 'file';
+      childNode.icon = 'fa fa-file';
+      childNode.label = members[i].name.replace(/^\s+|\s+$/, '');
+      childNode.parent = parentNode;
+      let childNodeData: ProjectStructure = {
+        id: parentNode.data.id,
+        name: childNode.label,
+        hasChildren: false,
+        isDataset: true,
+        datasetAttrs: parentNode.data.datasetAttrs
+      }
+      childNodeData.path = childNodeData.fileName = `${parentNode.label}(${childNode.label})`;
+      childNode.data = (childNodeData as ProjectStructure);
+      parentNode.children.push(childNode);
+    }
+  }
+
+  refreshHistory(path:string) {
+    const sub = this.mvsSearchHistory
+                  .saveSearchHistory(path)
+                  .subscribe(()=>{
+                    if(sub) sub.unsubscribe();
+                  });
+  }
 
 /**
 * [levelUp: function to ascend up a level in the file/folder tree]
 * @param index [tree index where the 'folder' parent is accessed]
 */
-  levelUp(): void {
-      this.path = this.path.replace(/\.$/, '');
-      if (!this.path.includes('.')){
-        this.path = '';
-      }
-      else{
-        this.path = this.path.replace(/\.[^\.]+$/, '')
-      }
-      this.updateDs();
-  }
-  updateTree(): void {
-      this.pathChanged.emit(this.path);
-      this.updateDs();
+  levelUp(): void{
+    if(!this.path.includes('.')){
+      this.path = '';
     }
+    let regex = new RegExp(/\.[^\.]+$/);
+    if(this.path.substr(this.path.length - 2, 2) == '.*'){
+      this.path = this.path.replace(regex, '').replace(regex, '.*');
+    } else {
+      this.path = this.path.replace(regex, '.*')
+    }
+    this.updateTreeView(this.path);
   }
+}
 
 
 
