@@ -2,6 +2,7 @@
   "name": "@zowe/zlux-angular-file-tree",
   "version": "0.1.0",
   "main": "dist/main.js",
+  "types": "dist/zlux-file-explorer/src/plugin.d.ts",
   "homepage": "https://github.com/zowe/zlux-file-explorer/blob/staging/README.md",
   "bugs": {
     "url": "https://github.com/zowe/zlux/issues"
