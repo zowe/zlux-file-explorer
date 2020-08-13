@@ -103,6 +103,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Input() inputStyle: any;
   @Input() searchStyle: any;
   @Input() treeStyle: any;
+  @Input() showUpArrow: boolean;
   @Input()
   set fileEdits(input: any) {
     if (input && input.action && input.action === "save-file") {

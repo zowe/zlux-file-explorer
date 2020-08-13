@@ -85,6 +85,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Input() searchStyle: any;
   @Input() treeStyle: any;
   @Input() style: any;
+  @Input() showUpArrow: boolean;
+
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
