@@ -77,6 +77,24 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
 
   }
 
+  @Input() set spawnModal(typeAndData:any) {
+    let type = typeAndData.type;
+    let data = typeAndData.data;
+    let isDataset = data.volser ? true : false;
+
+    if (type =='properties') {
+      isDataset
+        ? this.mvsComponent.showPropertiesDialog(data)
+        : this.ussComponent.showPropertiesDialog(data);
+    } else if (type == 'delete') {
+      isDataset
+        ? this.mvsComponent.showDeleteDialog(data)
+        : this.ussComponent.showDeleteDialog(data);
+    } else if (type == 'createFolder' && !isDataset) {
+      this.ussComponent.showCreateFolderDialog(data);
+    }
+  }
+
   @Input() selectPath: string;
   @Input() style: ZluxFileTreeStyle = {};
   @Input() headerStyle: ZluxFileTreeStyle = {};
