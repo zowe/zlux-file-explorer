@@ -92,6 +92,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
@@ -306,6 +307,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNodeDblClick($event: any): void {
     let updateTree = false; // A double click drills into a folder, so we make a fresh query instead of update
     this.displayTree($event.node.path, updateTree);
+    this.nodeDblClick.emit($event.node);
   }
 
   onNodeRightClick($event: any) {

@@ -89,6 +89,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
     this.intervalId = setInterval(() => {
@@ -338,6 +339,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.data = res[0].children;
       });
     }
+    this.nodeDblClick.emit($event.node);
   }
 
   onNodeRightClick(event:any) {
