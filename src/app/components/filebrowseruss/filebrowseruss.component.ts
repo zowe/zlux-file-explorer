@@ -61,6 +61,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
+  private fileToCopy : string;
 
   //TODO:define interface types for uss-data/data
   private data: TreeNode[];
@@ -191,6 +192,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showPropertiesDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
+      }},
+      { text: "Copy", action:() => { 
+        this.copyFile(this.rightClickedFile)
       }}
     ];
 
@@ -213,6 +217,54 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         
       }}
     ];
+  }
+
+  copyFile(rightClickedFile: any) {
+    if(!this.fileToCopy){
+      this.rightClickPropertiesFolder.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopy,this.rightClickedFile)
+        }}
+      );
+    }
+    this.fileToCopy = rightClickedFile.path
+  }
+
+  pasteFile(filePath: string, rightClickedFile: any) {
+    let pathAndName = filePath;
+    let name = this.getNameFromPathAndName(pathAndName);
+    this.isLoading = true;
+    let copySubscription = this.ussSrv.copyFile(pathAndName,rightClickedFile.path + "/" + name)
+    .subscribe(
+      resp => {
+        this.isLoading = false;
+        this.snackBar.open('Copied: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
+      },
+      error => {
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open('Failed to copy: ' + pathAndName + "' This is probably due to a server agent problem.", 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(pathAndName + ' does not exist.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else if (error.status == '400') { //Bad Request
+          this.snackBar.open("Failed to copy '" + pathAndName + "' This is probably due to a permission problem.", 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        }
+        this.isLoading = false;
+        this.errorMessage = <any>error;
+      }
+    );
+
+    setTimeout(() => {
+      if (copySubscription.closed == false) {
+        this.snackBar.open('Copying ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', { duration: 5000,   panelClass: 'center' });
+      }
+    }, 4000);
   }
 
   showPropertiesDialog(rightClickedFile: any) {
