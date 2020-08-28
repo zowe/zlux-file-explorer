@@ -241,21 +241,23 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.snackBar.open('Copied: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
       },
       error => {
-        if (error.status == '500') { //Internal Server Error
-          this.snackBar.open('Failed to copy: ' + pathAndName + "' This is probably due to a server agent problem.", 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
-        } else if (error.status == '404') { //Not Found
-          this.snackBar.open(pathAndName + ' does not exist.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
-        } else if (error.status == '400') { //Bad Request
-          this.snackBar.open("Failed to copy '" + pathAndName + "' This is probably due to a permission problem.", 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
-        } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
-        }
-        this.isLoading = false;
-        this.errorMessage = <any>error;
+        this.ussSrv.deleteFileOrFolder(rightClickedFile.path + "/" + name).subscribe(() => {
+          if (error.status == '500') { //Internal Server Error
+            this.snackBar.open('Failed to copy: ' + pathAndName + "' This is probably due to a server agent problem.", 
+            'Dismiss', { duration: 5000,   panelClass: 'center' });
+          } else if (error.status == '404') { //Not Found
+            this.snackBar.open(pathAndName + ' does not exist.', 
+            'Dismiss', { duration: 5000,   panelClass: 'center' });
+          } else if (error.status == '400') { //Bad Request
+            this.snackBar.open("Failed to copy '" + pathAndName + "' This is probably due to a permission problem.", 
+            'Dismiss', { duration: 5000,   panelClass: 'center' });
+          } else { //Unknown
+            this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+            'Dismiss', { duration: 5000,   panelClass: 'center' });
+          }
+          this.isLoading = false;
+          this.errorMessage = <any>error;
+        })
       }
     );
 
