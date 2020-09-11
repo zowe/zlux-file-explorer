@@ -35,6 +35,8 @@ import { FilePropertiesModal } from '../file-properties-modal/file-properties-mo
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
 import { MessageDuration } from '../../shared/message-duration';
+import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
+import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 
 @Component({
   selector: 'file-browser-uss',
@@ -189,6 +191,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesFile = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Change Mode/Permissions", action:() => { 
+        this.showPermissionsDialog(this.rightClickedFile) }},
+      { text: "Change Owners", action:() => { 
+        this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
       }}
@@ -197,6 +203,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesFolder = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Change Mode/Permissions", action:() => { 
+        this.showPermissionsDialog(this.rightClickedFile) }},
+      { text: "Change Owners", action:() => { 
+        this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Create a Directory...", action:() => { 
@@ -223,6 +233,26 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     filePropConfig.maxWidth = '350px';
 
     this.dialog.open(FilePropertiesModal, filePropConfig);
+  }
+
+  showPermissionsDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile
+    }
+    filePropConfig.maxWidth = '400px';
+
+    this.dialog.open(FilePermissionsModal, filePropConfig);
+  }
+
+  showOwnerDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile
+    }
+    filePropConfig.maxWidth = '400px';
+
+    this.dialog.open(FileOwnershipModal, filePropConfig);
   }
 
   showDeleteDialog(rightClickedFile: any) {

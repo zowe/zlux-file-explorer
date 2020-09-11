@@ -45,8 +45,10 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
-import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatCheckboxModule, MatButtonModule, MatButtonToggleModule } from '@angular/material';
+import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatCheckboxModule, MatButtonModule, MatButtonToggleModule, MatSlideToggleModule } from '@angular/material';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
+import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
+import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -320,6 +322,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     FileBrowserUSSComponent, 
     ZluxFileTreeComponent, 
     FilePropertiesModal,
+    FilePermissionsModal,
+    FileOwnershipModal,
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
@@ -341,10 +345,11 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     MatCheckboxModule,
     MatButtonModule,
     MatButtonToggleModule,
-    ZluxTabbingModule
+    ZluxTabbingModule,
+    MatSlideToggleModule
   ],
   exports: [ZluxFileTreeComponent],
-  entryComponents: [ZluxFileTreeComponent, FilePropertiesModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
+  entryComponents: [ZluxFileTreeComponent, FilePermissionsModal, FilePropertiesModal, FileOwnershipModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
 })
 export class ZluxFileTreeModule { }
 
