@@ -8,10 +8,9 @@
   
   Copyright Contributors to the Zowe Project.
 */
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { Http } from '@angular/http';
 
 @Component({
@@ -20,7 +19,7 @@ import { Http } from '@angular/http';
   styleUrls: ['./file-permissions-modal.component.scss',
   '../../../../src/app/shared/modal.component.scss'],
 })
-export class FilePermissionsModal implements OnInit {
+export class FilePermissionsModal {
 
   public name = '';
   public path = '';
@@ -61,9 +60,6 @@ export class FilePermissionsModal implements OnInit {
     }
 
     this.formatPermissions();
-  }
-
-  ngOnInit() {
   }
 
   applyFilter(filterValue: string) {
