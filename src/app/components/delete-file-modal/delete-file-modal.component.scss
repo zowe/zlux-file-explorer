@@ -8,44 +8,6 @@
   
   Copyright Contributors to the Zowe Project.
 */
-mat-dialog-actions {
-  justify-content: flex-end;
-}
-
-.mat-properties-delete {
-  padding: 6px;
-  width: 85px;
-  border-radius: 3px;
-  border: solid;
-  color: #e64242;
-  border-width: 1.75px;
-  box-shadow: transparent;
-  background-color: transparent;
-  margin-top: 25px;
-  margin-right: -10px;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.mat-properties-delete.cancel {
-  border-color: transparent;
-  color: #242424;
-  margin-top: 25px;
-  margin-right: 5px;
-}
-
-.mat-properties-delete.cancel:hover {
-  background-color: #e0e0e0;
-  -webkit-transition-duration: .2s;
-  transition-duration: .2s;
-}
-
-.mat-properties-delete:hover {
-  background-color: #fff0f0;
-  -webkit-transition-duration: .2s;
-  transition-duration: .2s;
-}
 
 .delete-content-body {
   margin-left: 40px;
