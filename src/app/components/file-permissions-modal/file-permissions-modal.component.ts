@@ -37,6 +37,7 @@ export class FilePermissionsModal {
   public publicExecute = false;
   public isDirectory = false;
   public recursive = false;
+  public node = null;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -44,18 +45,18 @@ export class FilePermissionsModal {
     private snackBar: MatSnackBar,
   ) 
   {
-    const node = data.event;
-    this.name = node.name;
-    this.path = node.path;
-    this.mode = node.mode;
+    this.node = data.event;
+    this.name = this.node.name;
+    this.path = this.node.path;
+    this.mode = this.node.mode;
 
-    if (node.icon) {
-      this.icon = node.icon;
-    } else if (node.collapsedIcon) {
-      this.icon = node.collapsedIcon;
+    if (this.node.icon) {
+      this.icon = this.node.icon;
+    } else if (this.node.collapsedIcon) {
+      this.icon = this.node.collapsedIcon;
     }
 
-    if (node.directory) {
+    if (this.node.directory) {
       this.isDirectory = true;
     }
 
@@ -256,6 +257,7 @@ export class FilePermissionsModal {
       if (res.status == 200) {
         this.snackBar.open(this.path + ' has been successfully changed to ' + this.mode + ".", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
+        this.node.mode = this.mode;
       } else {
         this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
