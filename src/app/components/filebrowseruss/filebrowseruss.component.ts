@@ -223,50 +223,71 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     if(!this.fileToCopy){
       this.rightClickPropertiesFolder.push(
         { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopy,this.rightClickedFile)
+          this.pasteFile(this.fileToCopy,this.rightClickedFile.path)
+        }}
+      );
+      this.rightClickPropertiesPanel.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopy,this.path)
         }}
       );
     }
     this.fileToCopy = rightClickedFile.path
   }
 
-  pasteFile(filePath: string, rightClickedFile: any) {
+  pasteFile(filePath: string, destinationPath: any) {
     let pathAndName = filePath;
     let name = this.getNameFromPathAndName(pathAndName);
-    this.isLoading = true;
-    let copySubscription = this.ussSrv.copyFile(pathAndName,rightClickedFile.path + "/" + name)
-    .subscribe(
-      resp => {
-        this.isLoading = false;
-        this.snackBar.open('Copied: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
-      },
-      error => {
-        this.ussSrv.deleteFileOrFolder(rightClickedFile.path + "/" + name).subscribe(() => {
-          if (error.status == '500') { //Internal Server Error
-            this.snackBar.open('Failed to copy: ' + pathAndName + "' This is probably due to a server agent problem.", 
+    if(this.getPathFromPathAndName(filePath) == destinationPath){
+      this.snackBar.open("Failed to copy: '" + filePath + "' Cannot copy file to same destination.",'Dismiss', { duration: 5000, panelClass: 'center' });
+      return;
+    }
+    if(name.indexOf(' ') >= 0){
+      this.snackBar.open("Failed to copy: '" + filePath + "' Copy operation not supported for filenames with spaces.",'Dismiss', { duration: 5000, panelClass: 'center' });
+      return;
+    }
+    let metaData = this.ussSrv.getFileMetadata(pathAndName);
+    metaData.subscribe(result => {
+      if(result.ccsid == -1){
+        this.snackBar.open("Failed to copy: '" + filePath + "' Copy operation not supported.", 
             'Dismiss', { duration: 5000,   panelClass: 'center' });
-          } else if (error.status == '404') { //Not Found
-            this.snackBar.open(pathAndName + ' does not exist.', 
-            'Dismiss', { duration: 5000,   panelClass: 'center' });
-          } else if (error.status == '400') { //Bad Request
-            this.snackBar.open("Failed to copy '" + pathAndName + "' This is probably due to a permission problem.", 
-            'Dismiss', { duration: 5000,   panelClass: 'center' });
-          } else { //Unknown
-            this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
-            'Dismiss', { duration: 5000,   panelClass: 'center' });
+        return;
+      }else{
+        this.isLoading = true;
+        let copySubscription = this.ussSrv.copyFile(pathAndName,destinationPath + "/" + name)
+        .subscribe(
+          resp => {
+            this.isLoading = false;
+            this.updateUss(destinationPath);
+            this.snackBar.open('Copied: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
+          },
+          error => {
+              if (error.status == '500') { //Internal Server Error
+                this.snackBar.open("Failed to copy: '" + pathAndName + "' This is probably due to a server agent problem.", 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              } else if (error.status == '404') { //Not Found
+                this.snackBar.open(pathAndName + ' does not exist.', 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              } else if (error.status == '400') { //Bad Request
+                this.snackBar.open("Failed to copy '" + pathAndName + "' This is probably due to a permission problem.", 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              } else { //Unknown
+                this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              }
+              this.isLoading = false;
+              this.errorMessage = <any>error;
           }
-          this.isLoading = false;
-          this.errorMessage = <any>error;
-        })
-      }
-    );
+        );
 
-    setTimeout(() => {
-      if (copySubscription.closed == false) {
-        this.snackBar.open('Copying ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+        setTimeout(() => {
+          if (copySubscription.closed == false) {
+            this.snackBar.open('Copying ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+              'Dismiss', { duration: 5000,   panelClass: 'center' });
+          }
+        }, 4000);
       }
-    }, 4000);
+    });
   }
 
   showPropertiesDialog(rightClickedFile: any) {
