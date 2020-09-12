@@ -61,7 +61,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
-  private fileToCopy : string;
+  private fileToCopyOrCut : string = '';
+  private isCutOperation : boolean;
 
   //TODO:define interface types for uss-data/data
   private data: TreeNode[];
@@ -195,6 +196,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Copy", action:() => { 
         this.copyFile(this.rightClickedFile)
+      }},
+      { text: "Cut", action:() => { 
+        this.cutFile(this.rightClickedFile)
       }}
     ];
 
@@ -220,36 +224,54 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   copyFile(rightClickedFile: any) {
-    if(!this.fileToCopy){
+    if(this.fileToCopyOrCut == ''){
       this.rightClickPropertiesFolder.push(
         { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopy,this.rightClickedFile.path)
+          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path)
         }}
       );
       this.rightClickPropertiesPanel.push(
         { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopy,this.path)
+          this.pasteFile(this.fileToCopyOrCut,this.path)
         }}
       );
     }
-    this.fileToCopy = rightClickedFile.path
+    this.fileToCopyOrCut = rightClickedFile.path
+    this.isCutOperation = false;
+  }
+
+  cutFile(rightClickedFile: any) {
+    if(this.fileToCopyOrCut == ''){
+      this.rightClickPropertiesFolder.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path)
+        }}
+      );
+      this.rightClickPropertiesPanel.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut,this.path)
+        }}
+      );
+    }
+    this.fileToCopyOrCut = rightClickedFile.path
+    this.isCutOperation = true;
   }
 
   pasteFile(filePath: string, destinationPath: any) {
     let pathAndName = filePath;
     let name = this.getNameFromPathAndName(pathAndName);
     if(this.getPathFromPathAndName(filePath) == destinationPath){
-      this.snackBar.open("Failed to copy: '" + filePath + "' Cannot copy file to same destination.",'Dismiss', { duration: 5000, panelClass: 'center' });
+      this.snackBar.open("Paste operation failed: '" + filePath + "' Cannot paste file to same destination.",'Dismiss', { duration: 5000, panelClass: 'center' });
       return;
     }
-    if(name.indexOf(' ') >= 0){
-      this.snackBar.open("Failed to copy: '" + filePath + "' Copy operation not supported for filenames with spaces.",'Dismiss', { duration: 5000, panelClass: 'center' });
+    if(pathAndName.indexOf(' ') >= 0){
+      this.snackBar.open("Paste operation failed: '" + filePath + "' Paste operation not supported for filenames with spaces.",'Dismiss', { duration: 5000, panelClass: 'center' });
       return;
     }
     let metaData = this.ussSrv.getFileMetadata(pathAndName);
     metaData.subscribe(result => {
       if(result.ccsid == -1){
-        this.snackBar.open("Failed to copy: '" + filePath + "' Copy operation not supported.", 
+        this.snackBar.open("Paste operation failed: '" + filePath + "' Operation not supported.", 
             'Dismiss', { duration: 5000,   panelClass: 'center' });
         return;
       }else{
@@ -259,17 +281,26 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           resp => {
             this.isLoading = false;
             this.updateUss(destinationPath);
-            this.snackBar.open('Copied: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
+            if(this.isCutOperation){
+              this.fileToCopyOrCut = '';
+              this.rightClickPropertiesFolder.pop();
+              this.rightClickPropertiesPanel.pop();
+              this.ussSrv.deleteFileOrFolder(pathAndName).subscribe(() => {
+                this.snackBar.open('Paste operation completed: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
+              });
+            }else{
+              this.snackBar.open('Paste operation completed: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
+            }
           },
           error => {
               if (error.status == '500') { //Internal Server Error
-                this.snackBar.open("Failed to copy: '" + pathAndName + "' This is probably due to a server agent problem.", 
+                this.snackBar.open("Failed to paste: '" + pathAndName + "' This is probably due to a server agent problem.", 
                 'Dismiss', { duration: 5000,   panelClass: 'center' });
               } else if (error.status == '404') { //Not Found
                 this.snackBar.open(pathAndName + ' does not exist.', 
                 'Dismiss', { duration: 5000,   panelClass: 'center' });
               } else if (error.status == '400') { //Bad Request
-                this.snackBar.open("Failed to copy '" + pathAndName + "' This is probably due to a permission problem.", 
+                this.snackBar.open("Failed to paste '" + pathAndName + "' This is probably due to a permission problem.", 
                 'Dismiss', { duration: 5000,   panelClass: 'center' });
               } else { //Unknown
                 this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
@@ -282,7 +313,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
         setTimeout(() => {
           if (copySubscription.closed == false) {
-            this.snackBar.open('Copying ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+            this.snackBar.open('Pasting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
               'Dismiss', { duration: 5000,   panelClass: 'center' });
           }
         }, 4000);
