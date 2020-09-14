@@ -35,7 +35,10 @@ export class CopyPasteService {
     this.currentOperation = 'cut';
   }
 
-  paste(path: string): Observable<void> {
+  paste(dir: string): Observable<void> {
+    const lastSlashPos = this.currentFile.lastIndexOf('/');
+    const fileName = this.currentFile.substring(lastSlashPos);
+    const path = `${dir}/${fileName}`;
     if (this.currentOperation === 'copy') {
       return this.finishCopyFile(path);
     } else if (this.currentOperation === 'cut') {
@@ -43,12 +46,12 @@ export class CopyPasteService {
     }
   }
 
-  private finishCopyFile(path: string): Observable<void> {
-    return of(null);
+  private finishCopyFile(newName: string): Observable<void> {
+    return this.ussCrud.copyFile(this.currentFile, newName, true);
   }
 
-  private finishCutFile(path: string): Observable<void> {
-    return of(null);
+  private finishCutFile(newName: string): Observable<void> {
+    return this.ussCrud.renameFile(this.currentFile, newName, true);
   }
 
   canPaste(): boolean {
