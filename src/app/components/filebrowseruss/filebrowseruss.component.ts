@@ -37,13 +37,14 @@ import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.co
 import { MessageDuration } from '../../shared/message-duration';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { CopyPasteService } from '../../services/copy-paste.service';
 
 @Component({
   selector: 'file-browser-uss',
   templateUrl: './filebrowseruss.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./filebrowseruss.component.css'],
-  providers: [UssCrudService, /*PersistentDataService,*/ SearchHistoryService]
+  providers: [UssCrudService, CopyPasteService, /*PersistentDataService,*/ SearchHistoryService]
 })
 
 export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowserUSS,
@@ -60,7 +61,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickedFile: any;
   public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
-  private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
 
@@ -77,6 +77,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     private utils: UtilsService, 
     /*private persistentDataService: PersistentDataService,*/
     private ussSearchHistory:SearchHistoryService,
+    private copyPaste: CopyPasteService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
@@ -191,6 +192,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesFile = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: 'Copy', action: () => { this.copyPaste.beginCopyFile(this.rightClickedFile.path) }},
+      { text: 'Cut', action: () => { this.copyPaste.beginCutFile(this.rightClickedFile.path) }},
       { text: "Change Mode/Permissions", action:() => { 
         this.showPermissionsDialog(this.rightClickedFile) }},
       { text: "Change Owners", action:() => { 
@@ -199,7 +202,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showDeleteDialog(this.rightClickedFile);
       }}
     ];
-
+    /*
     this.rightClickPropertiesFolder = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
@@ -213,6 +216,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showCreateFolderDialog(this.rightClickedFile);
       }}
     ];
+    */
 
     this.rightClickPropertiesPanel = [
       { text: "Create a Directory...", action:() => { 
@@ -223,6 +227,30 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         
       }}
     ];
+  }
+
+  get rightClickPropertiesFolder(): ContextMenuItem[] {
+    const items: ContextMenuItem[] = [
+      { text: "Properties", action:() => {
+        this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Change Mode/Permissions", action:() => {
+        this.showPermissionsDialog(this.rightClickedFile) }},
+      { text: "Change Owners", action:() => {
+        this.showOwnerDialog(this.rightClickedFile) }},
+      { text: "Delete", action:() => {
+        this.showDeleteDialog(this.rightClickedFile); }},
+      { text: "Create a Directory...", action:() => {
+        this.showCreateFolderDialog(this.rightClickedFile);
+      }}
+    ];
+    if (this.copyPaste.canPaste()) {
+      items.push({text: 'Paste', action: () => { this.finishPaste(this.rightClickedFile.path)}})
+    }
+    return items;
+  }
+
+  finishPaste(path: string): void {
+    this.copyPaste.paste(path).subscribe(() => {});
   }
 
   showPropertiesDialog(rightClickedFile: any) {
