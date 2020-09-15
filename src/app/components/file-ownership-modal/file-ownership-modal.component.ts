@@ -28,6 +28,7 @@ export class FileOwnershipModal {
   public icon = '';
   public ownerName = "";
   public groupName = "";
+  public node = null;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -35,15 +36,17 @@ export class FileOwnershipModal {
     private snackBar: MatSnackBar,
   ) 
   {
-    const node = data.event;
-    this.name = node.name;
-    this.path = node.path;
-    this.mode = node.mode;
+    this.node = data.event;
+    this.name = this.node.name;
+    this.path = this.node.path;
+    this.mode = this.node.mode;
+    this.ownerName = this.node.user;
+    this.groupName = this.node.group;
 
-    if (node.icon) {
-      this.icon = node.icon;
-    } else if (node.collapsedIcon) {
-      this.icon = node.collapsedIcon;
+    if (this.node.icon) {
+      this.icon = this.node.icon;
+    } else if (this.node.collapsedIcon) {
+      this.icon = this.node.collapsedIcon;
     }
 
     this.formatPermissions();
@@ -97,6 +100,8 @@ export class FileOwnershipModal {
       if (res.status == 200) {
         this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.ownerName + " Group: " + this.groupName + ".", 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
+        this.node.user = this.ownerName;
+        this.node.group = this.groupName;
       } else {
         this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
