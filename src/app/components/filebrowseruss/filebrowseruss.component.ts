@@ -37,6 +37,7 @@ import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.co
 import { MessageDuration } from '../../shared/message-duration';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { DownloadService } from '../../services/Download.service';
 
 @Component({
   selector: 'file-browser-uss',
@@ -79,6 +80,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     private ussSearchHistory:SearchHistoryService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private downloadService:DownloadService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
@@ -197,6 +199,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
+      }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile);
       }}
     ];
 
@@ -270,6 +275,26 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       this.deleteFileOrFolder(rightClickedFile);
     });
+  }
+
+  attemptDownload(rightClickedFile: any) {
+    let remotePath = rightClickedFile.path;
+    let filename = rightClickedFile.name;
+    let downloadObject = rightClickedFile;
+    this.downloadService.fetchFileHandler("https://localhost:8544/unixfile/contents"+ remotePath+"?responseType=raw",filename,remotePath, downloadObject).then((res) => {
+                    // this.downloadEndTrigger.emit(this.downloadService.finalObj);
+                    // if(this.downloadQueue.length > 0){
+                    //     this.downloadInProgress = false;
+                    //     //after end of a download shift the queue and start the next download.
+                    //     this.startDownload(this.downloadQueue.shift(),this.downloadRemoteFileQueue.shift(),this.downloadObjectQueue.shift());
+                    // }else{
+                    //     // fires when download queue is empty.
+                    //     this.downloadInProgress = false;
+                    //     return Promise.resolve("Completed All downloads");
+                    // }
+                }).catch((err) => {
+                    return Promise.reject(err);
+                });
   }
 
   showCreateFolderDialog(rightClickedFile: any) {
