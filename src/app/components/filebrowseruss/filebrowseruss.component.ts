@@ -62,7 +62,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
   private fileToCopyOrCut : string = '';
-  private isCutOperation : boolean;
 
   //TODO:define interface types for uss-data/data
   private data: TreeNode[];
@@ -227,37 +226,35 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     if(this.fileToCopyOrCut == ''){
       this.rightClickPropertiesFolder.push(
         { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path)
+          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path,false)
         }}
       );
       this.rightClickPropertiesPanel.push(
         { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopyOrCut,this.path)
+          this.pasteFile(this.fileToCopyOrCut,this.path,false)
         }}
       );
     }
     this.fileToCopyOrCut = rightClickedFile.path
-    this.isCutOperation = false;
   }
 
   cutFile(rightClickedFile: any) {
     if(this.fileToCopyOrCut == ''){
       this.rightClickPropertiesFolder.push(
         { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path)
+          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path,true)
         }}
       );
       this.rightClickPropertiesPanel.push(
         { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopyOrCut,this.path)
+          this.pasteFile(this.fileToCopyOrCut,this.path,true)
         }}
       );
     }
     this.fileToCopyOrCut = rightClickedFile.path
-    this.isCutOperation = true;
   }
 
-  pasteFile(filePath: string, destinationPath: any) {
+  pasteFile(filePath: string, destinationPath: any, isCutOperation: boolean) {
     let pathAndName = filePath;
     let name = this.getNameFromPathAndName(pathAndName);
     if(this.getPathFromPathAndName(filePath) == destinationPath){
@@ -281,10 +278,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           resp => {
             this.isLoading = false;
             this.updateUss(destinationPath);
-            if(this.isCutOperation){
+            if(isCutOperation){
               this.fileToCopyOrCut = '';
-              this.rightClickPropertiesFolder.pop();
-              this.rightClickPropertiesPanel.pop();
+              this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
+              this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
               this.ussSrv.deleteFileOrFolder(pathAndName).subscribe(() => {
                 this.snackBar.open('Paste operation completed: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
               });
