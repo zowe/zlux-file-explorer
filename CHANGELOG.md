@@ -1,5 +1,11 @@
 # ZLUX Angular File Tree
 
+## 0.3.0
+
+* Added modals, available via right click, to change ownership & permission information of files & folders.
+* Some CSS has been refactored.
+* Node-sass has been updated to support Node 12.
+
 ## 0.2.0
 
 * Allow users of this component to invoke its modals by using the spawnModal input with a javascript object containing the property 'type' equal to the type of modal to open, and 'data' equal to the FileNode object to be handled
