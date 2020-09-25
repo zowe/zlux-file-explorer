@@ -145,6 +145,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     ];
   }
+  
   showDeleteDialog(rightClickedFile: any) {
     if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.data.path, "This is already being deleted.") == true) {
       return;
