@@ -12,11 +12,11 @@ This is an angular component that can be included in applications to be able to 
 **NOTE: Because this relies upon ZSS APIs, it must be used in an environment which handles session lifecycles, as you must log in to ZSS prior to using those APIs. One way to utilize this is to use this within a Zowe App, within the Zowe Desktop**
 
 ## Installing
-You must set the @zowe registry scope to get this library, as it is not yet on npmjs.org
+Note: @zowe/zlux-angular-file-tree is published in separate registry configured in .npmrc
+`@zowe:registry=https://zowe.jfrog.io/zowe/api/npm/npm-release/` 
 
 ```
-npm config set @zowe:registry https://zowe.jfrog.io/zowe/api/npm/npm-release/
-npm install --save-prod @zowe/zlux-angular-file-tree
+npm install @zowe/zlux-angular-file-tree
 ```
 
 ## Embedding
