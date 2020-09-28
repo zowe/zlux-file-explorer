@@ -113,7 +113,7 @@ node('ibm-jenkins-slave-nvm') {
 
   pipeline.end([
     always: {
-      sh 'cat ~/.npm/*.log'
+      sh 'cat ~/.npm/_logs/*.log'
     }
   ])
 }
