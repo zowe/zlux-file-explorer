@@ -1,2 +1,5 @@
 # skip zlux folder which we downloaded
 zlux
+
+dco_signoffs/
+Jenkinsfile

@@ -111,5 +111,9 @@ node('ibm-jenkins-slave-nvm') {
   // define we need release stage
   pipeline.release()
 
-  pipeline.end()
+  pipeline.end([
+    always: {
+      sh 'cat ~/.npm/*.log'
+    }
+  ])
 }
