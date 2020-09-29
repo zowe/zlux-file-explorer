@@ -55,6 +55,8 @@ node('ibm-jenkins-slave-nvm') {
     timeout       : [ time: 10, unit: 'MINUTES' ],
     isSkippable   : true,
     stage         : {
+      sh "npm config set loglevel silly"
+
       pipeline.artifactory.download(
           specContent : """
 {
