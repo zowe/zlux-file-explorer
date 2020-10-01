@@ -217,7 +217,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Create a Directory...", action:() => { 
         this.showCreateFolderDialog(this.rightClickedFile);
-      }},
+      }}
     ];
 
     this.rightClickPropertiesPanel = [
@@ -437,6 +437,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         didContextMenuSpawn = this.windowActions.spawnContextMenu($event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
       }
     }
+    
     this.rightClickedFile = node;
     this.rightClick.emit($event.node);
     $event.originalEvent.preventDefault(); 
