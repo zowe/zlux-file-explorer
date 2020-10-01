@@ -28,6 +28,8 @@ export class FileOwnershipModal {
   public icon = '';
   public owner = '';
   public group = '';
+  public isDirectory = false;
+  public recursive = false;
   public node = null;
 
   constructor(
@@ -42,6 +44,7 @@ export class FileOwnershipModal {
     this.mode = this.node.mode;
     this.owner = this.node.owner;
     this.group = this.node.group;
+    this.isDirectory = this.node.directory;
 
     if (this.node.icon) {
       this.icon = this.node.icon;
@@ -94,7 +97,7 @@ export class FileOwnershipModal {
   }
 
   saveOwnerInfo() {
-    let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, undefined, this.owner, this.group);
+    let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, this.recursive, this.owner, this.group);
     this.http.post(url, null)
     .map(res=>{
       if (res.status == 200) {
