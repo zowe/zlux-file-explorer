@@ -632,6 +632,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   children: [],
                   label: this.getNameFromPathAndName(pathAndName),
                   mode: result.mode,
+                  owner: result.owner,
+                  group: result.group,
                   createdAt: result.createdAt,
                   data: "Folder",
                   directory: true,
