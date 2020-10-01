@@ -245,7 +245,6 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   }
 
   onRightClick($event: any) {
-    console.log("Right click event from zlux-file-tree component: ", $event);
     this.rightClick.emit($event);
   }
 

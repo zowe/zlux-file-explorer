@@ -59,7 +59,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private root: string;
   private newPath: string;
   private rightClickedFile: any;
-  private rightClickEvent: any;
   public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
@@ -197,7 +196,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Change Mode/Permissions", action:() => { 
         this.showPermissionsDialog(this.rightClickedFile) }},
       { text: "Rename...", action:() => { 
-        this.showRenameDialog(this.rightClickedFile, this.rightClickEvent) }},
+        this.showRenameField(this.rightClickedFile) }},
       { text: "Change Owners", action:() => { 
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
@@ -213,12 +212,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Change Owners", action:() => { 
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Rename...", action:() => { 
-        this.showRenameDialog(this.rightClickedFile, this.rightClickEvent) }},
+        this.showRenameField(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Create a Directory...", action:() => { 
         this.showCreateFolderDialog(this.rightClickedFile);
-      }},     
+      }},
     ];
 
     this.rightClickPropertiesPanel = [
@@ -242,25 +241,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.dialog.open(FilePropertiesModal, filePropConfig);
   }
 
-  showRenameDialog(file: any, event: any) {
-    //refactor all of this shiiiiiit
+  showRenameField(file: any) {
     let selectedNodes = document.getElementsByClassName('ui-treenode-content-selected');
-    console.log('file: ', file);
-    console.log('right click event:', event);
-    let oldNodeYur;
     let oldName = file.name;
     let oldPath = file.path;
-    let renameFn = (e: any, node: HTMLElement) => {
+    let renameFn = (node: HTMLElement) => {
       let nameFromNode = renameField.value;
       let pathForRename: any = (oldPath as String).split("/");
       pathForRename.pop();
       pathForRename = pathForRename.join('/');
       let url = encodeURI(`/unixfile/rename${oldPath}?newName=${pathForRename}/${nameFromNode}`);
-      console.log('encoded url: ', url);
       if(oldName != nameFromNode){
-        file.name = nameFromNode;
-        file.label = nameFromNode;
-        file.path = `${pathForRename}/${nameFromNode}`;
+        // file.name = nameFromNode;
+        // file.label = nameFromNode;
+        // file.path = `${pathForRename}/${nameFromNode}`;
         this.http.post(url, null).subscribe(
           res => {
             this.snackBar.open('Renamed: ' + file.path + ` to ${nameFromNode}`,
@@ -281,8 +275,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               //Error info gets printed in uss.crud.service.ts
             }
             this.errorMessage = <any>error;
-            //renameField.parentNode.replaceChild(node, renameField);
-            this.updateUss(this.path);
+            renameField.parentNode.replaceChild(node, renameField);
             return;
           }
         );
@@ -295,7 +288,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       let nameFromNode = (curNode as HTMLElement).innerText.trim();
       if(oldName == nameFromNode){
         var renameField = document.createElement("input");
-        oldNodeYur = selectedNodes[i].cloneNode();
         renameField.setAttribute('id', 'renameHighlightedField');
         renameField.value = oldName;
         renameField.style.width = (curNode as HTMLElement).style.width;
@@ -306,14 +298,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             e.stopPropagation();
             e.preventDefault();
             e.cancelBubble = true;
-            //renameFn(e, curNode as HTMLElement);
             renameField.blur();
             return;
           }
         }
         renameField.addEventListener('keydown', rnNode);
         renameField.onblur = function(e) {
-          renameFn(e, curNode as HTMLElement)
+          renameFn(curNode as HTMLElement)
         };
         renameField.style.zIndex = "10000";
         curNode.parentNode.replaceChild(renameField, curNode);
@@ -446,8 +437,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         didContextMenuSpawn = this.windowActions.spawnContextMenu($event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
       }
     }
-    console.log("right click event from filebrowseruss: ", $event);
-    this.rightClickEvent = $event;
     this.rightClickedFile = node;
     this.rightClick.emit($event.node);
     $event.originalEvent.preventDefault(); 
@@ -769,18 +758,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   rename(): void {
-    this.log.debug('rename:' + this.selectedItem);
-    this.ussSrv.renameFile(this.selectedItem, this.checkPath(this.newPath))
-      .subscribe(
-        resp => {
-          this.updateUss(this.path);
-        },
-        error => this.errorMessage = <any>error
-      );
-  }
-
-  renameFileOrFolder(file: any): void {
-    file.
     this.log.debug('rename:' + this.selectedItem);
     this.ussSrv.renameFile(this.selectedItem, this.checkPath(this.newPath))
       .subscribe(
