@@ -59,6 +59,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private root: string;
   private newPath: string;
   private rightClickedFile: any;
+  private rightClickEvent: any;
   public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
@@ -242,7 +243,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showRenameField(file: any) {
-    let selectedNodes = document.getElementsByClassName('ui-treenode-content-selected');
+    const selectedNode = this.rightClickEvent.originalEvent.srcElement;
     let oldName = file.name;
     let oldPath = file.path;
     let renameFn = (node: HTMLElement) => {
@@ -250,11 +251,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       let pathForRename: any = (oldPath as String).split("/");
       pathForRename.pop();
       pathForRename = pathForRename.join('/');
-      let url = encodeURI(`/unixfile/rename${oldPath}?newName=${pathForRename}/${nameFromNode}`);
       if(oldName != nameFromNode){
-        this.http.post(url, null).subscribe(
+        this.ussSrv.renameFile(oldPath, `${pathForRename}/${nameFromNode}`).subscribe(
           res => {
-            this.snackBar.open('Renamed: ' + file.path + ` to ${nameFromNode}`,
+            this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
               'Dismiss', { duration: 5000,   panelClass: 'center' });
             this.updateUss(this.path);
             return;
@@ -267,7 +267,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               this.snackBar.open(file.path + ' could not be opened or does not exist.', 
               'Dismiss', { duration: 5000,   panelClass: 'center' });
             } else { //Unknown
-              this.snackBar.open("Uknown error '" + error.status + "' occured for: " + file.path, 
+              this.snackBar.open("Uknown error '" + error.status + "' occurred for: " + file.path, 
               'Dismiss', { duration: 5000,   panelClass: 'center' });
             }
             this.errorMessage = <any>error;
@@ -279,35 +279,29 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         renameField.parentNode.replaceChild(node, renameField);
       }
     }
-    for(let i = 0; i < selectedNodes.length; i++){
-      const curNode = selectedNodes[i];
-      let nameFromNode = (curNode as HTMLElement).innerText.trim();
-      if(oldName == nameFromNode){
-        var renameField = document.createElement("input");
-        renameField.setAttribute('id', 'renameHighlightedField');
-        renameField.value = oldName;
-        renameField.style.width = (curNode as HTMLElement).style.width;
-        renameField.style.height = (curNode as HTMLElement).style.height;
-        let rnNode = (e) => {
-          if(e.which == 13 || e.key == "Enter" || e.keyCode == 13){
-            e.stopImmediatePropagation();
-            e.stopPropagation();
-            e.preventDefault();
-            e.cancelBubble = true;
-            renameField.blur();
-            return;
-          }
-        }
-        renameField.addEventListener('keydown', rnNode);
-        renameField.onblur = function(e) {
-          renameFn(curNode as HTMLElement)
-        };
-        renameField.style.zIndex = "10000";
-        curNode.parentNode.replaceChild(renameField, curNode);
-        renameField.focus();
-        renameField.select();
+    var renameField = document.createElement("input");
+    renameField.setAttribute('id', 'renameHighlightedField');
+    renameField.value = oldName;
+    renameField.style.width = (selectedNode as HTMLElement).style.width;
+    renameField.style.height = (selectedNode as HTMLElement).style.height;
+    let rnNode = (e) => {
+      if(e.which == 13 || e.key == "Enter" || e.keyCode == 13){
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        e.preventDefault();
+        e.cancelBubble = true;
+        renameField.blur();
+        return;
       }
     }
+    renameField.addEventListener('keydown', rnNode);
+    renameField.onblur = function(e) {
+      renameFn(selectedNode)
+    };
+    renameField.style.zIndex = "10000";
+    selectedNode.parentNode.replaceChild(renameField, selectedNode);
+    renameField.focus();
+    renameField.select();
   }
 
   showPermissionsDialog(rightClickedFile: any) {
@@ -435,6 +429,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.rightClickedFile = node;
+    this.rightClickEvent = $event;
     this.rightClick.emit($event.node);
     $event.originalEvent.preventDefault(); 
   }
