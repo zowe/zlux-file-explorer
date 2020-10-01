@@ -14,7 +14,6 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject, Optional, ViewChild
 } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
@@ -81,7 +80,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     private ussSearchHistory:SearchHistoryService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private http: Http,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
