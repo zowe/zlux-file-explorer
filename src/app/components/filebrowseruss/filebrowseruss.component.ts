@@ -252,9 +252,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       pathForRename = pathForRename.join('/');
       let url = encodeURI(`/unixfile/rename${oldPath}?newName=${pathForRename}/${nameFromNode}`);
       if(oldName != nameFromNode){
-        // file.name = nameFromNode;
-        // file.label = nameFromNode;
-        // file.path = `${pathForRename}/${nameFromNode}`;
         this.http.post(url, null).subscribe(
           res => {
             this.snackBar.open('Renamed: ' + file.path + ` to ${nameFromNode}`,
@@ -272,7 +269,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             } else { //Unknown
               this.snackBar.open("Uknown error '" + error.status + "' occured for: " + file.path, 
               'Dismiss', { duration: 5000,   panelClass: 'center' });
-              //Error info gets printed in uss.crud.service.ts
             }
             this.errorMessage = <any>error;
             renameField.parentNode.replaceChild(node, renameField);
