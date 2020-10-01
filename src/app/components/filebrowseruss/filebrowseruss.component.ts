@@ -251,19 +251,22 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let oldName = file.name;
     let oldPath = file.path;
     let renameFn = (e: any, node: HTMLElement) => {
-      let nameFromNode = node.innerText.trim();
-      nameFromNode = renameField.value;
+      let nameFromNode = renameField.value;
       let pathForRename: any = (oldPath as String).split("/");
       pathForRename.pop();
       pathForRename = pathForRename.join('/');
       let url = encodeURI(`/unixfile/rename${oldPath}?newName=${pathForRename}/${nameFromNode}`);
       console.log('encoded url: ', url);
       if(oldName != nameFromNode){
+        file.name = nameFromNode;
+        file.label = nameFromNode;
+        file.path = `${pathForRename}/${nameFromNode}`;
         this.http.post(url, null).subscribe(
           res => {
             this.snackBar.open('Renamed: ' + file.path + ` to ${nameFromNode}`,
               'Dismiss', { duration: 5000,   panelClass: 'center' });
             this.updateUss(this.path);
+            return;
           },
           error => {
             if (error.status == '500') { //Internal Server Error
@@ -280,6 +283,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             this.errorMessage = <any>error;
             //renameField.parentNode.replaceChild(node, renameField);
             this.updateUss(this.path);
+            return;
           }
         );
       } else {
@@ -290,44 +294,28 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       const curNode = selectedNodes[i];
       let nameFromNode = (curNode as HTMLElement).innerText.trim();
       if(oldName == nameFromNode){
-        file.selectable = false;
-        file.draggable = true;
-        file.droppable = true;
         var renameField = document.createElement("input");
         oldNodeYur = selectedNodes[i].cloneNode();
         renameField.setAttribute('id', 'renameHighlightedField');
         renameField.value = oldName;
         renameField.style.width = (curNode as HTMLElement).style.width;
         renameField.style.height = (curNode as HTMLElement).style.height;
-        let stopEnter = function(e) {
-          if(e.which == 13){
-            e.stopImmediatePropagation();
-            e.stopPropagation();
-            e.preventDefault();
-            e.cancelBubble = true;
-          }
-        }
-        document.addEventListener('keydown', stopEnter);
-        window.addEventListener('keydown', stopEnter);
         let rnNode = (e) => {
-          if(e.which == 13){
+          if(e.which == 13 || e.key == "Enter" || e.keyCode == 13){
             e.stopImmediatePropagation();
             e.stopPropagation();
             e.preventDefault();
             e.cancelBubble = true;
-            renameFn(e, curNode as HTMLElement);
+            //renameFn(e, curNode as HTMLElement);
+            renameField.blur();
             return;
           }
         }
-        let rnNode2 = (e) => {
-          renameFn(e, curNode as HTMLElement);
-          return;
-        }
         renameField.addEventListener('keydown', rnNode);
-        renameField.addEventListener('keyup', rnNode);
-        renameField.onblur = rnNode2;
-        renameField.onsubmit = rnNode2;
-        renameField.style.zIndex = "1000";
+        renameField.onblur = function(e) {
+          renameFn(e, curNode as HTMLElement)
+        };
+        renameField.style.zIndex = "10000";
         curNode.parentNode.replaceChild(renameField, curNode);
         renameField.focus();
         renameField.select();
