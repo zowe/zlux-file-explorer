@@ -58,7 +58,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private root: string;
   private newPath: string;
   private rightClickedFile: any;
-  private rightClickEvent: any;
+  private lastRightClickEvent: any;
   public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
@@ -241,12 +241,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showRenameField(file: any) {
-    const selectedNode = this.rightClickEvent.originalEvent.srcElement;
+    const selectedNode = this.lastRightClickEvent.originalEvent.srcElement;
     let oldName = file.name;
     let oldPath = file.path;
     let renameFn = (node: HTMLElement) => {
       let nameFromNode = renameField.value;
-      let pathForRename: any = (oldPath as String).split("/");
+      let pathForRename:any;
+      pathForRename = (oldPath as String).split("/");
       pathForRename.pop();
       pathForRename = pathForRename.join('/');
       if(oldName != nameFromNode){
@@ -427,7 +428,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.rightClickedFile = node;
-    this.rightClickEvent = $event;
+    this.lastRightClickEvent = $event;
     this.rightClick.emit($event.node);
     $event.originalEvent.preventDefault(); 
   }
