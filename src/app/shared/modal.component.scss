@@ -17,6 +17,10 @@ mat-dialog-actions {
   width: 50%;
 }
 
+.modal-column-full-width {
+  width: 100%;
+}
+
 /* Clear floats after the columns */
 .modal-row:after {
   content: "";
