@@ -12,6 +12,8 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
+import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'file-permissions-modal',
@@ -23,7 +25,6 @@ export class FilePermissionsModal {
 
   public name = '';
   public path = '';
-  public mode = 0;
   public modeSym = '';
   public icon = '';
   public userRead = false;
@@ -38,6 +39,23 @@ export class FilePermissionsModal {
   public isDirectory = false;
   public recursive = false;
   public node = null;
+  public octalMode: string; // 3-chars string e.g. "077"
+  public octalModePattern = "^[0-7]{3}$";
+  matcher = new CustomErrorStateMatcher();
+  private readonly navigationKeys = [
+    'Backspace',
+    'Delete',
+    'Tab',
+    'Escape',
+    'Enter',
+    'Home',
+    'End',
+    'ArrowLeft',
+    'ArrowRight',
+    'Clear',
+    'Copy',
+    'Paste'
+  ];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -48,7 +66,7 @@ export class FilePermissionsModal {
     this.node = data.event;
     this.name = this.node.name;
     this.path = this.node.path;
-    this.mode = this.node.mode;
+    this.octalMode = this.makeOctalModeString(this.node.mode);
 
     if (this.node.icon) {
       this.icon = this.node.icon;
@@ -63,18 +81,17 @@ export class FilePermissionsModal {
     this.formatPermissions();
   }
 
+  makeOctalModeString(mode: number): string {
+    const withZeros = '000' + mode;
+    return withZeros.substring(withZeros.length - 3);
+  }
+
   applyFilter(filterValue: string) {
   }
 
   formatPermissions() {
-    let modeString = String(this.mode);
-    if (modeString.length == 2) { // In case the mode is not properly formatted as "000" instead of "0", "20" etc
-      modeString = "0" + modeString;
-    } else if (modeString.length == 1) {
-      modeString = "00" + modeString;
-    }
+    const modeString = this.octalMode;
     let modeStringSym = "";
-
     for (let i = 0; i < 3; i++) {
       let value =  modeString.charAt(i);
       switch(value) {
@@ -246,18 +263,18 @@ export class FilePermissionsModal {
       }
     }
 
-    this.mode = parseInt(modeStringSym);
+    this.octalMode = modeStringSym;
     this.formatPermissions();
   }
 
   savePermissions() {
-    let url :string = ZoweZLUX.uriBroker.unixFileUri('chmod', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, this.mode.toString(), this.recursive);
+    let url :string = ZoweZLUX.uriBroker.unixFileUri('chmod', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, this.octalMode, this.recursive);
     this.http.post(url, null)
     .map(res=>{
       if (res.status == 200) {
-        this.snackBar.open(this.path + ' has been successfully changed to ' + this.mode + ".", 
+        this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
           'Dismiss', { duration: 5000,   panelClass: 'center' });
-        this.node.mode = this.mode;
+        this.node.mode = parseInt(this.octalMode, 10);
       } else {
         this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });
@@ -271,6 +288,26 @@ export class FilePermissionsModal {
           'Dismiss', { duration: 5000,   panelClass: 'center' });
       }
     );
+  }
+
+  onOctalModeChange(newOctalMode: string, octalModeInput: FormControl): void {
+    if (octalModeInput.valid) {
+      this.octalMode = newOctalMode;
+      this.formatPermissions();
+    }
+  }
+
+  onOctalModeKeyDown(e: KeyboardEvent): void {
+    if (this.navigationKeys.indexOf(e.key) !== -1) {
+      return;
+    }
+    // Ctrl(or Meta) + A,C,V,X
+    if ((e.ctrlKey || e.metaKey) && 'acvx'.indexOf(e.key) !== -1) {
+      return;
+    }
+    if (('01234567').indexOf(e.key) === -1) {
+      e.preventDefault();
+    }
   }
 
   private handleErrorObservable (error: Response | any) {
