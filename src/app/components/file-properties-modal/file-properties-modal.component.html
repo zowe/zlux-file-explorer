@@ -34,6 +34,12 @@
             <mat-list-item>
                 <div class="selectable-text">Mode: </div>
               </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Owner: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Group: </div>
+            </mat-list-item>
             <mat-list-item *ngIf="fileType != 'Folder'">
               <div class="selectable-text">Size: </div>
             </mat-list-item>
@@ -53,6 +59,12 @@
             <mat-list-item>
                 <div class="selectable-text">{{fileMode}}</div>
               </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{fileOwner}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{fileGroup}}</div>
+            </mat-list-item>
             <mat-list-item *ngIf="fileType != 'Folder'">
               <div class="selectable-text">{{fileSize}} {{sizeType}}</div>
             </mat-list-item>

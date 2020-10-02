@@ -26,8 +26,11 @@ export class FileOwnershipModal {
   public mode = 0;
   public modeSym = '';
   public icon = '';
-  public ownerName = "";
-  public groupName = "";
+  public owner = '';
+  public group = '';
+  public isDirectory = false;
+  public recursive = false;
+  public node = null;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -35,15 +38,18 @@ export class FileOwnershipModal {
     private snackBar: MatSnackBar,
   ) 
   {
-    const node = data.event;
-    this.name = node.name;
-    this.path = node.path;
-    this.mode = node.mode;
+    this.node = data.event;
+    this.name = this.node.name;
+    this.path = this.node.path;
+    this.mode = this.node.mode;
+    this.owner = this.node.owner;
+    this.group = this.node.group;
+    this.isDirectory = this.node.directory;
 
-    if (node.icon) {
-      this.icon = node.icon;
-    } else if (node.collapsedIcon) {
-      this.icon = node.collapsedIcon;
+    if (this.node.icon) {
+      this.icon = this.node.icon;
+    } else if (this.node.collapsedIcon) {
+      this.icon = this.node.collapsedIcon;
     }
 
     this.formatPermissions();
@@ -91,12 +97,14 @@ export class FileOwnershipModal {
   }
 
   saveOwnerInfo() {
-    let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, undefined, this.ownerName, this.groupName);
+    let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, this.recursive, this.owner, this.group);
     this.http.post(url, null)
     .map(res=>{
       if (res.status == 200) {
-        this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.ownerName + " Group: " + this.groupName + ".", 
+        this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
           'Dismiss', { duration: 5000,   panelClass: 'center' });
+        this.node.owner = this.owner;
+        this.node.group = this.group;
       } else {
         this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
           'Dismiss', { duration: 5000,   panelClass: 'center' });

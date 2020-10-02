@@ -26,6 +26,8 @@ export class FilePropertiesModal implements OnInit {
   public fileMode = 0;
   public fileSize = '';
   public fileIcon = '';
+  public fileOwner = '';
+  public fileGroup = '';
   public sizeType: string;
 
   constructor(
@@ -38,6 +40,8 @@ export class FilePropertiesModal implements OnInit {
     this.fileType = node.data;
     this.filePath = node.path;
     this.fileMode = node.mode;
+    this.fileOwner = node.owner;
+    this.fileGroup = node.group;
 
     if (node.size < 1024) { //Bytes
       this.fileSize = node.size;

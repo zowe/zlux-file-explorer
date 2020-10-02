@@ -30,10 +30,10 @@
 <div class="modal-row">
   <div class="modal-column-ownership">
     <mat-list-item>
-      User:&nbsp;&nbsp;
+      Owner:
       <mat-form-field style="margin-left: 15px;">
         <input id="owner-input" name="name" matInput type="text"
-          [(ngModel)]="ownerName">
+          [ngModel]="owner" (ngModelChange)="owner=$event.toUpperCase()">
         <button class="create-folder-clear-button" mat-button *ngIf="folderName" matSuffix mat-icon-button aria-label="Clear" (click)="folderName=''">
           <mat-icon class="create-folder-clear-icon">close</mat-icon>
         </button>
@@ -48,11 +48,24 @@
       Group:
       <mat-form-field style="margin-left: 15px;">
         <input id="group-input" matInput type="text"
-          [(ngModel)]="groupName">
+          [ngModel]="group" (ngModelChange)="group=$event.toUpperCase()">
         <button class="create-folder-clear-button" mat-button *ngIf="folderPath" matSuffix mat-icon-button aria-label="Clear" (click)="folderPath=''">
           <mat-icon class="create-folder-clear-icon">close</mat-icon>
         </button>
       </mat-form-field>
+    </mat-list-item>
+  </div>
+</div>
+
+<div class="modal-row" *ngIf="isDirectory">
+  <div class="modal-column-ownership" style="width: 30%;">
+    <mat-list-item>
+      <mat-slide-toggle color="primary" class="selectable-text" [(ngModel)]="recursive"></mat-slide-toggle>
+    </mat-list-item>
+  </div>
+  <div class="modal-column">
+    <mat-list-item>
+      <div class="selectable-text">Recursive?</div>
     </mat-list-item>
   </div>
 </div>
