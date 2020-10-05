@@ -20,21 +20,39 @@
 </mat-form-field> -->
 
 <div class="file-permissions-row">
-    <div class="modal-column" style="width: 30%;">
-      <mat-list-item>
-        <div class="selectable-text">Mode: </div>
-      </mat-list-item>
-    </div>
-    <div class="modal-column">
-      <mat-list-item>
-        <div class="selectable-text">{{mode}} ({{modeSym}})</div>
-      </mat-list-item>
-    </div>
+  <div class="modal-column-full-width">
+    <mat-list-item>
+      <span class="file-permissions-subtitle">Mode:</span>
+      <mat-form-field class="mode-form-field">
+        <input
+          class="mode-input"
+          matInput
+          required
+          type="text"
+          maxlength="3"
+          minlength="3"
+          [pattern]="octalModePattern"
+          [ngModel]="octalMode"
+          (ngModelChange)="onOctalModeChange($event, octalModeInput)"
+          #octalModeInput="ngModel"
+          (keydown)="onOctalModeKeyDown($event)"
+          [errorStateMatcher]="matcher"
+        >
+        <mat-error *ngIf="octalModeInput.errors?.pattern && !octalModeInput.errors?.required">
+          Invalid mode
+        </mat-error>
+        <mat-error *ngIf="octalModeInput.errors?.required">
+          Mode is required
+        </mat-error>
+      </mat-form-field>
+      <span class="mode-sym">{{modeSym}}</span>
+    </mat-list-item>
+  </div>
 </div>
 
 <div class="container">
 
-  <span class="file-permissions-subtitle user">User</span>
+  <span class="file-permissions-subtitle user">Owner</span>
   <section class="example-section user">
     <mat-checkbox color="primary" class="example-margin" [(ngModel)]="userRead" (change)="updateUI()">Read</mat-checkbox>
     <mat-checkbox color="primary" class="example-margin" [(ngModel)]="userWrite" (change)="updateUI()">Write</mat-checkbox>
@@ -48,7 +66,7 @@
     <mat-checkbox color="primary" class="example-margin" [(ngModel)]="groupExecute" (change)="updateUI()">Execute</mat-checkbox>
   </section>
 
-  <span class="file-permissions-subtitle public">Public</span>
+  <span class="file-permissions-subtitle public">Other</span>
    <section class="example-section public">
     <mat-checkbox color="primary" class="example-margin" [(ngModel)]="publicRead" (change)="updateUI()">Read</mat-checkbox>
     <mat-checkbox color="primary" class="example-margin" [(ngModel)]="publicWrite" (change)="updateUI()">Write</mat-checkbox>
@@ -71,7 +89,7 @@
 
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="modal-mat-button cancel">Cancel</button>
-  <button mat-button mat-dialog-close class="modal-mat-button" (click)="savePermissions()">Save</button>
+  <button mat-button mat-dialog-close class="modal-mat-button" (click)="savePermissions()" [disabled]="octalModeInput.invalid">Save</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
 </mat-dialog-actions>
 
