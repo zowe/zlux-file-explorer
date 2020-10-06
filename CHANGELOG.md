@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 0.4.0
+
+* Add rename functionality to USS browser
+
 ## 0.3.0
 
 * Added modals, available via right click, to change ownership & permission information of files & folders.
