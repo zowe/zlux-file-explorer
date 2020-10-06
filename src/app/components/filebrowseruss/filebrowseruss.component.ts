@@ -244,7 +244,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     const selectedNode = this.lastRightClickEvent.originalEvent.srcElement;
     let oldName = file.name;
     let oldPath = file.path;
+    file.selectable = false;
     let renameFn = (node: HTMLElement) => {
+      file.selectable = true;
       let nameFromNode = renameField.value;
       let pathForRename:any;
       pathForRename = (oldPath as String).split("/");
@@ -297,7 +299,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     renameField.onblur = function(e) {
       renameFn(selectedNode)
     };
-    renameField.style.zIndex = "10000";
     selectedNode.parentNode.replaceChild(renameField, selectedNode);
     renameField.focus();
     renameField.select();
