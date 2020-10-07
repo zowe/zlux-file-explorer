@@ -37,6 +37,7 @@ import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.co
 import { MessageDuration } from '../../shared/message-duration';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 
 @Component({
   selector: 'file-browser-uss',
@@ -198,6 +199,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showRenameField(this.rightClickedFile) }},
       { text: "Change Owners", action:() => { 
         this.showOwnerDialog(this.rightClickedFile) }},
+      { text: "Tag", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
       }}
@@ -212,6 +215,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Rename...", action:() => {
         this.showRenameField(this.rightClickedFile) }},
+      { text: "Tag Directory Contents", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Create a Directory...", action:() => { 
@@ -364,6 +369,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
     });
+  }
+  
+  showTaggingDialog(rightClickedFile: any) {
+    const config = new MatDialogConfig();
+    config.data = {
+      node: rightClickedFile
+    }
+    config.maxWidth = '450px';
+    this.dialog.open(FileTaggingModal, config);
   }
 
   onClick($event: any): void {
