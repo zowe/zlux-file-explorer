@@ -101,7 +101,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() USSRenameEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() inputStyle: any;
@@ -241,7 +241,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showRenameField(file: any) {
-    this.renameClick.emit(this.lastRightClickEvent);
     const selectedNode = this.lastRightClickEvent.originalEvent.srcElement;
     let oldName = file.name;
     let oldPath = file.path;
@@ -258,6 +257,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           res => {
             this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
               'Dismiss', { duration: 5000,   panelClass: 'center' });
+            this.USSRenameEvent.emit(this.lastRightClickEvent);
             this.updateUss(this.path);
             return;
           },
