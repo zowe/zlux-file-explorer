@@ -241,6 +241,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showRenameField(file: any) {
+    this.renameClick.emit(this.lastRightClickEvent);
     const selectedNode = this.lastRightClickEvent.originalEvent.srcElement;
     let oldName = file.name;
     let oldPath = file.path;
@@ -447,10 +448,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onPathChanged($event: any): void {
     this.pathChanged.emit($event);
-  }
-
-  onRenameClick($event: any): void {
-    this.renameClick.emit($event);
   }
 
   sortFn(a: any, b: any) {
