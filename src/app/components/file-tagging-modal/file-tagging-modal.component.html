@@ -19,12 +19,17 @@
         <input matInput required type="text"
           [(ngModel)]="selectedOption" (ngModelChange)="onValueChange($event)"
           [matAutocomplete]="auto"
+          [errorStateMatcher]="matcher"
+          #encodingInput="ngModel"
         >
         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
           <mat-option *ngFor="let option of filteredOptions" [value]="option">
             {{ option.name }}
           </mat-option>
         </mat-autocomplete>
+        <mat-error *ngIf="encodingInput.errors?.required">
+          Encoding is required
+        </mat-error>
       </mat-form-field>
     </mat-list-item>
   </div>
