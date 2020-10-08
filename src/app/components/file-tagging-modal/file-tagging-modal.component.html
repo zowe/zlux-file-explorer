@@ -16,9 +16,15 @@
       <ng-container *ngIf="isDirectory else file">Tag all files as</ng-container>
       <ng-template #file>Tag file as</ng-template>
       <mat-form-field appearance="standard" style="margin-left: 36px;">
-        <mat-select required name="codeset" [(ngModel)]="codeset">
-          <mat-option *ngFor="let option of tagOptions" [value]="option.codeset">{{option.title}}</mat-option>
-        </mat-select>
+        <input matInput required type="text"
+          [(ngModel)]="selectedOption" (ngModelChange)="onValueChange($event)"
+          [matAutocomplete]="auto"
+        >
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
+          <mat-option *ngFor="let option of filteredOptions" [value]="option">
+            {{ option.title }}
+          </mat-option>
+        </mat-autocomplete>
       </mat-form-field>
     </mat-list-item>
   </div>
@@ -39,7 +45,7 @@
 
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="modal-mat-button cancel">Cancel</button>
-  <button mat-button mat-dialog-close class="modal-mat-button" (click)="changeTag()">Save</button>
+  <button mat-button mat-dialog-close class="modal-mat-button" (click)="changeTag()" [disabled]="!isOptionSelected">Save</button>
 </mat-dialog-actions>
 
 <!--

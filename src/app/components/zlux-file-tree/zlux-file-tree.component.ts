@@ -46,6 +46,7 @@ import { FilePropertiesModal } from '../file-properties-modal/file-properties-mo
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
 import {
+  MatAutocompleteModule,
   MatButtonModule,
   MatButtonToggleModule,
   MatCheckboxModule,
@@ -54,7 +55,6 @@ import {
   MatIconModule,
   MatInputModule,
   MatListModule,
-  MatSelectModule,
   MatSlideToggleModule,
   MatSnackBarModule,
   MatTableModule,
@@ -361,8 +361,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     MatCheckboxModule,
     MatButtonModule,
     MatButtonToggleModule,
-    MatSelectModule,
     MatTooltipModule,
+    MatAutocompleteModule,
     ZluxTabbingModule,
     MatSlideToggleModule
   ],

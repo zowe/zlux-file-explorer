@@ -12,7 +12,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
-import { findTagOptionByCodeset, TagOption } from './tag-option';
+import { allTagOptions, findTagOptionByCodeset, TagOption } from './tag-option';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
@@ -32,12 +32,9 @@ export class FileTaggingModal {
   matcher = new CustomErrorStateMatcher();
   codeset: number;
   recursive: boolean = false;
-  tagOptions: TagOption[] = [
-    { title: 'Untagged', codeset: 0, type: 'delete' },
-    { title: 'IBM-1047', codeset: 1047, type: 'text' },
-    { title: 'ISO-8859-1', codeset: 819, type: 'text' },
-    { title: 'Binary', codeset: 65535, type: 'binary' },
-  ];
+  tagOptions = allTagOptions;
+  filteredOptions: TagOption[];
+  selectedOption: TagOption | string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -50,35 +47,38 @@ export class FileTaggingModal {
     this.icon = this.node.icon ? this.node.icon : this.node.collapsedIcon;
     this.title = this.isDirectory ? 'Tag files' : 'Tag file';
     this.codeset = this.isDirectory ? 0 : this.node.ccsid;
+    this.selectedOption = findTagOptionByCodeset(this.tagOptions, this.codeset);
+    this.filteredOptions = this.tagOptions;
   }
 
   changeTag(): void {
     const path: string = this.node.path;
     const recursive = this.recursive;
-    const codeset = this.codeset;
-    const option = findTagOptionByCodeset(this.tagOptions, codeset);
-    const type: ZLUX.TagType = option ? option.type : 'text';
+    const option = this.selectedOption as TagOption;
+    const type = option.type;
+    const codeset = (type === 'text') ? option.codeset : undefined;
     const options: ZLUX.UnixFileUriOptions = {
       recursive,
       type,
-      codeset: type === 'text' ? codeset : undefined
+      codeset
     };
     const url = ZoweZLUX.uriBroker.unixFileUri('chtag', path, options);
     const action = (type === 'delete') ? this.http.delete(url) : this.http.post(url, null);
     action.subscribe(
-      _res => this.onTaggingSuccess(path, type, codeset),
+      _res => this.onTaggingSuccess(path, type, option),
       err => this.onTaggingFailure(err),
     );
   }
 
-  onTaggingSuccess(path: string, type: ZLUX.TagType, codeset: number): void {
+  onTaggingSuccess(path: string, type: ZLUX.TagType, option: TagOption): void {
     if (!this.isDirectory) {
-      this.node.ccsid = codeset;
+      this.node.ccsid = option.codeset;
     }
     const verb = (type === 'delete') ? 'untagged' : 'tagged';
+    const asCodesetOrEmpty = (type === 'delete') ? '' : `as ${option.title}`;
     const message = this.isDirectory ?
-      `Files in ${path} have been successfully ${verb}` :
-      `File ${path} has been successfully ${verb}`
+      `Files in ${path} have been successfully ${verb} ${asCodesetOrEmpty}` :
+      `File ${path} has been successfully ${verb} ${asCodesetOrEmpty}`;
     this.snackBar.open(message, 'Dismiss', defaultSnackbarOptions);
   }
 
@@ -88,6 +88,28 @@ export class FileTaggingModal {
       message = err.error.error;
     }
     this.snackBar.open(`Error: ${message}.`, 'Dismiss', defaultSnackbarOptions);
+  }
+
+  displayFn(option?: TagOption): string | undefined {
+    return option ? option.title : undefined;
+  }
+
+  onValueChange(value?: string | TagOption): void {
+    if (value) {
+      const encoding = (typeof value === 'string') ? value : value.title;
+      this.filteredOptions = this.filter(this.tagOptions, encoding);
+    } else {
+      this.filteredOptions = this.tagOptions;
+    }
+  }
+
+  get isOptionSelected(): boolean {
+    return typeof this.selectedOption === 'object';
+  }
+
+  private filter(options: TagOption[], value: string): TagOption[] {
+    const filterValue = value.toLowerCase();
+    return options.filter(option => option.title.toLowerCase().includes(filterValue));
   }
 }
 
