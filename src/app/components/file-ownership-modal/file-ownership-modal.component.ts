@@ -12,6 +12,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
+import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-ownership-modal',
@@ -102,12 +103,12 @@ export class FileOwnershipModal {
     .map(res=>{
       if (res.status == 200) {
         this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         this.node.owner = this.owner;
         this.node.group = this.group;
       } else {
         this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     })
     .catch(this.handleErrorObservable).subscribe(
@@ -115,7 +116,7 @@ export class FileOwnershipModal {
       },
       error => { 
         this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     );
   }

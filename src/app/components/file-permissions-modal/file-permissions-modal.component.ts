@@ -14,6 +14,7 @@ import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 import { FormControl } from '@angular/forms';
+import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-permissions-modal',
@@ -273,11 +274,11 @@ export class FilePermissionsModal {
     .map(res=>{
       if (res.status == 200) {
         this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         this.node.mode = parseInt(this.octalMode, 10);
       } else {
         this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     })
     .catch(this.handleErrorObservable).subscribe(
@@ -285,7 +286,7 @@ export class FilePermissionsModal {
       },
       error => { 
         this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     );
   }
