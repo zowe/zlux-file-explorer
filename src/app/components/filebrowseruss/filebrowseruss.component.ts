@@ -246,6 +246,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let oldPath = file.path;
     file.selectable = false;
     let renameFn = (node: HTMLElement) => {
+      renameField.parentNode.replaceChild(node, renameField);
       file.selectable = true;
       let nameFromNode = renameField.value;
       let pathForRename:any;
@@ -253,12 +254,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       pathForRename.pop();
       pathForRename = pathForRename.join('/');
       if(oldName != nameFromNode){
-        this.ussSrv.renameFile(oldPath, `${pathForRename}/${nameFromNode}`).subscribe(
+        let newPath = `${pathForRename}/${nameFromNode}`;
+        this.ussSrv.renameFile(oldPath, newPath).subscribe(
           res => {
             this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
               'Dismiss', { duration: 5000,   panelClass: 'center' });
-            this.ussRenameEvent.emit(this.lastRightClickEvent.node);
-            this.updateUss(this.path);
+            this.ussRenameEvent.emit(this.lastRightClickEvent.node); 
+            file.label = nameFromNode;
+            file.path = newPath;
+            file.name = nameFromNode;
+            //this.updateUss(this.path);
             return;
           },
           error => {
@@ -273,12 +278,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               'Dismiss', { duration: 5000,   panelClass: 'center' });
             }
             this.errorMessage = <any>error;
-            renameField.parentNode.replaceChild(node, renameField);
             return;
           }
         );
-      } else {
-        renameField.parentNode.replaceChild(node, renameField);
       }
     }
     var renameField = document.createElement("input");
