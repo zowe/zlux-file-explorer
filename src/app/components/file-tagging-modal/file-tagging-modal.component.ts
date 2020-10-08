@@ -75,7 +75,7 @@ export class FileTaggingModal {
       this.node.ccsid = option.codeset;
     }
     const verb = (type === 'delete') ? 'untagged' : 'tagged';
-    const asCodesetOrEmpty = (type === 'delete') ? '' : `as ${option.title}`;
+    const asCodesetOrEmpty = (type === 'delete') ? '' : `as ${option.name}`;
     const message = this.isDirectory ?
       `Files in ${path} have been successfully ${verb} ${asCodesetOrEmpty}` :
       `File ${path} has been successfully ${verb} ${asCodesetOrEmpty}`;
@@ -91,12 +91,12 @@ export class FileTaggingModal {
   }
 
   displayFn(option?: TagOption): string | undefined {
-    return option ? option.title : undefined;
+    return option ? option.name : undefined;
   }
 
   onValueChange(value?: string | TagOption): void {
     if (value) {
-      const encoding = (typeof value === 'string') ? value : value.title;
+      const encoding = (typeof value === 'string') ? value : value.name;
       this.filteredOptions = this.filter(this.tagOptions, encoding);
     } else {
       this.filteredOptions = this.tagOptions;
@@ -109,7 +109,7 @@ export class FileTaggingModal {
 
   private filter(options: TagOption[], value: string): TagOption[] {
     const filterValue = value.toLowerCase();
-    return options.filter(option => option.title.toLowerCase().includes(filterValue));
+    return options.filter(option => option.name.toLowerCase().includes(filterValue));
   }
 }
 

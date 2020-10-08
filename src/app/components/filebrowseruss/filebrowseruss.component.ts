@@ -199,7 +199,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showRenameField(this.rightClickedFile) }},
       { text: "Change Owners", action:() => { 
         this.showOwnerDialog(this.rightClickedFile) }},
-      { text: "Tag", action:() => { 
+      { text: "Tag...", action:() => { 
         this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
@@ -215,7 +215,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Rename...", action:() => {
         this.showRenameField(this.rightClickedFile) }},
-      { text: "Tag Directory Contents", action:() => { 
+      { text: "Tag Directory...", action:() => { 
         this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
