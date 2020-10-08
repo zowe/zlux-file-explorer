@@ -30,7 +30,6 @@ export class FileTaggingModal {
   name: string;
   title: string;
   matcher = new CustomErrorStateMatcher();
-  codeset: number;
   recursive: boolean = false;
   tagOptions = allTagOptions;
   filteredOptions: TagOption[];
@@ -46,8 +45,8 @@ export class FileTaggingModal {
     this.isDirectory = this.node.directory;
     this.icon = this.node.icon ? this.node.icon : this.node.collapsedIcon;
     this.title = this.isDirectory ? 'Tag files' : 'Tag file';
-    this.codeset = this.isDirectory ? 0 : this.node.ccsid;
-    this.selectedOption = findTagOptionByCodeset(this.tagOptions, this.codeset);
+    const codeset = this.isDirectory ? 0 : this.node.ccsid;
+    this.selectedOption = findTagOptionByCodeset(this.tagOptions, codeset);
     this.filteredOptions = this.tagOptions;
   }
 
