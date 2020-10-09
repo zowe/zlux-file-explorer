@@ -14,13 +14,13 @@ export interface TagOption {
   type: ZLUX.TagType;
 }
 
-export function findTagOptionByCodeset(options: TagOption[], codeset: number): TagOption | undefined {
-  return options.find(option => option.codeset === codeset);
+export function findTagOptionByCodeset(codeset: number): TagOption | undefined {
+  return allTagOptions.find(option => option.codeset === codeset);
 }
 
 export const allTagOptions: TagOption[] = [
   { codeset: 0, name: 'Untagged', type: 'delete' },
-  { codeset: 65535, name: 'Binary', type: 'binary' },
+  { codeset: -1, name: 'Binary', type: 'binary' },
   { codeset: 1047, name: "IBM-1047", type: 'text' },
   { codeset: 819, name: "ISO8859-1", type: 'text' },
   { codeset: 1208, name: "UTF-8", type: 'text' },

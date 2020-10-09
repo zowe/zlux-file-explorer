@@ -9,11 +9,12 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 import { allTagOptions, findTagOptionByCodeset, TagOption } from './tag-option';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'file-tagging-modal',
@@ -37,6 +38,7 @@ export class FileTaggingModal {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
+    private dialogRef: MatDialogRef<FileTaggingModal>,
     private http: HttpClient,
     private snackBar: MatSnackBar,
   ) {
@@ -46,7 +48,7 @@ export class FileTaggingModal {
     this.icon = this.node.icon ? this.node.icon : this.node.collapsedIcon;
     this.title = this.isDirectory ? 'Tag files' : 'Tag file';
     const codeset = this.isDirectory ? 0 : this.node.ccsid;
-    this.selectedOption = findTagOptionByCodeset(this.tagOptions, codeset);
+    this.selectedOption = findTagOptionByCodeset(codeset);
     this.filteredOptions = this.tagOptions;
   }
 
@@ -63,16 +65,25 @@ export class FileTaggingModal {
     };
     const url = ZoweZLUX.uriBroker.unixFileUri('chtag', path, options);
     const action = (type === 'delete') ? this.http.delete(url) : this.http.post(url, null);
-    action.subscribe(
+    action.pipe(
+      finalize(() => this.closeDialog())
+    ).
+    subscribe(
       _res => this.onTaggingSuccess(path, type, option),
       err => this.onTaggingFailure(err),
     );
+  }
+
+  closeDialog() {
+    const needUpdate = this.isDirectory;
+    this.dialogRef.close(needUpdate);
   }
 
   onTaggingSuccess(path: string, type: ZLUX.TagType, option: TagOption): void {
     if (!this.isDirectory) {
       this.node.ccsid = option.codeset;
     }
+
     const verb = (type === 'delete') ? 'untagged' : 'tagged';
     const asCodesetOrEmpty = (type === 'delete') ? '' : `as ${option.name}`;
     const message = this.isDirectory ?

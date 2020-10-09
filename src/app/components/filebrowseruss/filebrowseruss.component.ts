@@ -378,7 +378,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       node: rightClickedFile
     }
     config.maxWidth = '450px';
-    this.dialog.open(FileTaggingModal, config);
+    const dialogRef = this.dialog.open(FileTaggingModal, config);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
+    });
   }
 
   onClick($event: any): void {
@@ -610,9 +615,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
 
   //Adds children to the existing this.data TreeNode array to update tree
-  addChild(node: any): void {
+  addChild(node: any, force?: boolean): void {
     let path = node.path;
-    if (node.children && node.children.length > 0) 
+    if (node.children && node.children.length > 0 && !force) 
     {
       //If an opened node has children, and the user clicked on it...
       if (node.expanded) {
