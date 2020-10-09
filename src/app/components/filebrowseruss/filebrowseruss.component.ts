@@ -101,7 +101,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() inputStyle: any;
@@ -192,9 +192,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesFile = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
-      { text: "Change Mode/Permissions", action:() => { 
+      { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
-      { text: "Rename...", action:() => {
+      { text: "Rename", action:() => {
         this.showRenameField(this.rightClickedFile) }},
       { text: "Change Owners", action:() => { 
         this.showOwnerDialog(this.rightClickedFile) }},
@@ -206,11 +206,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesFolder = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
-      { text: "Change Mode/Permissions", action:() => { 
+      { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
-      { text: "Change Owners", action:() => { 
+      { text: "Change Owners...", action:() => {
         this.showOwnerDialog(this.rightClickedFile) }},
-      { text: "Rename...", action:() => {
+      { text: "Rename", action:() => {
         this.showRenameField(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
@@ -246,6 +246,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let oldPath = file.path;
     file.selectable = false;
     let renameFn = (node: HTMLElement) => {
+      renameField.parentNode.replaceChild(node, renameField);
       file.selectable = true;
       let nameFromNode = renameField.value;
       let pathForRename:any;
@@ -253,11 +254,16 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       pathForRename.pop();
       pathForRename = pathForRename.join('/');
       if(oldName != nameFromNode){
-        this.ussSrv.renameFile(oldPath, `${pathForRename}/${nameFromNode}`).subscribe(
+        let newPath = `${pathForRename}/${nameFromNode}`;
+        this.ussSrv.renameFile(oldPath, newPath).subscribe(
           res => {
             this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
               'Dismiss', { duration: 5000,   panelClass: 'center' });
-            this.updateUss(this.path);
+            this.ussRenameEvent.emit(this.lastRightClickEvent.node); 
+            file.label = nameFromNode;
+            file.path = newPath;
+            file.name = nameFromNode;
+            //this.updateUss(this.path);
             return;
           },
           error => {
@@ -272,12 +278,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               'Dismiss', { duration: 5000,   panelClass: 'center' });
             }
             this.errorMessage = <any>error;
-            renameField.parentNode.replaceChild(node, renameField);
             return;
           }
         );
-      } else {
-        renameField.parentNode.replaceChild(node, renameField);
       }
     }
     var renameField = document.createElement("input");
@@ -338,6 +341,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       this.deleteFileOrFolder(rightClickedFile);
+      this.deleteClick.emit(this.lastRightClickEvent.node);
     });
   }
 
@@ -363,6 +367,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
+      this.newFolderClick.emit(this.lastRightClickEvent.node);
     });
   }
 
@@ -373,16 +378,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.copyClick.emit($event);
   }
 
-  onDeleteClick($event: any): void {
-    this.deleteClick.emit($event);
-  }
-
   onNewFileClick($event: any): void {
     this.newFileClick.emit($event);
-  }
-
-  onNewFolderClick($event: any): void {
-    this.newFolderClick.emit($event);
   }
   
   onNodeClick($event: any): void {
@@ -447,10 +444,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onPathChanged($event: any): void {
     this.pathChanged.emit($event);
-  }
-
-  onRenameClick($event: any): void {
-    this.renameClick.emit($event);
   }
 
   sortFn(a: any, b: any) {
