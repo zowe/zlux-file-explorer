@@ -8,17 +8,17 @@
   Copyright Contributors to the Zowe Project.
 */
 
-export interface TagOption {
+export interface FileTag {
   name: string;
   codeset: number;
   type: ZLUX.TagType;
 }
 
-export function findTagOptionByCodeset(codeset: number): TagOption | undefined {
-  return allTagOptions.find(option => option.codeset === codeset);
+export function findFileTagByCodeset(codeset: number): FileTag | undefined {
+  return fileTagList.find(option => option.codeset === codeset);
 }
 
-export const allTagOptions: TagOption[] = [
+export const fileTagList: FileTag[] = [
   { codeset: 0, name: 'Untagged', type: 'delete' },
   { codeset: -1, name: 'Binary', type: 'binary' },
   { codeset: 1047, name: "IBM-1047", type: 'text' },

@@ -12,7 +12,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
-import { allTagOptions, findTagOptionByCodeset, TagOption } from './tag-option';
+import { fileTagList, findFileTagByCodeset, FileTag } from '../../shared/file-tag';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 import { finalize } from 'rxjs/operators';
 
@@ -32,9 +32,9 @@ export class FileTaggingModal {
   title: string;
   matcher = new CustomErrorStateMatcher();
   recursive: boolean = false;
-  tagOptions = allTagOptions;
-  filteredOptions: TagOption[];
-  selectedOption: TagOption | string;
+  tagOptions = fileTagList;
+  filteredOptions: FileTag[];
+  selectedOption: FileTag | string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -48,14 +48,14 @@ export class FileTaggingModal {
     this.icon = this.node.icon ? this.node.icon : this.node.collapsedIcon;
     this.title = this.isDirectory ? 'Tag files' : 'Tag file';
     const codeset = this.isDirectory ? 0 : this.node.ccsid;
-    this.selectedOption = findTagOptionByCodeset(codeset);
+    this.selectedOption = findFileTagByCodeset(codeset);
     this.filteredOptions = this.tagOptions;
   }
 
   changeTag(): void {
     const path: string = this.node.path;
     const recursive = this.recursive;
-    const option = this.selectedOption as TagOption;
+    const option = this.selectedOption as FileTag;
     const type = option.type;
     const codeset = (type === 'text') ? option.codeset : undefined;
     const options: ZLUX.UnixFileUriOptions = {
@@ -79,7 +79,7 @@ export class FileTaggingModal {
     this.dialogRef.close(needUpdate);
   }
 
-  onTaggingSuccess(path: string, type: ZLUX.TagType, option: TagOption): void {
+  onTaggingSuccess(path: string, type: ZLUX.TagType, option: FileTag): void {
     if (!this.isDirectory) {
       this.node.ccsid = option.codeset;
     }
@@ -100,11 +100,11 @@ export class FileTaggingModal {
     this.snackBar.open(`Error: ${message}.`, 'Dismiss', defaultSnackbarOptions);
   }
 
-  displayFn(option?: TagOption): string | undefined {
+  displayFn(option?: FileTag): string | undefined {
     return option ? option.name : undefined;
   }
 
-  onValueChange(value?: string | TagOption): void {
+  onValueChange(value?: string | FileTag): void {
     if (value) {
       const encoding = (typeof value === 'string') ? value : value.name;
       this.filteredOptions = this.filter(this.tagOptions, encoding);
@@ -117,7 +117,7 @@ export class FileTaggingModal {
     return typeof this.selectedOption === 'object';
   }
 
-  private filter(options: TagOption[], value: string): TagOption[] {
+  private filter(options: FileTag[], value: string): FileTag[] {
     const filterValue = value.toLowerCase();
     return options.filter(option => option.name.toLowerCase().includes(filterValue));
   }
