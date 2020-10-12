@@ -321,7 +321,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
     filePropConfig.maxWidth = '400px';
 
-    this.dialog.open(FilePermissionsModal, filePropConfig);
+    const dialogRef = this.dialog.open(FilePermissionsModal, filePropConfig);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
+    });
   }
 
   showOwnerDialog(rightClickedFile: any) {
@@ -331,7 +336,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
     filePropConfig.maxWidth = '400px';
 
-    this.dialog.open(FileOwnershipModal, filePropConfig);
+    const dialogRef = this.dialog.open(FileOwnershipModal, filePropConfig);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
+    });
   }
 
   showDeleteDialog(rightClickedFile: any) {
