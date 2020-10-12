@@ -20,6 +20,16 @@
 </mat-form-field> -->
 
 <div class="file-permissions-row">
+  <mat-list-item>
+    <div class="modal-column">
+      <span class="file-permissions-subtitle">Owner: {{ owner }}</span>
+    </div>
+    <div class="modal-column">
+      <span class="file-permissions-subtitle">Group: {{ group }}</span>
+    </div>
+  </mat-list-item>
+</div>
+<div class="file-permissions-row">
   <div class="modal-column-full-width">
     <mat-list-item>
       <span class="file-permissions-subtitle">Mode:</span>

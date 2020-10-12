@@ -40,6 +40,8 @@ export class FilePermissionsModal {
   public isDirectory = false;
   public recursive = false;
   public node = null;
+  public owner: string;
+  public group: string;
   public octalMode: string; // 3-chars string e.g. "077"
   public octalModePattern = "^[0-7]{3}$";
   matcher = new CustomErrorStateMatcher();
@@ -67,6 +69,8 @@ export class FilePermissionsModal {
     this.node = data.event;
     this.name = this.node.name;
     this.path = this.node.path;
+    this.owner = this.node.owner;
+    this.group = this.node.group;
     this.octalMode = this.makeOctalModeString(this.node.mode);
 
     if (this.node.icon) {
