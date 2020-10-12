@@ -38,12 +38,12 @@
 <div class="modal-row" *ngIf="isDirectory">
   <div class="modal-column" style="width: 40%;">
     <mat-list-item>
-      <mat-slide-toggle matTooltip="Process subdirectories" color="primary" [(ngModel)]="recursive"></mat-slide-toggle>
+      <mat-slide-toggle color="primary" [(ngModel)]="recursive"></mat-slide-toggle>
     </mat-list-item>
   </div>
   <div class="modal-column">
     <mat-list-item>
-      <div class="selectable-text">Recursive?</div>
+      <div class="selectable-text">Process subdirectories</div>
     </mat-list-item>
   </div>
 </div>
