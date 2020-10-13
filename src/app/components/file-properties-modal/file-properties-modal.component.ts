@@ -10,11 +10,13 @@
 */
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
+import { findFileTagByCodeset, FileTag } from '../../shared/file-tag';
 
 @Component({
   selector: 'file-properties-modal',
   templateUrl: './file-properties-modal.component.html',
-  styleUrls: ['./file-properties-modal.component.scss']
+  styleUrls: ['./file-properties-modal.component.scss',
+  '../../../../src/app/shared/modal.component.scss'],
 })
 export class FilePropertiesModal implements OnInit {
 
@@ -25,7 +27,10 @@ export class FilePropertiesModal implements OnInit {
   public fileMode = 0;
   public fileSize = '';
   public fileIcon = '';
+  public fileOwner = '';
+  public fileGroup = '';
   public sizeType: string;
+  tag?: FileTag;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
@@ -37,6 +42,11 @@ export class FilePropertiesModal implements OnInit {
     this.fileType = node.data;
     this.filePath = node.path;
     this.fileMode = node.mode;
+    this.fileOwner = node.owner;
+    this.fileGroup = node.group;
+    if (!node.directory) {
+      this.tag = findFileTagByCodeset(node.ccsid);
+    }
 
     if (node.size < 1024) { //Bytes
       this.fileSize = node.size;

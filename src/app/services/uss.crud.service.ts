@@ -76,7 +76,7 @@ export class UssCrudService {
   }
 
   renameFile(oldPath:string, newPath:string, forceOverwrite?: boolean): Observable<any>{
-      let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', oldPath, undefined, undefined, newPath, forceOverwrite, undefined, true);
+      let url :string = ZoweZLUX.uriBroker.unixFileUri('rename', oldPath, undefined, undefined, newPath, forceOverwrite);
       return this.http.post(url, null)
       .map(res=>res.json())
       .catch(this.handleErrorObservable);

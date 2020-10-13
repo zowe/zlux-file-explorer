@@ -45,8 +45,25 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
-import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatCheckboxModule, MatButtonModule, MatButtonToggleModule } from '@angular/material';
+import {
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatCheckboxModule,
+  MatDialogModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
+  MatTableModule,
+  MatTooltipModule,
+} from '@angular/material';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
+import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
+import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -60,6 +77,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
   currentIndex: number;
   tabs: Array<tab>;
+  showUpArrow: boolean;
 
   @ViewChild(FileBrowserUSSComponent)
   private ussComponent: FileBrowserUSSComponent;
@@ -74,7 +92,25 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
     this.tabs = [{ index: 0, name: "USS" }, { index: 1, name: "Datasets (Beta)" }];
+    this.showUpArrow = true;
+  }
 
+  @Input() set spawnModal(typeAndData:any) {
+    let type = typeAndData.type;
+    let data = typeAndData.data;
+    let isDataset = data.volser ? true : false;
+
+    if (type =='properties') {
+      isDataset
+        ? this.mvsComponent.showPropertiesDialog(data)
+        : this.ussComponent.showPropertiesDialog(data);
+    } else if (type == 'delete') {
+      isDataset
+        ? this.mvsComponent.showDeleteDialog(data)
+        : this.ussComponent.showDeleteDialog(data);
+    } else if (type == 'createFolder' && !isDataset) {
+      this.ussComponent.showCreateFolderDialog(data);
+    }
   }
 
   @Input() selectPath: string;
@@ -87,10 +123,12 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
 
   @Output() fileOutput: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() datasetSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -141,7 +179,6 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   
          break; 
       } 
-  
       default: {
         this.treeStyle = {'filter': 'brightness(3)', 'color':'white'};
          break; 
@@ -191,12 +228,20 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
   }
 
+  displayUpArrow(show: boolean) {
+    this.showUpArrow = show;
+  }
+
   onCopyClick($event:any){
     this.copyClick.emit($event);
   }
 
   onDeleteClick($event:any){
     this.deleteClick.emit($event);
+  }
+
+  onUSSRenameEvent($event:any){
+    this.ussRenameEvent.emit($event);
   }
 
   onNewFileClick($event:any){
@@ -209,6 +254,10 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
 
   onNodeClick($event:any){
     this.nodeClick.emit($event);
+  }
+
+  onNodeDblClick($event: any) {
+    this.nodeDblClick.emit($event);
   }
 
   onPathChanged($event: any) {
@@ -293,6 +342,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     FileBrowserUSSComponent, 
     ZluxFileTreeComponent, 
     FilePropertiesModal,
+    FilePermissionsModal,
+    FileOwnershipModal,
+    FileTaggingModal,
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
@@ -314,10 +366,22 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     MatCheckboxModule,
     MatButtonModule,
     MatButtonToggleModule,
-    ZluxTabbingModule
+    MatTooltipModule,
+    MatAutocompleteModule,
+    ZluxTabbingModule,
+    MatSlideToggleModule
   ],
   exports: [ZluxFileTreeComponent],
-  entryComponents: [ZluxFileTreeComponent, FilePropertiesModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
+  entryComponents: [
+    ZluxFileTreeComponent,
+    FilePermissionsModal,
+    FilePropertiesModal,
+    FileOwnershipModal,
+    FileTaggingModal,
+    DatasetPropertiesModal,
+    DeleteFileModal,
+    CreateFolderModal,
+  ],
 })
 export class ZluxFileTreeModule { }
 

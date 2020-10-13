@@ -1,42 +1,21 @@
-
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 */
 
-.dataset-properties-header {
-  min-width: 375px;
-  white-space: nowrap;
-  margin-top: -28px;
-  margin-left: 40px;
-}
-
-.dataset-properties-question-circle {
-  font-size: 24px;
-  color: #5e9cff;
-  margin-left: 8px;
-  margin-top: -1px;
-  position: absolute;
-}
-
-.dataset-properties-main-icon {
-  font-size: 24px; 
-  margin-top: 4px; 
-  margin-left: 10px; 
-  float: left;
-}
+export const defaultSnackbarOptions = { duration: 5000, panelClass: 'center' };
 
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+
   SPDX-License-Identifier: EPL-2.0
-  
+
   Copyright Contributors to the Zowe Project.
 */

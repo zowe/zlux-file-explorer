@@ -35,9 +35,11 @@
     <file-browser-uss #ussComponent
       [hidden]="currentIndex != 0"
       (nodeClick)="onNodeClick($event)"
+      (nodeDblClick)="onNodeDblClick($event)"
       (newFileClick)="onNewFileClick($event)"
       (newFolderClick)="onNewFolderClick($event)"
       (deleteClick)="onDeleteClick($event)"
+      (ussRenameEvent)="onUSSRenameEvent($event)"
       (copyClick)="onCopyClick($event)"
       (rightClick)="onRightClick($event)"
       (pathChanged)="onPathChanged($event)"
@@ -45,16 +47,19 @@
       [inputStyle]="inputStyle"
       [treeStyle]="treeStyle"
       [searchStyle]="searchStyle"
+      [showUpArrow]="showUpArrow"
     ></file-browser-uss>
     <file-browser-mvs #mvsComponent
       [hidden]="currentIndex != 1"
       (nodeClick)="onNodeClick($event)"
+      (nodeDblClick)="onNodeDblClick($event)"
       (rightClick)="onRightClick($event)"
       (pathChanged)="onPathChanged($event)"
       [inputStyle]="inputStyle"
       [treeStyle]="treeStyle"
       [searchStyle]="searchStyle"
       [style]="style"
+      [showUpArrow]="showUpArrow"
     ></file-browser-mvs>
   </div>
   </div>

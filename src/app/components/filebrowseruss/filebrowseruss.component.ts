@@ -35,6 +35,10 @@ import { FilePropertiesModal } from '../file-properties-modal/file-properties-mo
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
 import { MessageDuration } from '../../shared/message-duration';
+import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
+import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
+import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-browser-uss',
@@ -56,6 +60,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private root: string;
   private newPath: string;
   private rightClickedFile: any;
+  private lastRightClickEvent: any;
   public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
@@ -92,17 +97,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() inputStyle: any;
   @Input() searchStyle: any;
   @Input() treeStyle: any;
+  @Input() showUpArrow: boolean;
   @Input()
   set fileEdits(input: any) {
     if (input && input.action && input.action === "save-file") {
@@ -187,6 +194,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesFile = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Change Mode/Permissions...", action:() => {
+        this.showPermissionsDialog(this.rightClickedFile) }},
+      { text: "Rename", action:() => {
+        this.showRenameField(this.rightClickedFile) }},
+      { text: "Change Owners", action:() => { 
+        this.showOwnerDialog(this.rightClickedFile) }},
+      { text: "Tag...", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
       }}
@@ -195,6 +210,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesFolder = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Change Mode/Permissions...", action:() => {
+        this.showPermissionsDialog(this.rightClickedFile) }},
+      { text: "Change Owners...", action:() => {
+        this.showOwnerDialog(this.rightClickedFile) }},
+      { text: "Rename", action:() => {
+        this.showRenameField(this.rightClickedFile) }},
+      { text: "Tag Directory...", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Create a Directory...", action:() => { 
@@ -223,6 +246,94 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.dialog.open(FilePropertiesModal, filePropConfig);
   }
 
+  showRenameField(file: any) {
+    const selectedNode = this.lastRightClickEvent.originalEvent.srcElement;
+    let oldName = file.name;
+    let oldPath = file.path;
+    file.selectable = false;
+    let renameFn = (node: HTMLElement) => {
+      renameField.parentNode.replaceChild(node, renameField);
+      file.selectable = true;
+      let nameFromNode = renameField.value;
+      let pathForRename:any;
+      pathForRename = (oldPath as String).split("/");
+      pathForRename.pop();
+      pathForRename = pathForRename.join('/');
+      if(oldName != nameFromNode){
+        let newPath = `${pathForRename}/${nameFromNode}`;
+        this.ussSrv.renameFile(oldPath, newPath).subscribe(
+          res => {
+            this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
+              'Dismiss', defaultSnackbarOptions);
+            this.updateUss(this.path);
+            this.ussRenameEvent.emit(this.lastRightClickEvent.node); 
+            file.label = nameFromNode;
+            file.path = newPath;
+            file.name = nameFromNode;
+            //this.updateUss(this.path);
+            return;
+          },
+          error => {
+            if (error.status == '500') { //Internal Server Error
+              this.snackBar.open('Failed to rename: ' + file.path + "'. unixfile call returned HTTP 500", 
+              'Dismiss', defaultSnackbarOptions);
+            } else if (error.status == '404') { //Not Found
+              this.snackBar.open(file.path + ' could not be opened or does not exist.', 
+              'Dismiss', defaultSnackbarOptions);
+            } else { //Unknown
+              this.snackBar.open("Uknown error '" + error.status + "' occurred for: " + file.path, 
+              'Dismiss', defaultSnackbarOptions);
+            }
+            this.errorMessage = <any>error;
+            return;
+          }
+        );
+      }
+    }
+    var renameField = document.createElement("input");
+    renameField.setAttribute('id', 'renameHighlightedField');
+    renameField.value = oldName;
+    renameField.style.width = (selectedNode as HTMLElement).style.width;
+    renameField.style.height = (selectedNode as HTMLElement).style.height;
+    let rnNode = (e) => {
+      if(e.which == 13 || e.key == "Enter" || e.keyCode == 13){
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        e.preventDefault();
+        e.cancelBubble = true;
+        renameField.blur();
+        return;
+      }
+    }
+    renameField.addEventListener('keydown', rnNode);
+    renameField.onblur = function(e) {
+      renameFn(selectedNode)
+    };
+    selectedNode.parentNode.replaceChild(renameField, selectedNode);
+    renameField.focus();
+    renameField.select();
+  }
+
+  showPermissionsDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile
+    }
+    filePropConfig.maxWidth = '400px';
+
+    this.dialog.open(FilePermissionsModal, filePropConfig);
+  }
+
+  showOwnerDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile
+    }
+    filePropConfig.maxWidth = '400px';
+
+    this.dialog.open(FileOwnershipModal, filePropConfig);
+  }
+
   showDeleteDialog(rightClickedFile: any) {
     if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "This is already being deleted.") == true) {
       return;
@@ -237,6 +348,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       this.deleteFileOrFolder(rightClickedFile);
+      this.deleteClick.emit(this.lastRightClickEvent.node);
     });
   }
 
@@ -262,6 +374,21 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
+      this.newFolderClick.emit(this.lastRightClickEvent.node);
+    });
+  }
+  
+  showTaggingDialog(rightClickedFile: any) {
+    const config = new MatDialogConfig();
+    config.data = {
+      node: rightClickedFile
+    }
+    config.maxWidth = '450px';
+    const dialogRef = this.dialog.open(FileTaggingModal, config);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
     });
   }
 
@@ -272,16 +399,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.copyClick.emit($event);
   }
 
-  onDeleteClick($event: any): void {
-    this.deleteClick.emit($event);
-  }
-
   onNewFileClick($event: any): void {
     this.newFileClick.emit($event);
-  }
-
-  onNewFolderClick($event: any): void {
-    this.newFolderClick.emit($event);
   }
   
   onNodeClick($event: any): void {
@@ -305,6 +424,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNodeDblClick($event: any): void {
     let updateTree = false; // A double click drills into a folder, so we make a fresh query instead of update
     this.displayTree($event.node.path, updateTree);
+    this.nodeDblClick.emit($event.node);
   }
 
   onNodeRightClick($event: any) {
@@ -327,6 +447,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.rightClickedFile = node;
+    this.lastRightClickEvent = $event;
     this.rightClick.emit($event.node);
     $event.originalEvent.preventDefault(); 
   }
@@ -344,10 +465,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onPathChanged($event: any): void {
     this.pathChanged.emit($event);
-  }
-
-  onRenameClick($event: any): void {
-    this.renameClick.emit($event);
   }
 
   sortFn(a: any, b: any) {
@@ -492,9 +609,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
 
   //Adds children to the existing this.data TreeNode array to update tree
-  addChild(node: any): void {
+  addChild(node: any, force?: boolean): void {
     let path = node.path;
-    if (node.children && node.children.length > 0) 
+    if (node.children && node.children.length > 0 && !force) 
     {
       //If an opened node has children, and the user clicked on it...
       if (node.expanded) {
@@ -599,6 +716,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   children: [],
                   label: this.getNameFromPathAndName(pathAndName),
                   mode: result.mode,
+                  owner: result.owner,
+                  group: result.group,
                   createdAt: result.createdAt,
                   data: "Folder",
                   directory: true,
@@ -628,7 +747,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         error => { 
           if (error.status == '500') { //Internal Server Error
             this.snackBar.open('Failed to create directory: ' + pathAndName + "' This is probably due to a server agent problem.", 
-            'Dismiss', { duration: 5000, panelClass: 'center' });
+            'Dismiss', defaultSnackbarOptions);
           }
           this.errorMessage = <any>error; 
         }
@@ -679,7 +798,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       resp => {
         this.isLoading = false;
         this.snackBar.open('Deleted: ' + name,
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.path);
         rightClickedFile.styleClass = "";
@@ -687,17 +806,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       error => {
         if (error.status == '500') { //Internal Server Error
           this.snackBar.open('Failed to delete: ' + pathAndName + "' This is probably due to a server agent problem.", 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(pathAndName + ' has already been deleted or does not exist.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           //Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.path);
@@ -710,7 +829,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     }, 4000);
   }
@@ -791,7 +910,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
     if (this.deletionQueue.has(pathAndName)) {
       this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
-            'Dismiss', { duration: 5000, panelClass: 'center' });
+            'Dismiss', defaultSnackbarOptions);
       return true;
     } 
     return false;

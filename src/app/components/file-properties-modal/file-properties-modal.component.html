@@ -11,7 +11,7 @@
 <zlux-tab-trap></zlux-tab-trap>
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <i class="{{fileIcon}}" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 3px;"></i>
-<h2 mat-dialog-title class="file-properties-header">{{fileName}} - Properties</h2>
+<h2 mat-dialog-title class="modal-mat-header">{{fileName}} - Properties</h2>
 
 
 <!-- Possible future filter code -->
@@ -19,8 +19,8 @@
   <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
 </mat-form-field> -->
 
-<div class="file-properties-row">
-    <div class="file-properties-column" style="width: 30%;">
+<div class="modal-row">
+    <div class="modal-column" style="width: 30%;">
         <mat-list>
             <mat-list-item>
               <div class="selectable-text">Created: </div>
@@ -34,12 +34,21 @@
             <mat-list-item>
                 <div class="selectable-text">Mode: </div>
               </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Owner: </div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">Group: </div>
+            </mat-list-item>
             <mat-list-item *ngIf="fileType != 'Folder'">
               <div class="selectable-text">Size: </div>
             </mat-list-item>
+            <mat-list-item *ngIf="fileType != 'Folder'">
+              <div class="selectable-text">Tag: </div>
+            </mat-list-item>
         </mat-list>
     </div>
-    <div class="file-properties-column">
+    <div class="modal-column">
         <mat-list>
             <mat-list-item>
               <div class="selectable-text">{{fileCreatedAt}}</div>
@@ -53,15 +62,24 @@
             <mat-list-item>
                 <div class="selectable-text">{{fileMode}}</div>
               </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{fileOwner}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <div class="selectable-text">{{fileGroup}}</div>
+            </mat-list-item>
             <mat-list-item *ngIf="fileType != 'Folder'">
               <div class="selectable-text">{{fileSize}} {{sizeType}}</div>
+            </mat-list-item>
+            <mat-list-item *ngIf="fileType != 'Folder'">
+              <div class="selectable-text">{{ tag?.name }}</div>
             </mat-list-item>
         </mat-list>
     </div>
 </div>
 
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close class="mat-properties-close">Close</button>
+  <button mat-button mat-dialog-close class="modal-mat-button">Close</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
 </mat-dialog-actions>
 

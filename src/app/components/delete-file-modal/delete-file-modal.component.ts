@@ -14,7 +14,8 @@ import { MAT_DIALOG_DATA } from '@angular/material';
 @Component({
   selector: 'delete-file-modal',
   templateUrl: './delete-file-modal.component.html',
-  styleUrls: ['./delete-file-modal.component.scss']
+  styleUrls: ['./delete-file-modal.component.scss',
+  '../../../../src/app/shared/modal.component.scss'],
 })
 export class DeleteFileModal {
 

@@ -16,7 +16,7 @@
     data-toggle="tooltip" 
     class="filebrowsermvs-pointer-logo"
     title="Go up to the parent level" 
-    (click)="levelUp()" 
+    (click)="levelUp()" *ngIf="showUpArrow"
     [ngStyle] = "treeStyle" tabindex="0" (keydown.enter)="levelUp()" />
     
   <div class="filebrowsermvs-search" [ngStyle] = "searchStyle">
