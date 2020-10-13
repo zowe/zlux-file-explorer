@@ -3,6 +3,7 @@
 ## 0.4.0
 
 * Add rename functionality to USS browser
+* Add right click menu to tag files and folders with a  popup modal to choose the encoding to tag (autofills to current tag)
 
 ## 0.3.0
 
