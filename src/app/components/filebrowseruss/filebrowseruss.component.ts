@@ -37,6 +37,8 @@ import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.co
 import { MessageDuration } from '../../shared/message-duration';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
+import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-browser-uss',
@@ -198,6 +200,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showRenameField(this.rightClickedFile) }},
       { text: "Change Owners", action:() => { 
         this.showOwnerDialog(this.rightClickedFile) }},
+      { text: "Tag...", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
       }}
@@ -212,6 +216,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Rename", action:() => {
         this.showRenameField(this.rightClickedFile) }},
+      { text: "Tag Directory...", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Create a Directory...", action:() => { 
@@ -258,7 +264,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.ussSrv.renameFile(oldPath, newPath).subscribe(
           res => {
             this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
-              'Dismiss', { duration: 5000,   panelClass: 'center' });
+              'Dismiss', defaultSnackbarOptions);
+            this.updateUss(this.path);
             this.ussRenameEvent.emit(this.lastRightClickEvent.node); 
             file.label = nameFromNode;
             file.path = newPath;
@@ -269,13 +276,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           error => {
             if (error.status == '500') { //Internal Server Error
               this.snackBar.open('Failed to rename: ' + file.path + "'. unixfile call returned HTTP 500", 
-              'Dismiss', { duration: 5000,   panelClass: 'center' });
+              'Dismiss', defaultSnackbarOptions);
             } else if (error.status == '404') { //Not Found
               this.snackBar.open(file.path + ' could not be opened or does not exist.', 
-              'Dismiss', { duration: 5000,   panelClass: 'center' });
+              'Dismiss', defaultSnackbarOptions);
             } else { //Unknown
               this.snackBar.open("Uknown error '" + error.status + "' occurred for: " + file.path, 
-              'Dismiss', { duration: 5000,   panelClass: 'center' });
+              'Dismiss', defaultSnackbarOptions);
             }
             this.errorMessage = <any>error;
             return;
@@ -368,6 +375,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
       this.newFolderClick.emit(this.lastRightClickEvent.node);
+    });
+  }
+  
+  showTaggingDialog(rightClickedFile: any) {
+    const config = new MatDialogConfig();
+    config.data = {
+      node: rightClickedFile
+    }
+    config.maxWidth = '450px';
+    const dialogRef = this.dialog.open(FileTaggingModal, config);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
     });
   }
 
@@ -588,9 +609,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
 
   //Adds children to the existing this.data TreeNode array to update tree
-  addChild(node: any): void {
+  addChild(node: any, force?: boolean): void {
     let path = node.path;
-    if (node.children && node.children.length > 0) 
+    if (node.children && node.children.length > 0 && !force) 
     {
       //If an opened node has children, and the user clicked on it...
       if (node.expanded) {
@@ -726,7 +747,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         error => { 
           if (error.status == '500') { //Internal Server Error
             this.snackBar.open('Failed to create directory: ' + pathAndName + "' This is probably due to a server agent problem.", 
-            'Dismiss', { duration: 5000, panelClass: 'center' });
+            'Dismiss', defaultSnackbarOptions);
           }
           this.errorMessage = <any>error; 
         }
@@ -777,7 +798,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       resp => {
         this.isLoading = false;
         this.snackBar.open('Deleted: ' + name,
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.path);
         rightClickedFile.styleClass = "";
@@ -785,17 +806,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       error => {
         if (error.status == '500') { //Internal Server Error
           this.snackBar.open('Failed to delete: ' + pathAndName + "' This is probably due to a server agent problem.", 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(pathAndName + ' has already been deleted or does not exist.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
           this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           //Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.path);
@@ -808,7 +829,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     }, 4000);
   }
@@ -889,7 +910,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
     if (this.deletionQueue.has(pathAndName)) {
       this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
-            'Dismiss', { duration: 5000, panelClass: 'center' });
+            'Dismiss', defaultSnackbarOptions);
       return true;
     } 
     return false;
