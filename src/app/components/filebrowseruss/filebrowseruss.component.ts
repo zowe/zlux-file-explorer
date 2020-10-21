@@ -66,6 +66,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
+  private fileToCopyOrCut : string = '';
 
   //TODO:define interface types for uss-data/data
   private data: TreeNode[];
@@ -204,6 +205,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showTaggingDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
+      }},
+      { text: "Copy", action:() => { 
+        this.copyFile(this.rightClickedFile)
+      }},
+      { text: "Cut", action:() => { 
+        this.cutFile(this.rightClickedFile)
       }}
     ];
 
@@ -234,6 +241,102 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         
       }}
     ];
+  }
+
+  copyFile(rightClickedFile: any) {
+    if(this.fileToCopyOrCut == ''){
+      this.rightClickPropertiesFolder.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path,false)
+        }}
+      );
+      this.rightClickPropertiesPanel.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut,this.path,false)
+        }}
+      );
+    }
+    this.fileToCopyOrCut = rightClickedFile.path
+  }
+
+  cutFile(rightClickedFile: any) {
+    if(this.fileToCopyOrCut == ''){
+      this.rightClickPropertiesFolder.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut,this.rightClickedFile.path,true)
+        }}
+      );
+      this.rightClickPropertiesPanel.push(
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut,this.path,true)
+        }}
+      );
+    }
+    this.fileToCopyOrCut = rightClickedFile.path
+  }
+
+  pasteFile(filePath: string, destinationPath: any, isCutOperation: boolean) {
+    let pathAndName = filePath;
+    let name = this.getNameFromPathAndName(pathAndName);
+    if(this.getPathFromPathAndName(filePath) == destinationPath){
+      this.snackBar.open("Paste operation failed: '" + filePath + "' Cannot paste file to same destination.",'Dismiss', { duration: 5000, panelClass: 'center' });
+      return;
+    }
+    if(pathAndName.indexOf(' ') >= 0){
+      this.snackBar.open("Paste operation failed: '" + filePath + "' Paste operation not supported for filenames with spaces.",'Dismiss', { duration: 5000, panelClass: 'center' });
+      return;
+    }
+    let metaData = this.ussSrv.getFileMetadata(pathAndName);
+    metaData.subscribe(result => {
+      if(result.ccsid == -1){
+        this.snackBar.open("Paste operation failed: '" + filePath + "' Operation not supported.", 
+            'Dismiss', { duration: 5000,   panelClass: 'center' });
+        return;
+      }else{
+        this.isLoading = true;
+        let copySubscription = this.ussSrv.copyFile(pathAndName,destinationPath + "/" + name)
+        .subscribe(
+          resp => {
+            this.isLoading = false;
+            this.updateUss(destinationPath);
+            if(isCutOperation){
+              this.fileToCopyOrCut = '';
+              this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
+              this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
+              this.ussSrv.deleteFileOrFolder(pathAndName).subscribe(() => {
+                this.snackBar.open('Paste operation completed: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
+              });
+            }else{
+              this.snackBar.open('Paste operation completed: ' + name,'Dismiss', { duration: 5000,   panelClass: 'center' });
+            }
+          },
+          error => {
+              if (error.status == '500') { //Internal Server Error
+                this.snackBar.open("Failed to paste: '" + pathAndName + "' This is probably due to a server agent problem.", 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              } else if (error.status == '404') { //Not Found
+                this.snackBar.open(pathAndName + ' does not exist.', 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              } else if (error.status == '400') { //Bad Request
+                this.snackBar.open("Failed to paste '" + pathAndName + "' This is probably due to a permission problem.", 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              } else { //Unknown
+                this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+                'Dismiss', { duration: 5000,   panelClass: 'center' });
+              }
+              this.isLoading = false;
+              this.errorMessage = <any>error;
+          }
+        );
+
+        setTimeout(() => {
+          if (copySubscription.closed == false) {
+            this.snackBar.open('Pasting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+              'Dismiss', { duration: 5000,   panelClass: 'center' });
+          }
+        }, 4000);
+      }
+    });
   }
 
   showPropertiesDialog(rightClickedFile: any) {
