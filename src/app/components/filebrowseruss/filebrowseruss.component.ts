@@ -346,18 +346,18 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               );
             }else{
               this.isLoading = false;
-              this.snackBar.open('Paste succesful: ' + name,'Dismiss', defaultSnackbarOptions);
+              this.snackBar.open('Paste successful: ' + name,'Dismiss', defaultSnackbarOptions);
             }
           },
           error => {
               if (error.status == '500') { //Internal Server Error
-                this.snackBar.open("Paste failed: '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
+                this.snackBar.open("Paste failed: HTTP 500 from app-server or agent occurred for '" + pathAndName + "'. Server returned with: " + error._body, 
                 'Dismiss', longSnackbarOptions);
               } else if (error.status == '404') { //Not Found
                 this.snackBar.open("Paste failed: '" + pathAndName + "' does not exist.", 
                 'Dismiss', defaultSnackbarOptions);
               } else if (error.status == '400') { //Bad Request
-                this.snackBar.open("Paste failed: '" + pathAndName + "' This is probably due to a permission problem.", 
+                this.snackBar.open("Paste failed: HTTP 400 occurred for '" + pathAndName + "'. Check that you have correct permissions for this action.", 
                 'Dismiss', defaultSnackbarOptions);
               } else { //Unknown
                 this.snackBar.open("Paste failed: '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
