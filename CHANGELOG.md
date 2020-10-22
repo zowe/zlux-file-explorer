@@ -3,7 +3,8 @@
 ## 0.5.0
 
 * Added cut, copy, and paste functionality to USS files.
-* onPathChanged emitter now fires from MVS as well & deprecated some old code.
+* onPathChanged emitter now fires from MVS as well
+* Removed unused & dead code.
 
 ## 0.4.0
 
