@@ -240,21 +240,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   copyFile(rightClickedFile: any) {
-    if (this.fileToCopyOrCut) {
-      this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
-      this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
-    }
     this.log.debug(`copyfile for  ${this.fileToCopyOrCut}, ${this.rightClickedFile.path}, ${this.path}`);
-    this.rightClickPropertiesFolder.push( // Create a paste option for the folder
-      { text: "Paste", action:() => { 
-        this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, false)
-      }}
-    );
-    this.rightClickPropertiesPanel.push( // Create a paste option for the active directory
-      { text: "Paste", action:() => { 
-        this.pasteFile(this.fileToCopyOrCut, this.path, false)
-      }}
-    );
+    if (this.fileToCopyOrCut == null) {
+      this.rightClickPropertiesFolder.push( // Create a paste option for the folder
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, false)
+        }}
+      );
+      this.rightClickPropertiesPanel.push( // Create a paste option for the active directory
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut, this.path, false)
+        }}
+      );
+    }
     this.fileToCopyOrCut = rightClickedFile;
     this.copyClick.emit(rightClickedFile);
   }
