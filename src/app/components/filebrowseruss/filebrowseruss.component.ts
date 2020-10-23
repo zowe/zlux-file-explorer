@@ -240,7 +240,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   copyFile(rightClickedFile: any) {
-    if(this.fileToCopyOrCut == null){
+    this.log.debug(`copyfile for  ${this.fileToCopyOrCut}, ${this.rightClickedFile.path}, ${this.path}`);
+    if (this.fileToCopyOrCut == null) {
       this.rightClickPropertiesFolder.push( // Create a paste option for the folder
         { text: "Paste", action:() => { 
           this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, false)
@@ -257,18 +258,21 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   cutFile(rightClickedFile: any) {
-    if(this.fileToCopyOrCut == null){
-      this.rightClickPropertiesFolder.push( // Create a paste option for the folder
-        { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, true)
-        }}
-      );
-      this.rightClickPropertiesPanel.push( // Create a paste option for the active directory
-        { text: "Paste", action:() => { 
-          this.pasteFile(this.fileToCopyOrCut, this.path, true)
-        }}
-      );
+    if (this.fileToCopyOrCut) {
+      this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
+      this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
     }
+    this.log.debug(`cutfile for  ${this.fileToCopyOrCut}, ${this.rightClickedFile.path}, ${this.path}`);
+    this.rightClickPropertiesFolder.push( // Create a paste option for the folder
+      { text: "Paste", action:() => { 
+        this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, true)
+      }}
+    );
+    this.rightClickPropertiesPanel.push( // Create a paste option for the active directory
+      { text: "Paste", action:() => { 
+        this.pasteFile(this.fileToCopyOrCut, this.path, true)
+      }}
+    );
     this.fileToCopyOrCut = rightClickedFile;
     this.copyClick.emit(rightClickedFile);
   }
@@ -276,6 +280,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   pasteFile(fileNode: any, destinationPath: any, isCut: boolean) {
     let pathAndName = fileNode.path;
     let name = this.getNameFromPathAndName(pathAndName);
+    this.log.debug(`paste for ${name}, ${destinationPath}, and cut=${isCut}`);
     if(this.getPathFromPathAndName(pathAndName) == destinationPath){
       this.snackBar.open("Paste failed: '" + pathAndName + "' Cannot paste file to same destination.",
         'Dismiss', defaultSnackbarOptions);
