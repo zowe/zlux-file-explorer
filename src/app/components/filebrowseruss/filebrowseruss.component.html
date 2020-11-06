@@ -37,7 +37,7 @@
   <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading" style="margin-left: 9px;"></div>
 
   <!-- Main tree -->
-  <div (click)="onClick($event);" [hidden]="hideExplorer" style="height: 100%;">
+  <div [hidden]="hideExplorer" style="height: 100%;">
     <tree-root [treeData]="data" 
       (clickEvent)="onNodeClick($event)"
       (dblClickEvent)="onNodeDblClick($event)" 
