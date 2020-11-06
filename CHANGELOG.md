@@ -1,5 +1,11 @@
 # ZLUX Angular File Tree
 
+## 0.5.0
+
+* Added cut, copy, and paste functionality to USS files.
+* onPathChanged emitter now fires from MVS as well
+* Removed unused & dead code.
+
 ## 0.4.0
 
 * Add rename functionality to USS browser
