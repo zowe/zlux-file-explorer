@@ -29,6 +29,7 @@
     "@angular/material": "~6.3.3",
     "@angular/platform-browser": "~6.0.9",
     "@angular/router": "~6.0.9",
+    "@types/qs": "^6.9.3",
     "carbon-components": "~8.23.0",
     "primeng": "~6.1.7"
   },
