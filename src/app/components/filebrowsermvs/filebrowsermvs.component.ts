@@ -193,7 +193,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
           'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
+          this.snackBar.open("Unknown error '" + error.status + "' occurred for: " + rightClickedFile.data.path, 
           'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
           // Error info gets printed in uss.crud.service.ts
         }
@@ -242,7 +242,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'" + ". " + JSON.parse(error._body)['msg'],
           'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
         } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + rightClickedFile.data.path, 
+          this.snackBar.open("Unknown error '" + error.status + "' occurred for: " + rightClickedFile.data.path, 
           'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
           //Error info gets printed in uss.crud.service.ts
         }
@@ -294,10 +294,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.dialog.open(DatasetPropertiesModal, filePropConfig);
-  }
-
-  browsePath(path: string): void{
-    this.path = path;
   }
 
   getDOMElement(): HTMLElement{
@@ -364,8 +360,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.getTreeForQueryAsync(path).then((res) => {
       this.data = res;
     });
-    
+    this.onPathChanged(path);
     this.refreshHistory(path);
+  }
+
+  onPathChanged($event: any): void {
+    this.pathChanged.emit($event);
   }
 
   getTreeForQueryAsync(path: string): Promise<any> {

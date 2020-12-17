@@ -90,49 +90,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   ngOnDestroy() { // PrimeNG as of 6.0 has no native right click support for its tree
     this.fileExplorerTree.nativeElement.removeEventListener('contextmenu', this.panelRightClickSelect.bind(this));
   }
-
-  /**
-   * Lazy loading
-   * @param event
-   */
-  //TODO:need to understand behavior model for double click and/or single click much like a desktop environment
-  //nodeExpand(event?: any) {
-    // if (event && event.node) {
-    //   const node: FileNode = event.node as FileNode;
-    //   const {nodeData, children} = node;
-    //
-    //   if (node.nodeType === FileNodeType.agent) {
-    //     const tepAgent: FileNodeAgent = nodeData as FileNodeAgent;
-    //
-    //     if (!children || children.length === 0 || (children.length === 1 && !children[0].label)) {
-    //       const child: FileNode = {
-    //         label: '',
-    //         icon: 'fa fa-spinner'
-    //       };
-    //
-    //       node.children = [child]; // fake-ish
-    //
-    //       this.FileNodeAgentTopLevelsService.getPost(tepAgent).subscribe(
-    //         (agentTopLevelChildren: FileNodeAgentTopLevel[]) => {
-    //           this.FileNodeAgentTopLevelReady(node, agentTopLevelChildren);
-    //           this.FileNodeAgentTopLevelsServiceError.emit({
-    //             exceptionMessage: null
-    //           })
-    //         },
-    //         (e: any) => {
-    //           XhrBase.errorConsole(e, 'FileNodeAgentTopLevelsService');
-    //           const errorMessage = JSON.parse(e._body);
-    //           this.FileNodeAgentTopLevelsServiceError.emit({
-    //             exceptionMessage: errorMessage.exceptionMessage
-    //           });
-    //           this.needCheckConnection.emit();
-    //         }
-    //       );
-    //     }
-    //   }
-    //   this.nodeExpanded.emit(true);
-    // }
-  }
+}
 
 /*
   This program and the accompanying materials are

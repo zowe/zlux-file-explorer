@@ -38,7 +38,7 @@ import { MessageDuration } from '../../shared/message-duration';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
-import { defaultSnackbarOptions } from '../../shared/snackbar-options';
+import { defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-browser-uss',
@@ -66,6 +66,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
+  private fileToCopyOrCut: any;
 
   //TODO:define interface types for uss-data/data
   private data: TreeNode[];
@@ -99,7 +100,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
+  // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
@@ -147,10 +148,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  browsePath(path: string): void {
-    this.path = path;
-  }
-
   getDOMElement(): HTMLElement {
     return this.elementRef.nativeElement;
   }
@@ -192,37 +189,43 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
-      { text: "Properties", action:() => { 
-        this.showPropertiesDialog(this.rightClickedFile) }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
-      { text: "Rename", action:() => {
-        this.showRenameField(this.rightClickedFile) }},
-      { text: "Change Owners", action:() => { 
+      { text: "Change Owners...", action:() => { 
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Tag...", action:() => { 
         this.showTaggingDialog(this.rightClickedFile) }},
+      { text: "Cut", action:() => { 
+        this.cutFile(this.rightClickedFile)
+      }},
+      { text: "Copy", action:() => { 
+        this.copyFile(this.rightClickedFile)
+      }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
-      }}
+      }},
+      { text: "Rename", action:() => {
+        this.showRenameField(this.rightClickedFile) }},
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }},
     ];
 
     this.rightClickPropertiesFolder = [
-      { text: "Properties", action:() => { 
-        this.showPropertiesDialog(this.rightClickedFile) }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
       { text: "Change Owners...", action:() => {
         this.showOwnerDialog(this.rightClickedFile) }},
-      { text: "Rename", action:() => {
-        this.showRenameField(this.rightClickedFile) }},
       { text: "Tag Directory...", action:() => { 
         this.showTaggingDialog(this.rightClickedFile) }},
-      { text: "Delete", action:() => { 
-        this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Create a Directory...", action:() => { 
         this.showCreateFolderDialog(this.rightClickedFile);
-      }}
+      }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile); }},
+      { text: "Rename", action:() => {
+        this.showRenameField(this.rightClickedFile) }},
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }}
     ];
 
     this.rightClickPropertiesPanel = [
@@ -234,6 +237,158 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         
       }}
     ];
+  }
+
+  copyFile(rightClickedFile: any) {
+    this.log.debug(`copyfile for  ${this.fileToCopyOrCut}, ${this.rightClickedFile.path}, ${this.path}`);
+    if (this.fileToCopyOrCut == null) {
+      this.rightClickPropertiesFolder.push( // Create a paste option for the folder
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, false)
+        }}
+      );
+      this.rightClickPropertiesPanel.push( // Create a paste option for the active directory
+        { text: "Paste", action:() => { 
+          this.pasteFile(this.fileToCopyOrCut, this.path, false)
+        }}
+      );
+    }
+    this.fileToCopyOrCut = rightClickedFile;
+    this.copyClick.emit(rightClickedFile);
+  }
+
+  cutFile(rightClickedFile: any) {
+    if (this.fileToCopyOrCut) {
+      this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
+      this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
+    }
+    this.log.debug(`cutfile for  ${this.fileToCopyOrCut}, ${this.rightClickedFile.path}, ${this.path}`);
+    this.rightClickPropertiesFolder.push( // Create a paste option for the folder
+      { text: "Paste", action:() => { 
+        this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, true)
+      }}
+    );
+    this.rightClickPropertiesPanel.push( // Create a paste option for the active directory
+      { text: "Paste", action:() => { 
+        this.pasteFile(this.fileToCopyOrCut, this.path, true)
+      }}
+    );
+    this.fileToCopyOrCut = rightClickedFile;
+    this.copyClick.emit(rightClickedFile);
+  }
+
+  pasteFile(fileNode: any, destinationPath: any, isCut: boolean) {
+    let pathAndName = fileNode.path;
+    let name = this.getNameFromPathAndName(pathAndName);
+    this.log.debug(`paste for ${name}, ${destinationPath}, and cut=${isCut}`);
+    if(this.getPathFromPathAndName(pathAndName) == destinationPath){
+      this.snackBar.open("Paste failed: '" + pathAndName + "' Cannot paste file to same destination.",
+        'Dismiss', defaultSnackbarOptions);
+      return;
+    }
+    if(pathAndName.indexOf(' ') >= 0){
+      this.snackBar.open("Paste failed: '" + pathAndName + "' Operation not yet supported for filenames with spaces.",
+        'Dismiss', defaultSnackbarOptions);
+      return;
+    }
+    let metaData = this.ussSrv.getFileMetadata(pathAndName);
+    metaData.subscribe(result => {
+      if(result.ccsid == -1){
+        this.snackBar.open("Paste failed: '" + pathAndName + "' Operation not yet supported for this encoding.", 
+          'Dismiss', defaultSnackbarOptions);
+        return;
+      }else{
+        this.isLoading = true;
+        let copySubscription = this.ussSrv.copyFile(pathAndName,destinationPath + "/" + name)
+        .subscribe(
+          resp => {
+            if (this.rightClickedFile) {
+              if (this.rightClickedFile.children && this.rightClickedFile.children.length > 0) {
+                let expanded = this.rightClickedFile.expanded;
+                /* We recycle the same method used for opening (clicking on) a node. But instead of expanding it, 
+                we keep the same expanded state, and just use it to add a node */
+                this.addChild(this.rightClickedFile, true);
+                this.rightClickedFile.expanded = expanded;
+              } else if (this.path == destinationPath) {
+                /* In the case that we right click to paste on the active directory instead of a node, we update our tree
+                (active directory) instead of adding onto a specific node */
+                this.displayTree(this.path, true);
+              }
+            }
+            if(isCut){
+              /* Clear the paste option, because even if delete fails after, we have already done the copy */
+              this.isLoading = true;
+              this.fileToCopyOrCut = null;
+              this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
+              this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
+          
+              /* Delete (cut) portion */ 
+              this.ussSrv.deleteFileOrFolder(pathAndName)
+              .subscribe(
+                resp => {
+                  this.isLoading = false;
+                  this.removeChild(fileNode);
+                  this.snackBar.open('Paste successful: ' + name,'Dismiss', defaultSnackbarOptions);
+                },
+                error => {
+                  if (error.status == '500') { //Internal Server Error
+                    this.snackBar.open("Copied successfully, but failed to cut '" + pathAndName + "' Server returned with: " + error._body, 
+                      'Dismiss', longSnackbarOptions);
+                  } else if (error.status == '404') { //Not Found
+                    this.snackBar.open("Copied successfully, but '" + pathAndName + "' has already been deleted or does not exist.", 
+                      'Dismiss', defaultSnackbarOptions);
+                    this.removeChild(fileNode);
+                  } else if (error.status == '400') { //Bad Request
+                    this.snackBar.open("Copied successfully but failed to cut '" + pathAndName + "' This is probably due to a permission problem.", 
+                      'Dismiss', defaultSnackbarOptions);
+                  } else { //Unknown
+                    this.snackBar.open("Copied successfully, but unknown error cutting '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
+                      'Dismiss', longSnackbarOptions);
+                  }
+                  this.isLoading = false;
+                  this.errorMessage = <any>error;
+                }
+              );
+            }else{
+              this.isLoading = false;
+              this.snackBar.open('Paste successful: ' + name,'Dismiss', defaultSnackbarOptions);
+            }
+          },
+          error => {
+              if (error.status == '500') { //Internal Server Error
+                this.snackBar.open("Paste failed: HTTP 500 from app-server or agent occurred for '" + pathAndName + "'. Server returned with: " + error._body, 
+                'Dismiss', longSnackbarOptions);
+              } else if (error.status == '404') { //Not Found
+                this.snackBar.open("Paste failed: '" + pathAndName + "' does not exist.", 
+                'Dismiss', defaultSnackbarOptions);
+              } else if (error.status == '400') { //Bad Request
+                this.snackBar.open("Paste failed: HTTP 400 occurred for '" + pathAndName + "'. Check that you have correct permissions for this action.", 
+                'Dismiss', defaultSnackbarOptions);
+              } else { //Unknown
+                this.snackBar.open("Paste failed: '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
+                'Dismiss', longSnackbarOptions);
+              }
+              this.isLoading = false;
+              this.errorMessage = <any>error;
+          }
+        );
+
+        setTimeout(() => {
+          if (copySubscription.closed == false) {
+            this.snackBar.open('Pasting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+              'Dismiss', defaultSnackbarOptions);
+          }
+        }, 4000);
+      }
+    },
+    error => {
+        if (error.status == '404') { // This happens when user attempts to paste a file that's been deleted after copying
+          this.snackBar.open("Paste failed: '" + pathAndName + "' does not exist.", 
+            'Dismiss', defaultSnackbarOptions);
+        }
+        this.isLoading = false;
+        this.errorMessage = <any>error;
+    });
   }
 
   showPropertiesDialog(rightClickedFile: any) {
@@ -275,14 +430,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           },
           error => {
             if (error.status == '500') { //Internal Server Error
-              this.snackBar.open('Failed to rename: ' + file.path + "'. unixfile call returned HTTP 500", 
-              'Dismiss', defaultSnackbarOptions);
+              this.snackBar.open('Failed to rename ' + file.path + "'. Error: " + error._body, 
+              'Dismiss', longSnackbarOptions);
             } else if (error.status == '404') { //Not Found
               this.snackBar.open(file.path + ' could not be opened or does not exist.', 
               'Dismiss', defaultSnackbarOptions);
             } else { //Unknown
-              this.snackBar.open("Uknown error '" + error.status + "' occurred for: " + file.path, 
-              'Dismiss', defaultSnackbarOptions);
+              this.snackBar.open("Unknown error for '" + file.path + "'. " + error.status + " - " + error._body, 
+              'Dismiss', longSnackbarOptions);
             }
             this.errorMessage = <any>error;
             return;
@@ -321,7 +476,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
     filePropConfig.maxWidth = '400px';
 
-    this.dialog.open(FilePermissionsModal, filePropConfig);
+    const dialogRef = this.dialog.open(FilePermissionsModal, filePropConfig);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
+    });
   }
 
   showOwnerDialog(rightClickedFile: any) {
@@ -331,7 +491,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
     filePropConfig.maxWidth = '400px';
 
-    this.dialog.open(FileOwnershipModal, filePropConfig);
+    const dialogRef = this.dialog.open(FileOwnershipModal, filePropConfig);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
+    });
   }
 
   showDeleteDialog(rightClickedFile: any) {
@@ -392,16 +557,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     });
   }
 
-  onClick($event: any): void {
-  }
-
-  onCopyClick($event: any): void {
-    this.copyClick.emit($event);
-  }
-
-  onNewFileClick($event: any): void {
-    this.newFileClick.emit($event);
-  }
+  // onNewFileClick($event: any): void {
+  //   this.newFileClick.emit($event);
+  // }
   
   onNodeClick($event: any): void {
     this.path = this.path.replace(/\/$/, '');
@@ -486,7 +644,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
-    this.pathChanged.emit(path);
     if (path === undefined || path === '') {
       path = this.root; 
     }
@@ -765,17 +922,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  rename(): void {
-    this.log.debug('rename:' + this.selectedItem);
-    this.ussSrv.renameFile(this.selectedItem, this.checkPath(this.newPath))
-      .subscribe(
-        resp => {
-          this.updateUss(this.path);
-        },
-        error => this.errorMessage = <any>error
-      );
-  }
-
   delete(e: EventTarget): void {
     this.ussSrv.deleteFileOrFolder(this.selectedItem)
       .subscribe(
@@ -805,18 +951,18 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       },
       error => {
         if (error.status == '500') { //Internal Server Error
-          this.snackBar.open('Failed to delete: ' + pathAndName + "' This is probably due to a server agent problem.", 
-          'Dismiss', defaultSnackbarOptions);
+          this.snackBar.open("Failed to delete '" + pathAndName + "' Server returned with: " + error._body, 
+          'Dismiss', longSnackbarOptions);
         } else if (error.status == '404') { //Not Found
-          this.snackBar.open(pathAndName + ' has already been deleted or does not exist.', 
+          this.snackBar.open("Failed to delete '" + pathAndName + ' has already been deleted or does not exist.', 
           'Dismiss', defaultSnackbarOptions);
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
           'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
-          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
-          'Dismiss', defaultSnackbarOptions);
+          this.snackBar.open("Unknown error '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
+          'Dismiss', longSnackbarOptions);
           //Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.path);

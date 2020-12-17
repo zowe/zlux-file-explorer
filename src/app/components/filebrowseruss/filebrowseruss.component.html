@@ -26,7 +26,7 @@
       placeholder="Enter an absolute path..."  
       [ngStyle] = "inputStyle" 
       class="filebrowseruss-search-input"
-      (keydown.enter)="displayTree(path, false); onPathChanged(path);" 
+      (keydown.enter)="displayTree(path, false);" 
       [disabled]="isLoading" 
       (ngModelChange)="checkPathSlash($event)">
     <!-- TODO: make search history a directive to use in both uss and mvs-->

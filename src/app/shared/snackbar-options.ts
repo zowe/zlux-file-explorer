@@ -9,6 +9,7 @@
 */
 
 export const defaultSnackbarOptions = { duration: 5000, panelClass: 'center' };
+export const longSnackbarOptions = { duration: 8000, panelClass: 'center' };
 
 /*
   This program and the accompanying materials are

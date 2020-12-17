@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
@@ -40,6 +40,8 @@ export class FilePermissionsModal {
   public isDirectory = false;
   public recursive = false;
   public node = null;
+  public owner: string;
+  public group: string;
   public octalMode: string; // 3-chars string e.g. "077"
   public octalModePattern = "^[0-7]{3}$";
   matcher = new CustomErrorStateMatcher();
@@ -60,6 +62,7 @@ export class FilePermissionsModal {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
+    private dialogRef: MatDialogRef<FilePermissionsModal>,
     private http: Http,
     private snackBar: MatSnackBar,
   ) 
@@ -67,6 +70,8 @@ export class FilePermissionsModal {
     this.node = data.event;
     this.name = this.node.name;
     this.path = this.node.path;
+    this.owner = this.node.owner;
+    this.group = this.node.group;
     this.octalMode = this.makeOctalModeString(this.node.mode);
 
     if (this.node.icon) {
@@ -271,6 +276,7 @@ export class FilePermissionsModal {
   savePermissions() {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chmod', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, this.octalMode, this.recursive);
     this.http.post(url, null)
+    .finally(() => this.closeDialog())
     .map(res=>{
       if (res.status == 200) {
         this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
@@ -289,6 +295,11 @@ export class FilePermissionsModal {
           'Dismiss', defaultSnackbarOptions);
       }
     );
+  }
+  
+  closeDialog() {
+    const needUpdate = this.isDirectory;
+    this.dialogRef.close(needUpdate);
   }
 
   onOctalModeChange(newOctalMode: string, octalModeInput: FormControl): void {
