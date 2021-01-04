@@ -1,5 +1,5 @@
 {
-  "extends": "./zlux/zlux-app-manager/virtual-desktop/plugin-config/tsconfig.base.json",
+  "extends": "../../zlux/zlux-app-manager/virtual-desktop/plugin-config/tsconfig.base.json",
   "include": [
     "src/**/*.ts",
     //"../zlux-platform/interface/src/mvd-hosting.d.ts"
@@ -17,9 +17,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
     "lib": [
       "es2016",
       "dom"

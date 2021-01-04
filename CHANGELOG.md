@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 0.6.0
+
+* Added refresh buttons for USS/Dataset views
+
 ## 0.5.0
 
 * Added cut, copy, and paste functionality to USS files.
