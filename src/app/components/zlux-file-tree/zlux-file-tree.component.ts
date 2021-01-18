@@ -91,7 +91,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   {
     //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
-    this.tabs = [{ index: 0, name: "USS" }, { index: 1, name: "Datasets (Beta)" }];
+    this.tabs = [{ index: 0, name: "USS" }, { index: 1, name: "Datasets" }];
     this.showUpArrow = true;
   }
 
