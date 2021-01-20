@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 0.7.0
+
+* Added refresh button to right click folder menu
+
 ## 0.6.0
 
 * Added refresh buttons for USS/Dataset views
