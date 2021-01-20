@@ -211,6 +211,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     ];
 
     this.rightClickPropertiesFolder = [
+      { text: "Refresh", action:() => { 
+        this.addChild(this.rightClickedFile, true, false);
+      }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
       { text: "Change Owners...", action:() => {
@@ -591,6 +594,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     if (node.directory) {
       rightClickProperties = this.rightClickPropertiesFolder;
+      if (this.rightClickedFile) {
+        for (let i = 0; i < rightClickProperties.length; i++) {
+          if (rightClickProperties[i].text == "Refresh") {
+            rightClickProperties[i].action = () => { 
+              this.addChild(this.rightClickedFile, true, this.rightClickedFile.expanded || false); };
+            break;
+          }
+        }
+      }
     } else {
       rightClickProperties = this.rightClickPropertiesFile;
     }
@@ -765,8 +777,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
 
-  //Adds children to the existing this.data TreeNode array to update tree
-  addChild(node: any, force?: boolean): void {
+  //Adds children to the existing this.data TreeNode array to update tree, force - fetches new data
+  //expand - expands or not folder node after fetching new data
+  addChild(node: any, force?: boolean, expand?: boolean): void {
     let path = node.path;
     if (node.children && node.children.length > 0 && !force) 
     {
@@ -780,8 +793,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     } 
     else //When the selected node has no children
-    { 
-      node.expanded = true;
+    {
+      let someData = this.ussSrv.getFileMetadata(path);
+      someData.subscribe(
+        result => {
+          if (result.directory == node.directory) { // To cover the ridiculous edgecase of 1. create folder 'blob' 2. delete folder 3. create file 'blob'
+            node.mode = result.mode;
+            node.owner = result.owner;
+            node.group = result.group;
+            node.size = result.size;
+            node.ccsid = result.ccsid;
+          }
+        }
+      ); 
+      node.expanded = expand !== undefined ? expand : true;
       this.ussData = this.ussSrv.getFile(path);
       let tempChildren: TreeNode[] = [];
       this.ussData.subscribe(
