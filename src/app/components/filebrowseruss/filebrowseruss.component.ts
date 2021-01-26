@@ -34,11 +34,10 @@ import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
-import { MessageDuration } from '../../shared/message-duration';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
-import { defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
+import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-browser-uss',
@@ -189,6 +188,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
+      { text: "Refresh", action:() => { 
+        this.refreshFile(this.rightClickedFile);
+      }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
       { text: "Change Owners...", action:() => { 
@@ -212,7 +214,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     this.rightClickPropertiesFolder = [
       { text: "Refresh", action:() => { 
-        this.addChild(this.rightClickedFile, true, false);
+        this.addChild(this.rightClickedFile, true, this.rightClickedFile.expanded || false);
       }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
@@ -331,7 +333,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 resp => {
                   this.isLoading = false;
                   this.removeChild(fileNode);
-                  this.snackBar.open('Paste successful: ' + name,'Dismiss', defaultSnackbarOptions);
+                  this.snackBar.open('Paste successful: ' + name,'Dismiss', quickSnackbarOptions);
                 },
                 error => {
                   if (error.status == '500') { //Internal Server Error
@@ -341,7 +343,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                     this.snackBar.open("Copied successfully, but '" + pathAndName + "' has already been deleted or does not exist.", 
                       'Dismiss', defaultSnackbarOptions);
                     this.removeChild(fileNode);
-                  } else if (error.status == '400') { //Bad Request
+                  } else if (error.status == '400' || error.status == '403') { //Bad Request
                     this.snackBar.open("Copied successfully but failed to cut '" + pathAndName + "' This is probably due to a permission problem.", 
                       'Dismiss', defaultSnackbarOptions);
                   } else { //Unknown
@@ -354,7 +356,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               );
             }else{
               this.isLoading = false;
-              this.snackBar.open('Paste successful: ' + name,'Dismiss', defaultSnackbarOptions);
+              this.snackBar.open('Paste successful: ' + name,'Dismiss', quickSnackbarOptions);
             }
           },
           error => {
@@ -379,14 +381,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         setTimeout(() => {
           if (copySubscription.closed == false) {
             this.snackBar.open('Pasting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-              'Dismiss', defaultSnackbarOptions);
+              'Dismiss', quickSnackbarOptions);
           }
         }, 4000);
       }
     },
     error => {
         if (error.status == '404') { // This happens when user attempts to paste a file that's been deleted after copying
-          this.snackBar.open("Paste failed: '" + pathAndName + "' does not exist.", 
+          this.snackBar.open("Paste failed: Original '" + pathAndName + "' no longer exists.", 
             'Dismiss', defaultSnackbarOptions);
         }
         this.isLoading = false;
@@ -421,8 +423,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         let newPath = `${pathForRename}/${nameFromNode}`;
         this.ussSrv.renameFile(oldPath, newPath).subscribe(
           res => {
-            this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
-              'Dismiss', defaultSnackbarOptions);
+            this.snackBar.open("Renamed '" + oldName + "' to '" + nameFromNode + "'",
+              'Dismiss', quickSnackbarOptions);
             this.updateUss(this.path);
             this.ussRenameEvent.emit(this.lastRightClickEvent.node); 
             file.label = nameFromNode;
@@ -432,14 +434,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             return;
           },
           error => {
-            if (error.status == '500') { //Internal Server Error
-              this.snackBar.open('Failed to rename ' + file.path + "'. Error: " + error._body, 
-              'Dismiss', longSnackbarOptions);
+            if (error.status == '403') { //Internal Server Error
+              this.snackBar.open("Failed to rename '" + file.path + "'. Bad permissions.", 
+              'Dismiss', defaultSnackbarOptions);
             } else if (error.status == '404') { //Not Found
-              this.snackBar.open(file.path + ' could not be opened or does not exist.', 
+              this.snackBar.open("'" + file.path + "' could not be opened or does not exist.", 
               'Dismiss', defaultSnackbarOptions);
             } else { //Unknown
-              this.snackBar.open("Unknown error for '" + file.path + "'. " + error.status + " - " + error._body, 
+              this.snackBar.open("Failed to rename '" + file.path + "'. Error: " + error._body, 
               'Dismiss', longSnackbarOptions);
             }
             this.errorMessage = <any>error;
@@ -596,11 +598,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       rightClickProperties = this.rightClickPropertiesFolder;
       if (this.rightClickedFile) {
         for (let i = 0; i < rightClickProperties.length; i++) {
-          if (rightClickProperties[i].text == "Refresh") {
-            rightClickProperties[i].action = () => { 
-              this.addChild(this.rightClickedFile, true, this.rightClickedFile.expanded || false); };
-            break;
-          }
+          // if (rightClickProperties[i].text == "Refresh") {
+          //   rightClickProperties[i].action = () => { 
+          //     this.addChild(this.rightClickedFile, true, this.rightClickedFile.expanded || false); };
+          //   break;
+          // }
         }
       }
     } else {
@@ -760,7 +762,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.isLoading = false;
         if (error.status == '403') { //Permission denied
           this.snackBar.open('Failed to open: Permission denied.', 
-          'Dismiss', { duration: MessageDuration.Medium, panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         }
         this.errorMessage = <any>error;
       }
@@ -777,11 +779,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
 
-  //Adds children to the existing this.data TreeNode array to update tree, force - fetches new data
-  //expand - expands or not folder node after fetching new data
-  addChild(node: any, force?: boolean, expand?: boolean): void {
+  //Adds children to the existing node to update this.data array, 
+  //fetch - fetches new data, expand - expands or not folder node after fetching new data
+  addChild(node: any, fetch?: boolean, expand?: boolean): void {
     let path = node.path;
-    if (node.children && node.children.length > 0 && !force) 
+    if (node.children && node.children.length > 0 && !fetch) 
     {
       //If an opened node has children, and the user clicked on it...
       if (node.expanded) {
@@ -792,20 +794,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         node.expanded = true;
       }
     } 
-    else //When the selected node has no children
+    else //When the selected node has no children or we want to fetch new data
     {
-      let someData = this.ussSrv.getFileMetadata(path);
-      someData.subscribe(
-        result => {
-          if (result.directory == node.directory) { // To cover the ridiculous edgecase of 1. create folder 'blob' 2. delete folder 3. create file 'blob'
-            node.mode = result.mode;
-            node.owner = result.owner;
-            node.group = result.group;
-            node.size = result.size;
-            node.ccsid = result.ccsid;
-          }
-        }
-      ); 
+      this.refreshFile(node);
       node.expanded = expand !== undefined ? expand : true;
       this.ussData = this.ussSrv.getFile(path);
       let tempChildren: TreeNode[] = [];
@@ -864,6 +855,46 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             this.log.debug("failed to find index");
         }); 
     }
+  }
+
+  refreshFile(node: any) {
+    let path = node.path;
+    let someData = this.ussSrv.getFileMetadata(path);
+      someData.subscribe(
+        result => {
+          if (result.directory) {
+            node.data = "Folder";
+            node.collapsedIcon = "fa fa-folder";
+            node.expandedIcon = "fa fa-folder-open";
+          } else {
+            node.items = {};
+            node.icon = "fa fa-file";
+            node.data = "File";
+          }
+          node.directory = result.directory;
+          node.mode = result.mode;
+          node.owner = result.owner;
+          node.group = result.group;
+          node.size = result.size;
+          node.ccsid = result.ccsid;
+          node.createdAt = result.createdAt;
+          return node;
+        },
+        e => {
+          if (e.status = 404) {
+            this.snackBar.open("Failed to refresh '" + node.name + "' no longer exists or has been renamed.", 
+          'Dismiss', defaultSnackbarOptions);
+            this.removeChild(node);
+          } else if (e.status = 403) {
+            this.snackBar.open("Failed to refresh '" + node.name + "' Permission denied.", 
+          'Dismiss', defaultSnackbarOptions);
+          } else if (e.status = 500) {
+            this.snackBar.open("Failed to refresh '" + node.name + "' Server returned with: " + e._body, 
+            'Dismiss', longSnackbarOptions);
+          }
+          return node;
+        }
+      ); 
   }
 
   updateUss(path: string): void {
@@ -928,7 +959,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         },
         error => { 
           if (error.status == '500') { //Internal Server Error
-            this.snackBar.open('Failed to create directory: ' + pathAndName + "' This is probably due to a server agent problem.", 
+            this.snackBar.open("Failed to create directory: '" + pathAndName + "' This is probably due to a server agent problem.", 
             'Dismiss', defaultSnackbarOptions);
           }
           this.errorMessage = <any>error; 
@@ -968,8 +999,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     .subscribe(
       resp => {
         this.isLoading = false;
-        this.snackBar.open('Deleted: ' + name,
-          'Dismiss', defaultSnackbarOptions);
+        this.snackBar.open("Deleted '" + name + "'",
+          'Dismiss', quickSnackbarOptions);
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.path);
         rightClickedFile.styleClass = "";
@@ -979,10 +1010,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.snackBar.open("Failed to delete '" + pathAndName + "' Server returned with: " + error._body, 
           'Dismiss', longSnackbarOptions);
         } else if (error.status == '404') { //Not Found
-          this.snackBar.open("Failed to delete '" + pathAndName + ' has already been deleted or does not exist.', 
+          this.snackBar.open("Failed to delete '" + pathAndName + ' Already been deleted or does not exist.', 
           'Dismiss', defaultSnackbarOptions);
           this.removeChild(rightClickedFile);
-        } else if (error.status == '400') { //Bad Request
+        } else if (error.status == '400' || error.status == '403') { //Bad Request
           this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
           'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
@@ -999,8 +1030,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
-        this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', defaultSnackbarOptions);
+        this.snackBar.open("Deleting '" + pathAndName + "'... Larger payloads may take longer. Please be patient.", 
+          'Dismiss', quickSnackbarOptions);
       }
     }, 4000);
   }
@@ -1080,7 +1111,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
     if (this.deletionQueue.has(pathAndName)) {
-      this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
+      this.snackBar.open("Deletion in progress: '" + pathAndName + "' " + message, 
             'Dismiss', defaultSnackbarOptions);
       return true;
     } 

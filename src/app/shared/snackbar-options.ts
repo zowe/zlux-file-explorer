@@ -8,6 +8,7 @@
   Copyright Contributors to the Zowe Project.
 */
 
+export const quickSnackbarOptions = { duration: 3500, panelClass: 'center' };
 export const defaultSnackbarOptions = { duration: 5000, panelClass: 'center' };
 export const longSnackbarOptions = { duration: 8000, panelClass: 'center' };
 
