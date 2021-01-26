@@ -596,15 +596,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     if (node.directory) {
       rightClickProperties = this.rightClickPropertiesFolder;
-      if (this.rightClickedFile) {
-        for (let i = 0; i < rightClickProperties.length; i++) {
-          // if (rightClickProperties[i].text == "Refresh") {
-          //   rightClickProperties[i].action = () => { 
-          //     this.addChild(this.rightClickedFile, true, this.rightClickedFile.expanded || false); };
-          //   break;
-          // }
-        }
-      }
     } else {
       rightClickProperties = this.rightClickPropertiesFile;
     }
