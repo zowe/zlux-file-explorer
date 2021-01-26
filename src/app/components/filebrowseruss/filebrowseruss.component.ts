@@ -188,7 +188,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
-      { text: "Refresh", action:() => { 
+      { text: "Refresh Metadata", action:() => { 
         this.refreshFile(this.rightClickedFile);
       }},
       { text: "Change Mode/Permissions...", action:() => {
@@ -479,7 +479,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     filePropConfig.data = {
       event: rightClickedFile
     }
-    filePropConfig.maxWidth = '400px';
+    filePropConfig.width = '400px';
 
     const dialogRef = this.dialog.open(FilePermissionsModal, filePropConfig);
     dialogRef.afterClosed().subscribe((res?: boolean) => {
