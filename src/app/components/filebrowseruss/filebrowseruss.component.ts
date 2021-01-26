@@ -873,7 +873,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         },
         e => {
           if (e.status = 404) {
-            this.snackBar.open("Failed to refresh '" + node.name + "' no longer exists or has been renamed.", 
+            this.snackBar.open("Failed to refresh '" + node.name + "' No longer exists or has been renamed.", 
           'Dismiss', defaultSnackbarOptions);
             this.removeChild(node);
           } else if (e.status = 403) {
