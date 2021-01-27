@@ -11,10 +11,12 @@
 */
 
 import { Injectable } from '@angular/core';
+import { DatasetAttributes } from '../structures/editor-project';
 
 @Injectable()
 export class UtilsService {
   constructor(){}
+
   filePathCheck(path:string):string{
     if (path.charAt(0) === '/') {
         return path.substring(1);
@@ -35,6 +37,10 @@ export class UtilsService {
       }
     }
     return true;
+  }
+
+  isDatasetMigrated(attrs: DatasetAttributes): boolean {
+    return attrs.volser === 'MIGRAT' || attrs.volser === 'ARCIVE';
   }
 
 }

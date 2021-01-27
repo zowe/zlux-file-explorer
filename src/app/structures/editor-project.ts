@@ -29,7 +29,12 @@ export interface DatasetAttributes {
   csiEntryType: string,
   dsorg: DatasetOrganization,
   recfm: RecordFormat,
-  volser: string
+  volser: string;
+  members?: Member[];
+}
+
+export interface Member {
+  name: string;
 }
 
 export interface RecordFormat {

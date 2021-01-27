@@ -1,4 +1,3 @@
-
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
@@ -9,8 +8,15 @@
   Copyright Contributors to the Zowe Project.
 */
 
-export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTreeComponent  } from './app/components/zlux-file-tree/zlux-file-tree.component';
+export class MessageDuration {
+  static Short: number = 3000;
 
+  static Medium: number = 6000;
+
+  static Long: number = 10000;
+
+  static ExtraLong: number = 20000;
+}
 
 /*
   This program and the accompanying materials are
@@ -21,4 +27,3 @@ export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTree
   
   Copyright Contributors to the Zowe Project.
 */
-

@@ -26,7 +26,7 @@ export class UssCrudService {
     return Observable.throw(error.message || error);
   }
   constructor(private http: Http, private utils:UtilsService){}
-  addFolder(path:string, forceOverwrite?: boolean): Observable<any>{
+  makeDirectory(path:string, forceOverwrite?: boolean): Observable<any>{
     let url:string = ZoweZLUX.uriBroker.unixFileUri('mkdir', path, undefined, undefined, undefined, forceOverwrite);
     return this.http.post(url, null)
       .map(res=>res.json())
@@ -48,6 +48,18 @@ export class UssCrudService {
       .catch(this.handleErrorObservable);
   }
 
+  getFileMetadata(path:string): Observable<any> {
+    let filePath:string = this.utils.filePathCheck(path);
+    let url:string = ZoweZLUX.uriBroker.unixFileUri('metadata', filePath);
+
+    //TODO: Fix ZSS bug where "%2F" is not properly processed as a "/" character
+    url = url.split("%2F").join("/");
+
+    return this.http.get(url)
+      .map(res=>res.json())
+      .catch(this.handleErrorObservable);
+  }
+
   copyFile(oldPath:string, newPath:string, forceOverwrite?: boolean): Observable<any>{
       let url :string = ZoweZLUX.uriBroker.unixFileUri('copy', oldPath, undefined, undefined, newPath, forceOverwrite, undefined, true);
       return this.http.post(url, null)
@@ -55,7 +67,7 @@ export class UssCrudService {
       .catch(this.handleErrorObservable);
   }
 
-  deleteFile(path:string): Observable<any>{
+  deleteFileOrFolder(path:string): Observable<any>{
     let filePath:string = this.utils.filePathCheck(path);
     let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', filePath);
     return this.http.delete(url)
@@ -64,7 +76,7 @@ export class UssCrudService {
   }
 
   renameFile(oldPath:string, newPath:string, forceOverwrite?: boolean): Observable<any>{
-      let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', oldPath, undefined, undefined, newPath, forceOverwrite, undefined, true);
+      let url :string = ZoweZLUX.uriBroker.unixFileUri('rename', oldPath, undefined, undefined, newPath, forceOverwrite);
       return this.http.post(url, null)
       .map(res=>res.json())
       .catch(this.handleErrorObservable);

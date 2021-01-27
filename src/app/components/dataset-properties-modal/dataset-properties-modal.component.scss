@@ -9,8 +9,27 @@
   Copyright Contributors to the Zowe Project.
 */
 
-export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTreeComponent  } from './app/components/zlux-file-tree/zlux-file-tree.component';
+.dataset-properties-header {
+  min-width: 375px;
+  white-space: nowrap;
+  margin-top: -28px;
+  margin-left: 40px;
+}
 
+.dataset-properties-question-circle {
+  font-size: 24px;
+  color: #5e9cff;
+  margin-left: 8px;
+  margin-top: -1px;
+  position: absolute;
+}
+
+.dataset-properties-main-icon {
+  font-size: 24px; 
+  margin-top: 4px; 
+  margin-left: 10px; 
+  float: left;
+}
 
 /*
   This program and the accompanying materials are
@@ -21,4 +40,3 @@ export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTree
   
   Copyright Contributors to the Zowe Project.
 */
-

@@ -12,9 +12,9 @@
 
 import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
-  Output, ViewEncapsulation, Inject
+  Output, ViewEncapsulation, Inject, Optional, ViewChild
 } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -27,9 +27,18 @@ import { Capability, FileBrowserCapabilities }
 //TODO: Implement new capabilities from zlux-platform
 import { UssDataObject } from '../../structures/persistantdata';
 import { TreeNode } from 'primeng/primeng';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { SearchHistoryService } from '../../services/searchHistoryService';
+import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
+import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
+import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
+import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { MessageDuration } from '../../shared/message-duration';
+import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
+import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
+import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-browser-uss',
@@ -44,59 +53,63 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities: Array<Capability>;
   public hideExplorer: boolean;
-  isFile: boolean;
-  errorMessage: String;
-  rtClickDisplay: boolean;
-  addFileDisplay: boolean;
-  addFolderDisplay: boolean;
-  copyDisplay: boolean;
-  renameDisplay: boolean;
-  selectedItem: string;
-  path: string;
-  root: string;
-  newPath: string;
-  popUpMenuX: number;
-  popUpMenuY: number;
-  selectedFile: TreeNode;
-  isLoading: boolean;
+
+  private errorMessage: String;
+  private selectedItem: string;
+  private path: string;
+  private root: string;
+  private newPath: string;
+  private rightClickedFile: any;
+  private lastRightClickEvent: any;
+  public isLoading: boolean;
+  private rightClickPropertiesFile: ContextMenuItem[];
+  private rightClickPropertiesFolder: ContextMenuItem[];
+  private rightClickPropertiesPanel: ContextMenuItem[];
+  private deletionQueue = new Map();
 
   //TODO:define interface types for uss-data/data
-  data: TreeNode[];
-  dataObject: UssDataObject;
-  ussData: Observable<any>;
-  intervalId: any;
-  timeVar: number = 10000;//time represents in ms how fast tree updates changes from mainframe
+  private data: TreeNode[];
+  private dataObject: UssDataObject;
+  private ussData: Observable<any>;
+  private intervalId: any;
+  private updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
+  @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
     private utils: UtilsService, 
     /*private persistentDataService: PersistentDataService,*/
     private ussSearchHistory:SearchHistoryService,
-    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger
-    ) {
-    //this.componentClass = ComponentClass.FileBrowser;
-    this.initalizeCapabilities();
-    this.ussSearchHistory.onInit('uss');
-    this.rtClickDisplay = false;
-    this.addFileDisplay = false;
-    this.addFolderDisplay = false;
-    this.copyDisplay = false;
-    this.renameDisplay = false;
-    this.root = ""; // Dev purposes: Replace with home directory to test Explorer functionalities
-    this.path = this.root;
-    this.data = []; // Main treeData array (the nodes the Explorer displays)
-    this.hideExplorer = false;
-    this.isLoading = false;
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+    @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
+    @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
+      //this.componentClass = ComponentClass.FileBrowser;
+      this.initalizeCapabilities();
+      this.ussSearchHistory.onInit('uss');
+      this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
+      this.path = this.root;
+      this.data = []; // Main treeData array (the nodes the Explorer displays)
+      this.hideExplorer = false;
+      this.isLoading = false;
   }
 
+  @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() renameClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
+  @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
 
-  @Input() style: any;
+  @Input() inputStyle: any;
+  @Input() searchStyle: any;
+  @Input() treeStyle: any;
+  @Input() showUpArrow: boolean;
   @Input()
   set fileEdits(input: any) {
     if (input && input.action && input.action === "save-file") {
@@ -113,6 +126,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   ngOnInit() {
     this.loadUserHomeDirectory();
+    this.initializeRightClickProperties();
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
@@ -124,13 +138,26 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //   })
       // this.intervalId = setInterval(() => {
         this.updateUss(this.path);
-      // }, this.timeVar);
+      // }, this.updateInterval);
   }
 
   ngOnDestroy() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  }
+
+  browsePath(path: string): void {
+    this.path = path;
+  }
+
+  getDOMElement(): HTMLElement {
+    return this.elementRef.nativeElement;
+  }
+
+  getSelectedPath(): string {
+    //TODO:how do we want to want to handle caching vs message to app to open said path
+    return this.path;
   }
 
   loadUserHomeDirectory(): void {
@@ -140,10 +167,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         resp => {
           if(resp && resp.home){
             this.path = resp.home.trim();
-            if (this.path.length == 0 || this.path.charAt(0) != '/') {
-              this.path = '/';
-            }
-          } else {
+          }else{
             this.path = '/';
           }
           this.displayTree(this.path, true);
@@ -160,73 +184,287 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }, 2000);
   }
 
-  browsePath(path: string): void {
-    this.path = path;
-  }
-
-  getDOMElement(): HTMLElement {
-    return this.elementRef.nativeElement;
-  }
-
-  getSelectedPath(): string {
-    //TODO:how do we want to want to handle caching vs message to app to open said path
-    return this.path;
-  }
-
   initalizeCapabilities() {
   //   //this.capabilities = new Array<Capability>();
   //   //this.capabilities.push(FileBrowserCapabilities.FileBrowser);
   //   //this.capabilities.push(FileBrowserCapabilities.FileBrowserUSS);
   }
 
+  initializeRightClickProperties() {
+    this.rightClickPropertiesFile = [
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Change Mode/Permissions...", action:() => {
+        this.showPermissionsDialog(this.rightClickedFile) }},
+      { text: "Rename", action:() => {
+        this.showRenameField(this.rightClickedFile) }},
+      { text: "Change Owners", action:() => { 
+        this.showOwnerDialog(this.rightClickedFile) }},
+      { text: "Tag...", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile);
+      }}
+    ];
+
+    this.rightClickPropertiesFolder = [
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Change Mode/Permissions...", action:() => {
+        this.showPermissionsDialog(this.rightClickedFile) }},
+      { text: "Change Owners...", action:() => {
+        this.showOwnerDialog(this.rightClickedFile) }},
+      { text: "Rename", action:() => {
+        this.showRenameField(this.rightClickedFile) }},
+      { text: "Tag Directory...", action:() => { 
+        this.showTaggingDialog(this.rightClickedFile) }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile); }},
+      { text: "Create a Directory...", action:() => { 
+        this.showCreateFolderDialog(this.rightClickedFile);
+      }}
+    ];
+
+    this.rightClickPropertiesPanel = [
+      { text: "Create a Directory...", action:() => { 
+        let nodeToUse = {
+          path: this.path,
+        }
+        this.showCreateFolderDialog(nodeToUse);
+        
+      }}
+    ];
+  }
+
+  showPropertiesDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile
+    }
+    filePropConfig.maxWidth = '350px';
+
+    this.dialog.open(FilePropertiesModal, filePropConfig);
+  }
+
+  showRenameField(file: any) {
+    const selectedNode = this.lastRightClickEvent.originalEvent.srcElement;
+    let oldName = file.name;
+    let oldPath = file.path;
+    file.selectable = false;
+    let renameFn = (node: HTMLElement) => {
+      renameField.parentNode.replaceChild(node, renameField);
+      file.selectable = true;
+      let nameFromNode = renameField.value;
+      let pathForRename:any;
+      pathForRename = (oldPath as String).split("/");
+      pathForRename.pop();
+      pathForRename = pathForRename.join('/');
+      if(oldName != nameFromNode){
+        let newPath = `${pathForRename}/${nameFromNode}`;
+        this.ussSrv.renameFile(oldPath, newPath).subscribe(
+          res => {
+            this.snackBar.open(`Renamed: ${oldName} to ${nameFromNode}`,
+              'Dismiss', defaultSnackbarOptions);
+            this.updateUss(this.path);
+            this.ussRenameEvent.emit(this.lastRightClickEvent.node); 
+            file.label = nameFromNode;
+            file.path = newPath;
+            file.name = nameFromNode;
+            //this.updateUss(this.path);
+            return;
+          },
+          error => {
+            if (error.status == '500') { //Internal Server Error
+              this.snackBar.open('Failed to rename: ' + file.path + "'. unixfile call returned HTTP 500", 
+              'Dismiss', defaultSnackbarOptions);
+            } else if (error.status == '404') { //Not Found
+              this.snackBar.open(file.path + ' could not be opened or does not exist.', 
+              'Dismiss', defaultSnackbarOptions);
+            } else { //Unknown
+              this.snackBar.open("Uknown error '" + error.status + "' occurred for: " + file.path, 
+              'Dismiss', defaultSnackbarOptions);
+            }
+            this.errorMessage = <any>error;
+            return;
+          }
+        );
+      }
+    }
+    var renameField = document.createElement("input");
+    renameField.setAttribute('id', 'renameHighlightedField');
+    renameField.value = oldName;
+    renameField.style.width = (selectedNode as HTMLElement).style.width;
+    renameField.style.height = (selectedNode as HTMLElement).style.height;
+    let rnNode = (e) => {
+      if(e.which == 13 || e.key == "Enter" || e.keyCode == 13){
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        e.preventDefault();
+        e.cancelBubble = true;
+        renameField.blur();
+        return;
+      }
+    }
+    renameField.addEventListener('keydown', rnNode);
+    renameField.onblur = function(e) {
+      renameFn(selectedNode)
+    };
+    selectedNode.parentNode.replaceChild(renameField, selectedNode);
+    renameField.focus();
+    renameField.select();
+  }
+
+  showPermissionsDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile
+    }
+    filePropConfig.maxWidth = '400px';
+
+    this.dialog.open(FilePermissionsModal, filePropConfig);
+  }
+
+  showOwnerDialog(rightClickedFile: any) {
+    const filePropConfig = new MatDialogConfig();
+    filePropConfig.data = {
+      event: rightClickedFile
+    }
+    filePropConfig.maxWidth = '400px';
+
+    this.dialog.open(FileOwnershipModal, filePropConfig);
+  }
+
+  showDeleteDialog(rightClickedFile: any) {
+    if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "This is already being deleted.") == true) {
+      return;
+    }
+
+    const fileDeleteConfig = new MatDialogConfig();
+    fileDeleteConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
+    const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
+      this.deleteFileOrFolder(rightClickedFile);
+      this.deleteClick.emit(this.lastRightClickEvent.node);
+    });
+  }
+
+  showCreateFolderDialog(rightClickedFile: any) {
+    if (rightClickedFile.path) { // If this came from a node object
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "Cannot create a directory inside a directory queued for deletion.") == true) {
+        return;
+      }  
+    } else { // Or if this is just a path
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile, "Cannot create a directory inside a directory queued for deletion.") == true) {
+        return;
+      }
+    }
+
+    const folderCreateConfig = new MatDialogConfig();
+    folderCreateConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    let fileDeleteRef:MatDialogRef<CreateFolderModal>  = this.dialog.open(CreateFolderModal, folderCreateConfig);
+    const createFolder = fileDeleteRef.componentInstance.onCreate.subscribe(onCreateResponse => {
+      /* pathAndName - Path and name obtained from create folder prompt
+      updateExistingTree - Should the existing tree update or fetch a new one */
+      this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
+      this.newFolderClick.emit(this.lastRightClickEvent.node);
+    });
+  }
+  
+  showTaggingDialog(rightClickedFile: any) {
+    const config = new MatDialogConfig();
+    config.data = {
+      node: rightClickedFile
+    }
+    config.maxWidth = '450px';
+    const dialogRef = this.dialog.open(FileTaggingModal, config);
+    dialogRef.afterClosed().subscribe((res?: boolean) => {
+      if (res) {
+        this.addChild(rightClickedFile, true);
+      }
+    });
+  }
+
   onClick($event: any): void {
-    this.rtClickDisplay = false;
   }
 
   onCopyClick($event: any): void {
     this.copyClick.emit($event);
   }
 
-  onDeleteClick($event: any): void {
-    this.deleteClick.emit($event);
-  }
-
   onNewFileClick($event: any): void {
     this.newFileClick.emit($event);
   }
-
-  onNewFolderClick($event: any): void {
-    this.newFolderClick.emit($event);
-  }
-
+  
   onNodeClick($event: any): void {
-    this.rtClickDisplay = false;
     this.path = this.path.replace(/\/$/, '');
 
     if ($event.node.data === 'Folder') {
-      this.addChild($event.node.path, $event);
+      if (this.checkIfInDeletionQueueAndMessage($event.node.path, "Cannot open a directory queued for deletion.") == true) {
+        return;
+      } 
+      this.addChild($event.node);
       this.nodeClick.emit($event.node);
     }
     else {
+      if (this.checkIfInDeletionQueueAndMessage($event.node.path, "Cannot open a file queued for deletion.") == true) {
+        return;
+      } 
       this.nodeClick.emit($event.node);
     }
   }
 
   onNodeDblClick($event: any): void {
-    let updateTree = false; // A double click drills into a folder, so we fetch fresh contents
+    let updateTree = false; // A double click drills into a folder, so we make a fresh query instead of update
     this.displayTree($event.node.path, updateTree);
+    this.nodeDblClick.emit($event.node);
   }
 
-  onRightClick($event: any): void {
-    this.rtClickDisplay = !this.rtClickDisplay;
-    this.popUpMenuX = $event.clientX;
-    this.popUpMenuY = $event.clientY;
-    this.selectedItem = this.path + '/' + $event.target.innerText;
-    this.isFile = this.utils.isfile(this.checkPath(this.selectedItem), this.data);
+  onNodeRightClick($event: any) {
+    let node = $event.node;
+    let rightClickProperties;
+
+    if (node.directory) {
+      rightClickProperties = this.rightClickPropertiesFolder;
+    } else {
+      rightClickProperties = this.rightClickPropertiesFile;
+    }
+     
+    if (this.windowActions) {
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu($event.originalEvent.clientX, $event.originalEvent.clientY, rightClickProperties, true);
+      // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
+      if (!didContextMenuSpawn) { // If context menu failed to spawn...
+        let heightAdjustment = $event.originalEvent.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu($event.originalEvent.clientX, heightAdjustment, rightClickProperties, true);
+      }
+    }
+
+    this.rightClickedFile = node;
+    this.lastRightClickEvent = $event;
+    this.rightClick.emit($event.node);
+    $event.originalEvent.preventDefault(); 
   }
 
-  onRenameClick($event: any): void {
-    this.renameClick.emit($event);
+  onPanelRightClick($event: any) {
+    if (this.windowActions) {
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, $event.clientY, this.rightClickPropertiesPanel, true);
+      // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
+      if (!didContextMenuSpawn) { // If context menu failed to spawn...
+        let heightAdjustment = $event.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
+      }
+    }
+  }
+
+  onPathChanged($event: any): void {
+    this.pathChanged.emit($event);
   }
 
   sortFn(a: any, b: any) {
@@ -248,8 +486,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
-    if (path === undefined || path == '') {
+    this.pathChanged.emit(path);
+    if (path === undefined || path === '') {
       path = this.root; 
+    }
+    if (path === '') {
+      this.log.warn("Please enter a valid path. For example: '/'");
+      this.data = [];
+      return;
     }
     this.isLoading = true;
     this.ussData = this.ussSrv.getFile(path); 
@@ -310,7 +554,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 networkArray = tempChildren;
               }
           }
-          else if (dataArray[indexArray[indexArray.length-1]] !== undefined && dataArray[indexArray[indexArray.length-1]].data == 'Folder' && dataArray[indexArray[indexArray.length-1]].children !== undefined && dataArray[indexArray[indexArray.length-1]].children.length !== 0)
+          else if (dataArray[indexArray[indexArray.length-1]] !== undefined && dataArray[indexArray[indexArray.length-1]].data == 'Folder' 
+          && dataArray[indexArray[indexArray.length-1]].children !== undefined && dataArray[indexArray[indexArray.length-1]].children.length !== 0)
           {
             //... if the children of dataArray with index in last element of indexArray are not empty, drill into them!
             parentNode = dataArray[indexArray[indexArray.length-1]];
@@ -331,6 +576,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.log.debug(tempChildren);
       this.data = tempChildren;
       this.path = path;
+      this.onPathChanged(this.path);
 
       // this.persistentDataService.getData()
       //       .subscribe(data => {
@@ -340,15 +586,18 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       //         this.persistentDataService.setData(this.dataObject)
       //           .subscribe((res: any) => { });
       //       })
-        },
-        error => {
-          this.isLoading = false;
-          this.errorMessage = <any>error;
+      },
+      error => {
+        this.isLoading = false;
+        if (error.status == '403') { //Permission denied
+          this.snackBar.open('Failed to open: Permission denied.', 
+          'Dismiss', { duration: MessageDuration.Medium, panelClass: 'center' });
         }
-      );
-
-      this.refreshHistory(this.path);
-    }
+        this.errorMessage = <any>error;
+      }
+    );
+    this.refreshHistory(this.path);
+  }
 
   private refreshHistory(path:string) {
     const sub = this.ussSearchHistory
@@ -356,34 +605,26 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   .subscribe(()=>{
                     if(sub) sub.unsubscribe();
                   });
-}
+  }
 
-  public sleep(milliseconds) {
-      var start = new Date().getTime();
-      for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-          break;
-        }
-      }
-    }
 
   //Adds children to the existing this.data TreeNode array to update tree
-  addChild(path: string, $event: any): void {
-    if ($event.node.children && $event.node.children.length > 0) 
+  addChild(node: any, force?: boolean): void {
+    let path = node.path;
+    if (node.children && node.children.length > 0 && !force) 
     {
       //If an opened node has children, and the user clicked on it...
-      if ($event.node.expanded) {
-        $event.node.expanded = false;
+      if (node.expanded) {
+        node.expanded = false;
       }
       //If a closed node has children, and the user clicked on it...
       else {
-        $event.node.expanded = true;
+        node.expanded = true;
       }
     } 
     else //When the selected node has no children
     { 
-      this.selectedFile = $event.node;
-      $event.node.expanded = true;
+      node.expanded = true;
       this.ussData = this.ussSrv.getFile(path);
       let tempChildren: TreeNode[] = [];
       this.ussData.subscribe(
@@ -407,26 +648,26 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             tempChildren.push(files.entries[i]);
 
           }
-          $event.node.children = tempChildren;
-          $event.node.expandedIcon = "fa fa-folder-open"; $event.node.collapsedIcon = "fa fa-folder";
+          node.children = tempChildren;
+          node.expandedIcon = "fa fa-folder-open"; node.collapsedIcon = "fa fa-folder";
           this.log.debug(path + " was populated with " + tempChildren.length + " children.");
 
-          while ($event.node.parent !== undefined) {
-            let newChild = $event.node.parent;
-            newChild.children[$event.node.id] = $event.node;
+          while (node.parent !== undefined) {
+            let newChild = node.parent;
+            newChild.children[node.id] = node;
             newChild.expanded = true;
             newChild.expandedIcon = "fa fa-folder-open"; newChild.collapsedIcon = "fa fa-folder";
-            $event.node = newChild;
+            node = newChild;
           }
 
           let index = -1;
           for (let i: number = 0; i < this.data.length; i++) {
-            if (this.data[i].label == $event.node.label) {
+            if (this.data[i].label == node.label) {
               index = i; break;
             }
           }
           if (index != -1) {
-            this.data[index] = $event.node;
+            this.data[index] = node;
             // this.persistentDataService.getData()
             //   .subscribe(data => {
             //     this.dataObject = data.contents;
@@ -459,15 +700,57 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       );
   }
 
-  addFolder(): void {
-    this.log.debug('add:' + this.selectedItem);
-    this.ussSrv.addFolder(this.checkPath(this.newPath))
+  createFolder(pathAndName: string, node: any, update: boolean): void {
+    this.ussSrv.makeDirectory(pathAndName)
       .subscribe(
         resp => {
-          this.updateUss(this.path);
-          this.newPath = '';
+          this.log.debug('Created: ' + pathAndName);
+          let path = this.getPathFromPathAndName(pathAndName);
+          let someData = this.ussSrv.getFileMetadata(pathAndName);
+          someData.subscribe(
+            result => {
+              // If the right-clicked 'node' is the correct, valid node
+              if ((node.expanded && node.children) && (node.path == path)) {
+                let nodeToAdd = {
+                  id: node.children.length,
+                  children: [],
+                  label: this.getNameFromPathAndName(pathAndName),
+                  mode: result.mode,
+                  owner: result.owner,
+                  group: result.group,
+                  createdAt: result.createdAt,
+                  data: "Folder",
+                  directory: true,
+                  expandedIcon: "fa fa-folder-open",
+                  collapsedIcon: "fa fa-folder",
+                  name: this.getNameFromPathAndName(pathAndName),
+                  parent: node,
+                  path: pathAndName,
+                  size: result.size
+                }
+                node.children.push(nodeToAdd); //Add node to right clicked node
+              }
+              // ..otherwise treat folder creation without any context.
+              else {
+                if (path == this.path) { // If we are creating a folder at the parent level
+                  this.displayTree(path, true);
+                } else if (update) { // If we want to update the tree
+                  this.addChild(node);
+                } else { // If we want a fresh fetch of the tree
+                  this.displayTree(pathAndName, false); // ...plop the Explorer into the newly created location.
+                }
+                this.newPath = pathAndName;
+              }
+            }
+          ); 
         },
-        error => this.errorMessage = <any>error
+        error => { 
+          if (error.status == '500') { //Internal Server Error
+            this.snackBar.open('Failed to create directory: ' + pathAndName + "' This is probably due to a server agent problem.", 
+            'Dismiss', defaultSnackbarOptions);
+          }
+          this.errorMessage = <any>error; 
+        }
       );
   }
 
@@ -494,31 +777,101 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   delete(e: EventTarget): void {
-    this.log.debug('delete:' + this.selectedItem);
-    this.ussSrv.deleteFile(this.selectedItem)
+    this.ussSrv.deleteFileOrFolder(this.selectedItem)
       .subscribe(
         resp => {
+          this.log.debug('Deleted: ' + this.selectedItem);
           this.updateUss(this.path);
         },
         error => this.errorMessage = <any>error
       );
   }
 
-  deleteFile(pathAndName: string): void {
-    this.ussSrv.deleteFile(pathAndName)
+  deleteFileOrFolder(rightClickedFile: any): void {
+    let pathAndName = rightClickedFile.path;
+    let name = this.getNameFromPathAndName(pathAndName);
+    this.isLoading = true;
+    this.deletionQueue.set(rightClickedFile.path, rightClickedFile);
+    rightClickedFile.styleClass = "filebrowseruss-node-deleting";
+    let deleteSubscription = this.ussSrv.deleteFileOrFolder(pathAndName)
     .subscribe(
       resp => {
-        this.updateUss(this.path);
+        this.isLoading = false;
+        this.snackBar.open('Deleted: ' + name,
+          'Dismiss', defaultSnackbarOptions);
+        this.removeChild(rightClickedFile);
+        this.deletionQueue.delete(rightClickedFile.path);
+        rightClickedFile.styleClass = "";
       },
-      error => this.errorMessage = <any>error
+      error => {
+        if (error.status == '500') { //Internal Server Error
+          this.snackBar.open('Failed to delete: ' + pathAndName + "' This is probably due to a server agent problem.", 
+          'Dismiss', defaultSnackbarOptions);
+        } else if (error.status == '404') { //Not Found
+          this.snackBar.open(pathAndName + ' has already been deleted or does not exist.', 
+          'Dismiss', defaultSnackbarOptions);
+          this.removeChild(rightClickedFile);
+        } else if (error.status == '400') { //Bad Request
+          this.snackBar.open("Failed to delete '" + pathAndName + "' This is probably due to a permission problem.", 
+          'Dismiss', defaultSnackbarOptions);
+        } else { //Unknown
+          this.snackBar.open("Uknown error '" + error.status + "' occured for: " + pathAndName, 
+          'Dismiss', defaultSnackbarOptions);
+          //Error info gets printed in uss.crud.service.ts
+        }
+        this.deletionQueue.delete(rightClickedFile.path);
+        this.isLoading = false;
+        rightClickedFile.styleClass = "";
+        this.errorMessage = <any>error;
+      }
     );
+
+    setTimeout(() => {
+      if (deleteSubscription.closed == false) {
+        this.snackBar.open('Deleting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+          'Dismiss', defaultSnackbarOptions);
+      }
+    }, 4000);
   }
+
+  removeChild(node: any) {
+    let parent;
+    let children;
+    if (node.parent) { // If the selected node has a parent,
+      parent = node.parent;
+      children = parent.children; // ...just use the top-most children
+    } else { // The selected node *is* the top-most node,
+      children = this.data; // ...just use the UI nodes as our children
+    }
+
+    let length = children.length;
+    let i = 0;
+    while (i < length) {
+      if (children[i] && (children[i].path == node.path) && (children[i].name == node.name)) { // If we catch the node we wanted to remove,
+        children.splice(i, 1); // ...remove it
+        if (node.parent && node.parent.children) { // Update the children to no longer include removed node
+          node.parent.children = children;
+        } else {
+          this.data = children;
+        }
+      }
+      i++;
+    }
+  }
+
+  sendNotification(title: string, message: string): number {
+    let pluginId = this.pluginDefinition.getBasePlugin().getIdentifier();
+    // We can specify a different styleClass to theme the notification UI i.e. [...] message, 1, pluginId, "org_zowe_zlux_editor_snackbar"
+    let notification = ZoweZLUX.notificationManager.createNotification(title, message, 1, pluginId);
+    return ZoweZLUX.notificationManager.notify(notification);
+  }
+
   levelUp(): void {
     //TODO: may want to change this to 'root' depending on mainframe file access security
     //to prevent people from accessing files/folders outside their root dir
     if (this.path !== "/" && this.path !== '') 
     {
-      this.path = this.path.replace(/\/$/, '').replace(/\/[^\/]+$/, '');
+      this.path = this.getPathFromPathAndName(this.path);
       if (this.path === '' || this.path == '/') {
         this.path = '/';
       }
@@ -532,20 +885,35 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     } else
       this.updateUss(this.path);
   }
-  addFileDialog() {
-    this.addFileDisplay = true;
+
+  getPathFromPathAndName(pathAndName: string): string {
+    let path = pathAndName.replace(/\/$/, '').replace(/\/[^\/]+$/, '');
+    return path;
   }
-  addFolderDialog() {
-    this.addFolderDisplay = true;
+
+  getNameFromPathAndName(pathAndName: string): string {
+    let name = pathAndName.replace(/(^.*)(\/.*\/)/, '');
+    return name;
   }
-  copyDialog() {
-    this.copyDisplay = true;
-  }
-  renameDialog() {
-    this.renameDisplay = true;
-  }
+
   private checkPath(input: string): string {
     return this.utils.filePathEndCheck(this.path) + input;
+  }
+
+  checkPathSlash(event: any) {
+    if (this.path == "") {
+      this.path = "/";
+      this.fileExplorerUSSInput.nativeElement.value="/";
+    }
+  }
+
+  checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
+    if (this.deletionQueue.has(pathAndName)) {
+      this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
+            'Dismiss', defaultSnackbarOptions);
+      return true;
+    } 
+    return false;
   }
 }
 
@@ -559,4 +927,3 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   Copyright Contributors to the Zowe Project.
 */
-

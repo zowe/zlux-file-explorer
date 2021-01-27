@@ -8,9 +8,10 @@
   
   Copyright Contributors to the Zowe Project.
 */
-
-export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTreeComponent  } from './app/components/zlux-file-tree/zlux-file-tree.component';
-
+.modal-column-ownership {
+  float: left;
+  width: 100%;
+}
 
 /*
   This program and the accompanying materials are
@@ -21,4 +22,3 @@ export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTree
   
   Copyright Contributors to the Zowe Project.
 */
-

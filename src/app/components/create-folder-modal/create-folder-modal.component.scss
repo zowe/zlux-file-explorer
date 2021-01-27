@@ -9,7 +9,31 @@
   Copyright Contributors to the Zowe Project.
 */
 
-export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTreeComponent  } from './app/components/zlux-file-tree/zlux-file-tree.component';
+.create-folder-content-body {
+  margin-left: 45px;
+  margin-bottom: -5px;
+  margin-top: 1px;
+  font-size: 17px;
+  min-width: 400px;
+}
+
+.create-folder-clear-button {
+  border-radius: 100%;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.create-folder-clear-button:hover {
+  background-color: rgba(0, 0, 0, 0.12) !important;
+  transition: 0 !important;
+  -webkit-transition-duration: 0 !important;
+  transition-duration: 0 !important;
+}
+
+.create-folder-clear-icon {
+  font-size: 14px;
+  height: 5px;
+}
 
 
 /*
@@ -21,4 +45,3 @@ export { ZluxFileTreeModule as FileTreeModule, ZluxFileTreeComponent as FileTree
   
   Copyright Contributors to the Zowe Project.
 */
-

@@ -1,0 +1,21 @@
+# ZLUX Angular File Tree
+
+## 0.4.0
+
+* Add rename functionality to USS browser
+* Add right click menu to tag files and folders with a  popup modal to choose the encoding to tag (autofills to current tag)
+
+## 0.3.0
+
+* Added modals, available via right click, to change ownership & permission information of files & folders.
+* Some CSS has been refactored.
+* Node-sass has been updated to support Node 12.
+
+## 0.2.0
+
+* Allow users of this component to invoke its modals by using the spawnModal input with a javascript object containing the property 'type' equal to the type of modal to open, and 'data' equal to the FileNode object to be handled
+
+## 0.1.0
+
+* Bugfix: Clicking on a migrated dataset would result in sending PDS contents in the form of the dataset contents, rather than displaying the PDS as a folder of PDS members. Now, clicking on a migrated dataset will either display its contents or show PDS members, depending on whether or not the dataset is or is not a PDS.
+* Security: Update dependencies to more recent minor versions to reduce quantity of npm audit warnings.
