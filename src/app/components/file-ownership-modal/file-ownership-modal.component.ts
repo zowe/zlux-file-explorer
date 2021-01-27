@@ -9,7 +9,7 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
@@ -35,6 +35,7 @@ export class FileOwnershipModal {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
+    private dialogRef: MatDialogRef<FileOwnershipModal>,
     private http: Http,
     private snackBar: MatSnackBar,
   ) 
@@ -100,6 +101,7 @@ export class FileOwnershipModal {
   saveOwnerInfo() {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, this.recursive, this.owner, this.group);
     this.http.post(url, null)
+    .finally(() => this.closeDialog())
     .map(res=>{
       if (res.status == 200) {
         this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
@@ -119,6 +121,12 @@ export class FileOwnershipModal {
           'Dismiss', defaultSnackbarOptions);
       }
     );
+  }
+  
+    
+  closeDialog() {
+    const needUpdate = this.isDirectory;
+    this.dialogRef.close(needUpdate);
   }
 
   private handleErrorObservable (error: Response | any) {
