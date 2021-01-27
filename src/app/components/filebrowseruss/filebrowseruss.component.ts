@@ -872,14 +872,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           return node;
         },
         e => {
-          if (e.status = 404) {
+          if (e.status == 404) {
             this.snackBar.open("Failed to refresh '" + node.name + "' No longer exists or has been renamed.", 
           'Dismiss', defaultSnackbarOptions);
             this.removeChild(node);
-          } else if (e.status = 403) {
+          } else if (e.status == 403) {
             this.snackBar.open("Failed to refresh '" + node.name + "' Permission denied.", 
           'Dismiss', defaultSnackbarOptions);
-          } else if (e.status = 500) {
+          } else if (e.status == 500) {
             this.snackBar.open("Failed to refresh '" + node.name + "' Server returned with: " + e._body, 
             'Dismiss', longSnackbarOptions);
           }
