@@ -20,6 +20,16 @@
 </mat-form-field> -->
 
 <div class="file-permissions-row">
+  <mat-list-item>
+    <div class="modal-column">
+      <span class="file-permissions-subtitle">Owner: {{ owner }}</span>
+    </div>
+    <div class="modal-column">
+      <span class="file-permissions-subtitle">Group: {{ group }}</span>
+    </div>
+  </mat-list-item>
+</div>
+<div class="file-permissions-row">
   <div class="modal-column-full-width">
     <mat-list-item>
       <span class="file-permissions-subtitle">Mode:</span>
@@ -89,7 +99,7 @@
 
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="modal-mat-button cancel">Cancel</button>
-  <button mat-button mat-dialog-close class="modal-mat-button" (click)="savePermissions()" [disabled]="octalModeInput.invalid">Save</button>
+  <button mat-button class="modal-mat-button" (click)="savePermissions()" [disabled]="octalModeInput.invalid">Save</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
 </mat-dialog-actions>
 

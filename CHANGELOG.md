@@ -1,5 +1,19 @@
 # ZLUX Angular File Tree
 
+## 0.7.0
+
+* Added refresh button to right click folder menu & file menu
+
+## 0.6.0
+
+* Added refresh buttons for USS/Dataset views
+
+## 0.5.0
+
+* Added cut, copy, and paste functionality to USS files.
+* onPathChanged emitter now fires from MVS as well
+* Removed unused & dead code.
+
 ## 0.4.0
 
 * Add rename functionality to USS browser
