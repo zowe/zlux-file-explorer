@@ -16,9 +16,7 @@ import { take, finalize } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { UtilsService } from '../../services/utils.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes, Member } from '../../structures/editor-project';
-import { childEvent } from '../../structures/child-event';
 //import { PersistentDataService } from '../../services/persistentData.service';
-import { MvsDataObject } from '../../structures/persistantdata';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
 import { SearchHistoryService } from '../../services/searchHistoryService';
@@ -26,6 +24,7 @@ import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
+import { defaultSnackbarOptions, quickSnackbarOptions } from '../../shared/snackbar-options';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -34,8 +33,6 @@ import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platfo
 */
 //Commented out to fix compilation errors from zlux-platform changes, does not affect program
 //TODO: Implement new capabilities from zlux-platform
-
-const SNACKBAR_DUR: number = 5000;
 
 @Component({
   selector: 'file-browser-mvs',
@@ -51,7 +48,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   public hideExplorer: boolean;
   private path: string;
   private lastPath: string;
-  private errorMessage: String;
   private intervalId: any;
   private updateInterval: number = 300000;
   //TODO:define interface types for mvs-data/data
@@ -176,7 +172,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       resp => {
         this.isLoading = false;
         this.snackBar.open(resp.msg,
-        'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        'Dismiss', defaultSnackbarOptions);
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.data.path);
         rightClickedFile.styleClass = "";
@@ -184,30 +180,30 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       error => {
         if (error.status == '500') { //Internal Server Error
           this.snackBar.open("Failed to delete: '" + rightClickedFile.data.path + "' This is probably due to a server agent problem.",
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           this.removeChild(rightClickedFile);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
           this.snackBar.open("Unknown error '" + error.status + "' occurred for: " + rightClickedFile.data.path, 
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           // Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.data.path);
         this.isLoading = false;
         rightClickedFile.styleClass = "";
-        this.errorMessage = <any>error;
+        this.log.severe(error);
       }
     );
 
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     }, 4000);
   }
@@ -221,7 +217,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       resp => {
         this.isLoading = false;
         this.snackBar.open(resp.msg,
-        'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+        'Dismiss', defaultSnackbarOptions);
         //Update vs removing node since symbolicly linked data/index of vsam can be named anything
         this.updateTreeView(this.path);
         this.deletionQueue.delete(rightClickedFile.data.path);
@@ -230,33 +226,33 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       error => {
         if (error.status == '500') { //Internal Server Error
           this.snackBar.open("Failed to delete: '" + rightClickedFile.data.path + "' This is probably due to a server agent problem.",
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else if (error.status == '404') { //Not Found
           this.snackBar.open(rightClickedFile.data.path + ' has already been deleted or does not exist.', 
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           this.updateTreeView(this.path);
         } else if (error.status == '400') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "' This is probably due to a permission problem.",
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else if (error.status == '403') { //Bad Request
           this.snackBar.open("Failed to delete '" + rightClickedFile.data.path + "'" + ". " + JSON.parse(error._body)['msg'],
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
           this.snackBar.open("Unknown error '" + error.status + "' occurred for: " + rightClickedFile.data.path, 
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
           //Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.data.path);
         this.isLoading = false;
         rightClickedFile.styleClass = "";
-        this.errorMessage = <any>error;
+        this.log.severe(error);
       }
     );
 
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', { duration: SNACKBAR_DUR,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     }, 4000);
   }
@@ -321,7 +317,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
             this.nodeClick.emit($event.node);
           },
           _err => this.snackBar.open(`Failed to recall dataset '${path}'`,
-            'Dismiss', { duration: SNACKBAR_DUR, panelClass: 'center' })
+            'Dismiss', defaultSnackbarOptions)
         );
       return;
     }
@@ -359,7 +355,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   updateTreeView(path: string): void {
     this.getTreeForQueryAsync(path).then((res) => {
       this.data = res;
-    });
+    }, (error) => {
+      if (error.status == '0') {
+        this.snackBar.open("Failed to communicate with the App server: " + error.status, 
+            'Dismiss', defaultSnackbarOptions);
+      } else {
+        this.snackBar.open("An unknown error occurred: " + error.status, 
+            'Dismiss', defaultSnackbarOptions);
+      }
+      this.log.severe(error);
+    }
+    );
     this.onPathChanged(path);
     this.refreshHistory(path);
   }
@@ -421,6 +427,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           }
           this.isLoading = false;
         } else {
+          this.snackBar.open("No datasets were found for '" + path + "'", 
+            'Dismiss', quickSnackbarOptions);
           //data set probably doesnt exist
           this.isLoading = false;
         }
@@ -497,7 +505,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   checkIfInDeletionQueueAndMessage(pathAndName: string, message: string): boolean {
     if (this.deletionQueue.has(pathAndName)) {
       this.snackBar.open('Deletion in progress: ' + pathAndName + "' " + message, 
-            'Dismiss', { duration: SNACKBAR_DUR, panelClass: 'center' });
+            'Dismiss', defaultSnackbarOptions);
       return true;
     } 
     return false;

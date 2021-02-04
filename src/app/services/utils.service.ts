@@ -30,15 +30,6 @@ export class UtilsService {
     return path;
   }
 
-  isfile(selectedItem:string, treeData:any):boolean{
-    for (let index:number = 0; index < treeData.length; index++){
-      if (treeData[index].path === selectedItem && treeData[index].data === "Documents Folder"){
-        return false;
-      }
-    }
-    return true;
-  }
-
   isDatasetMigrated(attrs: DatasetAttributes): boolean {
     return attrs.volser === 'MIGRAT' || attrs.volser === 'ARCIVE';
   }

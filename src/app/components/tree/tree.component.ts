@@ -12,7 +12,7 @@
 declare var require:any;
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, ViewChild, AfterContentInit, OnDestroy} from '@angular/core';
 import { TreeNode } from 'primeng/primeng';
-import { childEvent } from '../../structures/child-event';
+import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
 /**
  * [The tree component serves collapse/expansion of file/datasets]
@@ -40,7 +40,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   @Input() treeData: TreeNode;
   @Input() style: any;
   @Input() treeStyle: any;
-  @Output() clickEvent = new EventEmitter<childEvent>();
+  @Output() clickEvent = new EventEmitter<FileTreeNode>();
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();
   @Output() panelRightClickEvent = new EventEmitter<MouseEvent>();
