@@ -104,7 +104,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.showSearch = false;
       this.searchInputCtrl = new FormControl();
       this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
-        debounceTime(750),
+        debounceTime(500),
       ).subscribe((value) => {this.searchInputChanged(value)});
   }
 
