@@ -12,7 +12,7 @@
 
 
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional } from '@angular/core';
-import { take, finalize } from 'rxjs/operators';
+import { take, finalize, debounceTime } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { UtilsService } from '../../services/utils.service';
 import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes, Member } from '../../structures/editor-project';
@@ -25,6 +25,9 @@ import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-prop
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
 import { defaultSnackbarOptions, quickSnackbarOptions } from '../../shared/snackbar-options';
+import { FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import * as _ from 'lodash';
 
 /*import {FileBrowserFileSelectedEvent,
   IFileBrowserMVS
@@ -50,8 +53,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private lastPath: string;
   private intervalId: any;
   private updateInterval: number = 300000;
+  private searchInputCtrl: any;
+  private searchInputValueSubscription: Subscription;
+  private showSearch: boolean;
+
   //TODO:define interface types for mvs-data/data
   private data: any;
+  private dataCached: any;
   public isLoading: boolean;
   private rightClickedFile: any;
   private rightClickPropertiesDataset: ContextMenuItem[];
@@ -76,6 +84,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.hideExplorer = false;
     this.isLoading = false;
     this.additionalQualifiers = true;
+    this.showSearch = false;
+    this.searchInputCtrl = new FormControl();
+    this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
+      debounceTime(500),
+    ).subscribe((value) => {this.searchInputChanged(value)});
   }
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -141,6 +154,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     ];
   }
+
   showDeleteDialog(rightClickedFile: any) {
     if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.data.path, "This is already being deleted.") == true) {
       return;
@@ -290,6 +304,42 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.dialog.open(DatasetPropertiesModal, filePropConfig);
+  }
+
+  toggleSearch() {
+    this.showSearch = !this.showSearch;
+    if (this.showSearch) {
+      this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
+    } else {
+      if (this.dataCached) {
+        this.data = this.dataCached; // We don't care about deep clone because we just want to get dataCached back
+      }
+    }
+  }
+
+  searchInputChanged(input: string) {
+    if (this.dataCached) {
+      this.data = _.cloneDeep(this.dataCached); 
+    }
+    this.filterNodesByLabel(this.data, input);
+  }
+
+  filterNodesByLabel(data: any, label: string) {
+    for (let i = 0; i < data.length; i++) {
+      if (!(data[i]).label.includes(label)) {
+        if (data[i].children && data[i].children.length > 0) {
+          this.filterNodesByLabel(data[i].children, label);
+        }
+        if (!(data[i].children && data[i].children.length > 0)) {
+          data.splice(i, 1);
+          i--;
+        } // TODO: Refactor ".data" of USS node and ".type" of DS node to be the same thing 
+        else if (data[i].type = "folder") { // If some children didn't get filtered out (aka we got some matches) and we have a folder
+        // then we want to expand the node so the user can see their results in the search bar
+          data[i].expanded = true;
+        }
+      }
+    }
   }
 
   getDOMElement(): HTMLElement{

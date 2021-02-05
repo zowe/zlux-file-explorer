@@ -40,8 +40,6 @@ import { FilePermissionsModal } from '../file-permissions-modal/file-permissions
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
-import { KeybindingService } from '../../services/keybinding.service';
-import { KeyCode } from '../../services/keybinding.service';
 import { FileTreeNode } from '../../structures/child-event';
 import * as _ from 'lodash';
 
@@ -69,7 +67,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
   private fileToCopyOrCut: any;
-  private keyBindingSub: Subscription = new Subscription();
   private showSearch: boolean;
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
@@ -89,7 +86,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     private ussSearchHistory:SearchHistoryService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private appKeyboard: KeybindingService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
@@ -155,27 +151,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       // this.intervalId = setInterval(() => {
         this.updateUss(this.path);
       // }, this.updateInterval);
-    this.keyBindingSub.add(this.appKeyboard.keydownEvent
-      .subscribe((event) => {
-        if (event.which === KeyCode.KEY_P && event.ctrlKey) {
-          this.showSearch = !this.showSearch;
-          if (this.showSearch) {
-            this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
-          } else {
-            if (this.dataCached) {
-              this.data = this.dataCached; // We don't care about deep clone because we just want to get dataCached back
-            }
-          }
-        }
-    }));
-    this.fileExplorerUSSInput.nativeElement.click();
   }
 
   ngOnDestroy() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
-    this.keyBindingSub.unsubscribe();
     this.searchInputValueSubscription.unsubscribe();
   }
 
@@ -443,26 +424,32 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let oldName = file.name;
     let oldPath = file.path;
     file.selectable = false;
+
     let renameFn = (node: HTMLElement) => {
       renameField.parentNode.replaceChild(node, renameField);
       file.selectable = true;
       let nameFromNode = renameField.value;
-      let pathForRename:any;
-      pathForRename = (oldPath as String).split("/");
-      pathForRename.pop();
-      pathForRename = pathForRename.join('/');
+      let pathForRename = this.getPathFromPathAndName(oldPath);
       if(oldName != nameFromNode){
         let newPath = `${pathForRename}/${nameFromNode}`;
         this.ussSrv.renameFile(oldPath, newPath).subscribe(
           res => {
             this.snackBar.open("Renamed '" + oldName + "' to '" + nameFromNode + "'",
               'Dismiss', quickSnackbarOptions);
-            this.updateUss(this.path);
+            // this.updateUss(this.path); - We don't need to update the whole tree for 1 changed node (rename should be O(1) operation), 
+            // but if problems come up uncomment this
             this.ussRenameEvent.emit(this.rightClickedEvent.node); 
+            if (this.showSearch) { // Update saved cache if we're using the search bar
+              let nodeCached = this.findNodeByPath(this.dataCached, file.path)[0];
+              if (nodeCached) {
+                nodeCached.label = nameFromNode;
+                nodeCached.path = newPath;
+                nodeCached.name = nameFromNode;
+              }
+            }
             file.label = nameFromNode;
             file.path = newPath;
             file.name = nameFromNode;
-            //this.updateUss(this.path);
             return;
           },
           error => {
@@ -592,6 +579,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.addChild(rightClickedFile, true);
       }
     });
+  }
+
+  toggleSearch() {
+    this.showSearch = !this.showSearch;
+    if (this.showSearch) {
+      this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
+    } else {
+      if (this.dataCached) {
+        this.data = this.dataCached; // We don't care about deep clone because we just want to get dataCached back
+      }
+    }
   }
 
   // onNewFileClick($event: any): void {
@@ -833,6 +831,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       else {
         node.expanded = true;
       }
+      if (this.showSearch) { // Update node in cached data as well
+        let nodeCached = this.findNodeByPath(this.dataCached, path)[0];
+        if (nodeCached) {
+          nodeCached.expanded = node.expanded;
+        }
+      }
     } 
     else //When the selected node has no children or we want to fetch new data
     {
@@ -883,7 +887,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             this.data[index] = node;
             if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
               index = -1; // which may be in a different index due to filtering by search query
-              for (let i: number = 0; i < this.dataCached.length; i++) {
+              for (let i: number = 0; i < this.dataCached.length; i++) { // We could use this.findNodeByPath, but we need search only parent level
                 if (this.dataCached[i].label == node.label) {
                   index = i; break;
                 }
@@ -950,25 +954,41 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       ); 
   }
 
-  searchInputChanged(event: any) {
+  searchInputChanged(input: string) {
     if (this.dataCached) {
       this.data = _.cloneDeep(this.dataCached); 
     }
-    this.filterNodesByLabel(this.data, event);
+    this.filterNodesByLabel(this.data, input);
   }
 
   filterNodesByLabel(data: any, label: string) {
     for (let i = 0; i < data.length; i++) {
       if (!(data[i]).label.includes(label)) {
-        if (data[i].expanded && data[i].children && data[i].children.length > 0) {
+        if (data[i].children && data[i].children.length > 0) {
           this.filterNodesByLabel(data[i].children, label);
         }
         if (!(data[i].children && data[i].children.length > 0)) {
           data.splice(i, 1);
           i--;
+        } else if (data[i].data = "Folder") { // If some children didn't get filtered out (aka we got some matches) and we have a folder
+        // then we want to expand the node so the user can see their results in the search bar
+          data[i].expanded = true;
         }
       }
     }
+  }
+
+  // TODO: Could be optimized to do breadth first search vs depth first search
+  findNodeByPath(data: any, path: string) {
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].path == path) {
+        return [data[i], i]; // 0 - node, 1 - index
+      }
+      if (data[i].children && data[i].children.length > 0) {
+        return this.findNodeByPath(data[i].children, path);
+      }
+    }
+    return [null, null];
   }
 
   updateUss(path: string): void {
@@ -1004,6 +1024,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   size: result.size
                 }
                 node.children.push(nodeToAdd); //Add node to right clicked node
+                if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
+                  let nodeCached = this.findNodeByPath(this.dataCached, node.path)[0];
+                  if (nodeCached) {
+                    nodeCached.children.push(nodeToAdd);
+                  }
+                }
               }
               // ..otherwise treat folder creation without any context.
               else {
@@ -1011,7 +1037,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   this.displayTree(path, true);
                 } else if (update) { // If we want to update the tree
                   this.addChild(node);
-                } else { // If we want a fresh fetch of the tree
+                } else { // If we are creating a new folder in a location we're not looking at
                   this.displayTree(pathAndName, false); // ...plop the Explorer into the newly created location.
                 }
               }
@@ -1085,21 +1111,29 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       children = this.data; // ...just use the UI nodes as our children
     }
 
-    let length = children.length;
-    let i = 0;
-    while (i < length) {
-      if (children[i] && (children[i].path == node.path) && (children[i].name == node.name)) { // If we catch the node we wanted to remove,
-        children.splice(i, 1); // ...remove it
-        if (node.parent && node.parent.children) { // Update the children to no longer include removed node
-          node.parent.children = children;
-        } else {
-          this.data = children;
+    let nodeData = this.findNodeByPath(children, node.path);
+    if (nodeData) { // If we catch the node we wanted to remove,
+      let nodeObj = nodeData[0];
+      let nodeIndex = nodeData[1];
+      children.splice(nodeIndex, 1); // ...remove it
+      if (node.parent && node.parent.children) { // Update the children to no longer include removed node
+        node.parent.children = children;
+      } else {
+        this.data = children;
+      }
+    }
+
+    if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
+      let nodeDataCached = this.findNodeByPath(this.dataCached, node.path);
+      if (nodeDataCached) {
+        let nodeCached = nodeDataCached[0];
+        let indexCached = nodeDataCached[1];
+        if (nodeCached.parent) {
+          if (indexCached != -1) {
+            nodeCached.parent.children.splice(indexCached, 1);
+          }
         }
       }
-      i++;
-    }
-    if (this.showSearch) { // If search bar is visible, we need to update cached data so when we revert back, new data isn't out of date
-      this.dataCached = _.cloneDeep(this.data);
     }
   }
 

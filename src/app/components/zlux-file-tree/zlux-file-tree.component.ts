@@ -66,6 +66,8 @@ import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 import { KeybindingService } from '../../services/keybinding.service';
 import { InputTextModule } from 'primeng/inputtext';
+import { KeyCode } from '../../services/keybinding.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -77,9 +79,10 @@ import { InputTextModule } from 'primeng/inputtext';
 
 export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
-  currentIndex: number;
-  tabs: Array<tab>;
-  showUpArrow: boolean;
+  private currentIndex: number;
+  private tabs: Array<tab>;
+  private showUpArrow: boolean;
+  private keyBindingSub: Subscription = new Subscription();
 
   @ViewChild(FileBrowserUSSComponent)
   private ussComponent: FileBrowserUSSComponent;
@@ -194,6 +197,16 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     const fileExplorerGlobalElement = this.fileExplorerGlobal.nativeElement;
     this.appKeyboard.registerKeyUpEvent(fileExplorerGlobalElement);
     this.appKeyboard.registerKeyDownEvent(fileExplorerGlobalElement); 
+    this.keyBindingSub.add(this.appKeyboard.keydownEvent
+      .subscribe((event) => {
+        if (event.which === KeyCode.KEY_P && event.ctrlKey) {
+          if (this.currentIndex == 0) {
+            this.ussComponent.toggleSearch();
+          } else {
+            this.mvsComponent.toggleSearch();
+          }
+        }
+    }));
   }
 
   ngOnDestroy() {
