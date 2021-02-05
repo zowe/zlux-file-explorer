@@ -30,7 +30,8 @@
     "@angular/platform-browser": "~6.0.9",
     "@angular/router": "~6.0.9",
     "carbon-components": "~8.23.0",
-    "primeng": "~6.1.7"
+    "primeng": "~6.1.7",
+    "lodash": "~4.17.10"
   },
   "devDependencies": {
     "angular2-template-loader": "~0.6.2",

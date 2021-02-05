@@ -43,6 +43,7 @@ import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } fro
 import { KeybindingService } from '../../services/keybinding.service';
 import { KeyCode } from '../../services/keybinding.service';
 import { FileTreeNode } from '../../structures/child-event';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'file-browser-uss',
@@ -98,7 +99,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
       this.path = this.root;
       this.data = []; // Main treeData array (the nodes the Explorer displays)
-      this.dataCached = this.data;
       this.hideExplorer = false;
       this.isLoading = false;
       this.showSearch = false;
@@ -157,13 +157,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       // }, this.updateInterval);
     this.keyBindingSub.add(this.appKeyboard.keydownEvent
       .subscribe((event) => {
-        if (event.which === KeyCode.KEY_Q && event.ctrlKey) {
+        if (event.which === KeyCode.KEY_P && event.ctrlKey) {
           this.showSearch = !this.showSearch;
           if (this.showSearch) {
-            this.dataCached = JSON.parse(JSON.stringify(this.data));
+            this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
           } else {
             if (this.dataCached) {
-              this.data = JSON.parse(JSON.stringify(this.dataCached));
+              this.data = this.dataCached; // We don't care about deep clone because we just want to get dataCached back
             }
           }
         }
@@ -722,7 +722,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         let parentNode: FileTreeNode;
         indexArray = [0];
         dataArray = this.data;
-        this.dataCached = this.data;
         networkArray = tempChildren;
         while (indexArray[indexArray.length-1] <= dataArray.length) 
         {
@@ -748,7 +747,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 }
 
                 dataArray = this.data;
-                this.dataCached = this.data;
                 networkArray = tempChildren;
               }
           }
@@ -773,7 +771,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.log.debug("Tree has been updated.");
       this.log.debug(tempChildren);
       this.data = tempChildren;
-      this.dataCached = this.data;
+      if (this.showSearch) {
+        this.dataCached = this.data; // TODO: Implement logic to update tree of search queried results (so reverting the search filter doesn't fail)
+        if (!update) { // When a fresh tree is requested, it will get rid of this.data search queried results, so hide search bar
+          this.showSearch = false;
+        }
+      }
       this.path = path;
       this.onPathChanged(this.path);
 
@@ -878,6 +881,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           }
           if (index != -1) {
             this.data[index] = node;
+            if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
+              index = -1; // which may be in a different index due to filtering by search query
+              for (let i: number = 0; i < this.dataCached.length; i++) {
+                if (this.dataCached[i].label == node.label) {
+                  index = i; break;
+                }
+              }
+              if (index != -1) {
+                this.dataCached[index] = node;
+              } else {
+                this.log.debug("Though node added in working directory, failed to find index in cached data");
+              }
+            }
             // this.persistentDataService.getData()
             //   .subscribe(data => {
             //     this.dataObject = data.contents;
@@ -936,12 +952,21 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   searchInputChanged(event: any) {
     if (this.dataCached) {
-      this.data = JSON.parse(JSON.stringify(this.dataCached));
+      this.data = _.cloneDeep(this.dataCached); 
     }
-    for (let i = 0; i < this.data.length; i++) {
-      if (!(this.data[i]).label.includes(event)) {
-        this.data.splice(i, 1);
-        i--;
+    this.filterNodesByLabel(this.data, event);
+  }
+
+  filterNodesByLabel(data: any, label: string) {
+    for (let i = 0; i < data.length; i++) {
+      if (!(data[i]).label.includes(label)) {
+        if (data[i].expanded && data[i].children && data[i].children.length > 0) {
+          this.filterNodesByLabel(data[i].children, label);
+        }
+        if (!(data[i].children && data[i].children.length > 0)) {
+          data.splice(i, 1);
+          i--;
+        }
       }
     }
   }
@@ -1069,10 +1094,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           node.parent.children = children;
         } else {
           this.data = children;
-          this.dataCached = this.data;
         }
       }
       i++;
+    }
+    if (this.showSearch) { // If search bar is visible, we need to update cached data so when we revert back, new data isn't out of date
+      this.dataCached = _.cloneDeep(this.data);
     }
   }
 
