@@ -52,7 +52,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private path: string;
   private lastPath: string;
   private intervalId: any;
-  private updateInterval: number = 300000;
+  private updateInterval: number = 3000000;
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
   private showSearch: boolean;
@@ -104,27 +104,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.intervalId = setInterval(() => {
       if(this.data){
         this.getTreeForQueryAsync(this.lastPath).then((response: any) => {
-          let newData = response[0];
-          //Only update if data sets are added/removed
-          if(this.data.length != newData.length){
-            let expandedFolders = this.data.filter(dataObj => dataObj.expanded);
-            //checks if the query response contains the same PDS' that are currently expanded
-            let newDataHasExpanded = newData.filter(dataObj => expandedFolders.some(expanded => expanded.label === dataObj.label));
-            //Keep currently expanded datasets expanded after update
-            if(newDataHasExpanded.length > 0){
-              let expandedNewData = newData.map((obj) => {
-                let retObj = {};
-                newDataHasExpanded.forEach((expandedObj) => {
-                  if(obj.label == expandedObj.label){
-                    obj.expanded = true;
-                  }
-                  retObj = obj;
-                })
-                return retObj;
-              })
-              this.data = expandedNewData;
-            } else {
-              this.data = newData;
+          let newData = response;
+          this.updateTreeData(this.data, newData);
+          
+          if (this.showSearch) {
+            if (this.dataCached) {
+              this.updateTreeData(this.dataCached, newData);
             }
           }
         });
@@ -136,6 +121,34 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   ngOnDestroy(){
     if (this.intervalId) {
       clearInterval(this.intervalId);
+    }
+  }
+
+  // Updates the 'data' array with new data, preserving existing expanded datasets
+  updateTreeData(destinationData: any, newData: any) {
+    //Only update if data sets are added/removed
+    // TODO: Add a more in-depth check for DS updates (check DS properties too?)
+    if(destinationData.length != newData.length){
+      this.log.debug("Change in dataset count detected. Updating tree...");
+      let expandedFolders = destinationData.filter(dataObj => dataObj.expanded);
+      //checks if the query response contains the same PDS' that are currently expanded
+      let newDataHasExpanded = newData.filter(dataObj => expandedFolders.some(expanded => expanded.label === dataObj.label));
+      //Keep currently expanded datasets expanded after update
+      if(newDataHasExpanded.length > 0){
+        let expandedNewData = newData.map((obj) => {
+          let retObj = {};
+          newDataHasExpanded.forEach((expandedObj) => {
+            if(obj.label == expandedObj.label){
+              obj.expanded = true;
+            }
+            retObj = obj;
+          })
+          return retObj;
+        })
+        destinationData = expandedNewData;
+      } else {
+        destinationData = newData;
+      }
     }
   }
 
@@ -292,6 +305,39 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.data = nodes;
       }
     }
+
+    if (this.showSearch) { // If we remove a node, we need to update it in search bar cache
+      let nodeDataCached = this.findNodeByPath(this.dataCached, node.data.path);
+      if (nodeDataCached) {
+        let nodeCached = nodeDataCached[0];
+        let indexCached = nodeDataCached[1];
+        if (indexCached != -1) {
+          if (nodeCached.parent) {
+            nodeCached.parent.children.splice(indexCached, 1);
+            let parentDataCached = this.findNodeByPath(this.dataCached, node.parent.data.path);
+            if (parentDataCached) {
+              let parentIndexCached = parentDataCached[1];
+              this.dataCached[parentIndexCached] = nodeCached.parent;
+            }
+          } else {
+            this.dataCached.splice(indexCached, 1);
+          }
+        }
+      }
+    }
+  }
+
+  // TODO: Could be optimized to do breadth first search vs depth first search
+  findNodeByPath(data: any, path: string) {
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].data.path == path) {
+        return [data[i], i]; // 0 - node, 1 - index
+      }
+      if (data[i].children && data[i].children.length > 0) {
+        this.findNodeByPath(data[i].children, path);
+      }
+    }
+    return [null, null];
   }
 
   showPropertiesDialog(rightClickedFile: any) {
@@ -354,6 +400,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   onNodeClick($event: any): void{
     if($event.node.type == 'folder'){
       $event.node.expanded = !$event.node.expanded;
+      if (this.showSearch) { // Update search bar cached data
+        let nodeCached = this.findNodeByPath(this.dataCached, $event.node.data.path)[0];
+        if (nodeCached) {
+          nodeCached.expanded = $event.node.expanded;
+        }
+      }
     }
     if (this.utils.isDatasetMigrated($event.node.data.datasetAttrs)) {
       const path = $event.node.data.path;
@@ -364,6 +416,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         .subscribe(
           attrs => {
             this.updateRecalledDatasetNode($event.node, attrs);
+            if (this.showSearch) { // Update search bar cached data
+              let nodeCached = this.findNodeByPath(this.dataCached, $event.node.data.path)[0];
+              if (nodeCached) {
+                this.updateRecalledDatasetNode(nodeCached, attrs);
+              }
+            }
             this.nodeClick.emit($event.node);
           },
           _err => this.snackBar.open(`Failed to recall dataset '${path}'`,
@@ -405,6 +463,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   updateTreeView(path: string): void {
     this.getTreeForQueryAsync(path).then((res) => {
       this.data = res;
+      if (this.showSearch) {
+        this.dataCached = this.data;
+        this.showSearch = false;
+      }
     }, (error) => {
       if (error.status == '0') {
         this.snackBar.open("Failed to communicate with the App server: " + error.status, 
