@@ -78,6 +78,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private intervalId: any;
   private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
   @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
+  @ViewChild('searchInput') searchInput: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -584,11 +585,27 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   toggleSearch() {
     this.showSearch = !this.showSearch;
     if (this.showSearch) {
+      this.focusSearchInput();
       this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
     } else {
       if (this.dataCached) {
         this.data = this.dataCached; // We don't care about deep clone because we just want to get dataCached back
       }
+    }
+  }
+  
+  focusSearchInput(attemptCount?: number): void {
+    if (this.searchInput) {
+      this.searchInput.nativeElement.focus();
+      return;
+    }
+    const maxAttempts = 10;
+    if (typeof attemptCount !== 'number') {
+      attemptCount = maxAttempts;
+    }
+    if (attemptCount > 0) {
+      attemptCount--;
+      setTimeout(() => this.focusSearchInput(attemptCount), 200);
     }
   }
 
