@@ -77,8 +77,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private dataObject: UssDataObject;
   private intervalId: any;
   private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
-  @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
-  @ViewChild('searchInput') searchInput: ElementRef;
+  @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
+  @ViewChild('searchInputUSS') searchInputUSS: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -248,6 +248,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     ];
 
     this.rightClickPropertiesPanel = [
+      { text: "Show/Hide Search", action:() => { 
+        this.toggleSearch();
+        
+      }},
       { text: "Create a Directory...", action:() => { 
         let nodeToUse = {
           path: this.path,
@@ -594,9 +598,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
   
+  // TODO: There's an app2app opportunity here, where an app using the File Tree could spawn with a pre-filtered list of nodes
   focusSearchInput(attemptCount?: number): void {
-    if (this.searchInput) {
-      this.searchInput.nativeElement.focus();
+    if (this.searchInputUSS) {
+      this.searchInputUSS.nativeElement.focus();
       return;
     }
     const maxAttempts = 10;
@@ -605,7 +610,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
     if (attemptCount > 0) {
       attemptCount--;
-      setTimeout(() => this.focusSearchInput(attemptCount), 200);
+      setTimeout(() => this.focusSearchInput(attemptCount), 100);
     }
   }
 
@@ -1198,7 +1203,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   checkPathSlash(event: any) {
     if (this.path == "") {
       this.path = "/";
-      this.fileExplorerUSSInput.nativeElement.value="/";
+      this.pathInputUSS.nativeElement.value="/";
     }
   }
 

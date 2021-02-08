@@ -199,12 +199,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     this.appKeyboard.registerKeyDownEvent(fileExplorerGlobalElement); 
     this.keyBindingSub.add(this.appKeyboard.keydownEvent
       .subscribe((event) => {
-        if (event.which === KeyCode.KEY_P && event.ctrlKey) {
-          if (this.currentIndex == 0) {
-            this.ussComponent.toggleSearch();
-          } else {
-            this.mvsComponent.toggleSearch();
-          }
+        if (event.which === KeyCode.KEY_P && !event.ctrlKey) {
+          this.toggleSearch();
         }
     }));
   }
@@ -248,6 +244,14 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
     if (this.mvsComponent) {
       this.mvsComponent.hideExplorer = true;
+    }
+  }
+
+  toggleSearch() {
+    if (this.currentIndex == 0) {
+      this.ussComponent.toggleSearch();
+    } else {
+      this.mvsComponent.toggleSearch();
     }
   }
 

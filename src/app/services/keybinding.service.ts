@@ -12,7 +12,10 @@
 
 import { Injectable } from '@angular/core';
 
-import { Subject, Observable } from 'rxjs/Rx';
+// import { Subject, Observable } from 'rxjs/Rx';
+
+import { fromEvent, Subject, Observable, MonoTypeOperatorFunction } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Injectable()
 export class KeybindingService {
@@ -26,18 +29,16 @@ export class KeybindingService {
 
   registerKeyUpEvent(appChild:Element) {
     let elm = appChild.closest('div.window');
-    const observable = Observable.fromEvent(elm, 'keyup' ) as Observable<KeyboardEvent>;
-    observable
-      .filter(value => value.altKey)
-      .subscribe(this.keyupEvent);
+    fromEvent(elm, 'keyup' ).pipe(
+      filter(value => (value as KeyboardEvent).altKey))
+      .subscribe(value => this.keyupEvent.next((value as KeyboardEvent)));
   }
 
   registerKeyDownEvent(appChild:Element) {
     let elm = appChild.closest('div.window');
-    const observable = Observable.fromEvent(elm, 'keydown' ) as Observable<KeyboardEvent>;
-    observable
-      .filter(value => value.altKey)
-      .subscribe(this.keydownEvent);
+    fromEvent(elm, 'keydown' ).pipe(
+      filter(value => (value as KeyboardEvent).altKey))
+      .subscribe(value => this.keydownEvent.next((value as KeyboardEvent)));
   }
 }
 

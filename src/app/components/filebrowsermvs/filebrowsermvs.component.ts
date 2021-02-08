@@ -11,7 +11,7 @@
 */
 
 
-import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional, ViewChild } from '@angular/core';
 import { take, finalize, debounceTime } from 'rxjs/operators';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { UtilsService } from '../../services/utils.service';
@@ -56,6 +56,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
   private showSearch: boolean;
+  private rightClickPropertiesPanel: ContextMenuItem[];
+  @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
 
   //TODO:define interface types for mvs-data/data
   private data: any;
@@ -165,6 +167,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }
       }
+    ];
+    this.rightClickPropertiesPanel = [
+      { text: "Show/Hide Search", action:() => { 
+        this.toggleSearch();
+      }}
     ];
   }
 
@@ -355,6 +362,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   toggleSearch() {
     this.showSearch = !this.showSearch;
     if (this.showSearch) {
+      this.focusSearchInput();
       this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
     } else {
       if (this.dataCached) {
@@ -363,7 +371,23 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  focusSearchInput(attemptCount?: number): void {
+    if (this.searchInputMVS) {
+      this.searchInputMVS.nativeElement.focus();
+      return;
+    }
+    const maxAttempts = 10;
+    if (typeof attemptCount !== 'number') {
+      attemptCount = maxAttempts;
+    }
+    if (attemptCount > 0) {
+      attemptCount--;
+      setTimeout(() => this.focusSearchInput(attemptCount), 100);
+    }
+  }
+
   searchInputChanged(input: string) {
+    input = input.toUpperCase(); // Client-side the DS are uppercase
     if (this.dataCached) {
       this.data = _.cloneDeep(this.dataCached); 
     }
@@ -458,6 +482,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickedFile = node;
     this.rightClick.emit(event.node);
     event.originalEvent.preventDefault(); 
+  }
+
+  onPanelRightClick($event: any) {
+    if (this.windowActions) {
+      let didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, $event.clientY, this.rightClickPropertiesPanel, true);
+      // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
+      if (!didContextMenuSpawn) { // If context menu failed to spawn...
+        let heightAdjustment = $event.clientY - 25; // Bump it up 25px
+        didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
+      }
+    }
   }
 
   updateTreeView(path: string): void {

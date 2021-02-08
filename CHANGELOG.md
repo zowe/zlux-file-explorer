@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 0.8.0
+
+* Added a quick search that filters opened files, folders, and datasets (Alt + P)
+
 ## 0.7.0
 
 * Added refresh button to right click folder menu & file menu

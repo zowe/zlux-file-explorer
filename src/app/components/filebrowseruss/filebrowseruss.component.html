@@ -20,7 +20,7 @@
     *ngIf="showUpArrow">
   
   <div class="filebrowseruss-search" [ngStyle] = "searchStyle">
-    <input #fileExplorerUSSInput 
+    <input #pathInputUSS 
       [(ngModel)]="path" 
       list="searchUSSHistory" 
       placeholder="Enter an absolute path..."  
@@ -54,7 +54,7 @@
       placeholder="Search opened files/folders by name..." 
       class="filebrowseruss-search-bottom-input" 
       [formControl]="searchInputCtrl"
-      #searchInput>       
+      #searchInputUSS>       
   </div>
 </div>
 
