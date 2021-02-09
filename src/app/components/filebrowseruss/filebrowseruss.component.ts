@@ -591,6 +591,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     if (this.showSearch) {
       this.focusSearchInput();
       this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
+      if (this.searchInputCtrl.value) {
+        this.searchInputChanged(this.searchInputCtrl.value)
+      }
     } else {
       if (this.dataCached) {
         this.data = this.dataCached; // We don't care about deep clone because we just want to get dataCached back
