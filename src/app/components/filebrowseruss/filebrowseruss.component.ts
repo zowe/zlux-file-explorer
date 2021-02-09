@@ -14,7 +14,9 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
   Output, ViewEncapsulation, Inject, Optional, ViewChild
 } from '@angular/core';
+import { FormControl } from '@angular/forms'
 import { Observable, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
@@ -38,6 +40,8 @@ import { FilePermissionsModal } from '../file-permissions-modal/file-permissions
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
+import { FileTreeNode } from '../../structures/child-event';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'file-browser-uss',
@@ -51,29 +55,30 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //componentClass: ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities: Array<Capability>;
-  public hideExplorer: boolean;
 
-  private errorMessage: String;
-  private selectedItem: string;
+  public hideExplorer: boolean;
   private path: string;
   private root: string;
-  private newPath: string;
   private rightClickedFile: any;
-  private lastRightClickEvent: any;
+  private rightClickedEvent: any;
   public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
   private deletionQueue = new Map();
   private fileToCopyOrCut: any;
+  private showSearch: boolean;
+  private searchInputCtrl: any;
+  private searchInputValueSubscription: Subscription;
 
   //TODO:define interface types for uss-data/data
-  private data: TreeNode[];
+  private data: FileTreeNode[];
+  private dataCached: FileTreeNode[]; // Used for filtering against search bar
   private dataObject: UssDataObject;
-  private ussData: Observable<any>;
   private intervalId: any;
-  private updateInterval: number = 10000;//time represents in ms how fast tree updates changes from mainframe
-  @ViewChild('fileExplorerUSSInput') fileExplorerUSSInput: ElementRef;
+  private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
+  @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
+  @ViewChild('searchInputUSS') searchInputUSS: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -93,6 +98,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.data = []; // Main treeData array (the nodes the Explorer displays)
       this.hideExplorer = false;
       this.isLoading = false;
+      this.showSearch = false;
+      this.searchInputCtrl = new FormControl();
+      this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
+        debounceTime(500),
+      ).subscribe((value) => {this.searchInputChanged(value)});
   }
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -119,7 +129,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         response =>{
           this.log.debug("No errors");
         },
-        error => this.errorMessage = <any>error
+        error => {
+          this.log.debug(error);
+        }
       );
     }
   }
@@ -127,6 +139,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   ngOnInit() {
     this.loadUserHomeDirectory();
     this.initializeRightClickProperties();
+    // TODO: Uncomment & fix auto-update of node data based on an interval. Maybe future setting?
     // this.persistentDataService.getData()
     //   .subscribe(data => {
     //     if (data.contents.ussInput) {
@@ -145,6 +158,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+    this.searchInputValueSubscription.unsubscribe();
   }
 
   getDOMElement(): HTMLElement {
@@ -171,7 +185,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         },
         error => {
           this.isLoading = false;
-          this.errorMessage = <any>error;
+          this.log.warn("Unsuccessful in loading user home directory: ", error);
         }
       );
     setTimeout(() => {
@@ -234,6 +248,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     ];
 
     this.rightClickPropertiesPanel = [
+      { text: "Show/Hide Search", action:() => { 
+        this.toggleSearch();
+        
+      }},
       { text: "Create a Directory...", action:() => { 
         let nodeToUse = {
           path: this.path,
@@ -351,7 +369,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                       'Dismiss', longSnackbarOptions);
                   }
                   this.isLoading = false;
-                  this.errorMessage = <any>error;
+                  this.log.severe(error);
                 }
               );
             }else{
@@ -374,7 +392,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 'Dismiss', longSnackbarOptions);
               }
               this.isLoading = false;
-              this.errorMessage = <any>error;
+              this.log.severe(error);
           }
         );
 
@@ -392,7 +410,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             'Dismiss', defaultSnackbarOptions);
         }
         this.isLoading = false;
-        this.errorMessage = <any>error;
+        this.log.warn(error);
     });
   }
 
@@ -407,30 +425,36 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showRenameField(file: any) {
-    const selectedNode = this.lastRightClickEvent.originalEvent.srcElement;
+    const selectedNode = this.rightClickedEvent.originalEvent.srcElement;
     let oldName = file.name;
     let oldPath = file.path;
     file.selectable = false;
+
     let renameFn = (node: HTMLElement) => {
       renameField.parentNode.replaceChild(node, renameField);
       file.selectable = true;
       let nameFromNode = renameField.value;
-      let pathForRename:any;
-      pathForRename = (oldPath as String).split("/");
-      pathForRename.pop();
-      pathForRename = pathForRename.join('/');
+      let pathForRename = this.getPathFromPathAndName(oldPath);
       if(oldName != nameFromNode){
         let newPath = `${pathForRename}/${nameFromNode}`;
         this.ussSrv.renameFile(oldPath, newPath).subscribe(
           res => {
             this.snackBar.open("Renamed '" + oldName + "' to '" + nameFromNode + "'",
               'Dismiss', quickSnackbarOptions);
-            this.updateUss(this.path);
-            this.ussRenameEvent.emit(this.lastRightClickEvent.node); 
+            // this.updateUss(this.path); - We don't need to update the whole tree for 1 changed node (rename should be O(1) operation), 
+            // but if problems come up uncomment this
+            this.ussRenameEvent.emit(this.rightClickedEvent.node); 
+            if (this.showSearch) { // Update saved cache if we're using the search bar
+              let nodeCached = this.findNodeByPath(this.dataCached, file.path)[0];
+              if (nodeCached) {
+                nodeCached.label = nameFromNode;
+                nodeCached.path = newPath;
+                nodeCached.name = nameFromNode;
+              }
+            }
             file.label = nameFromNode;
             file.path = newPath;
             file.name = nameFromNode;
-            //this.updateUss(this.path);
             return;
           },
           error => {
@@ -444,7 +468,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               this.snackBar.open("Failed to rename '" + file.path + "'. Error: " + error._body, 
               'Dismiss', longSnackbarOptions);
             }
-            this.errorMessage = <any>error;
+            this.log.severe(error);
             return;
           }
         );
@@ -518,7 +542,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       this.deleteFileOrFolder(rightClickedFile);
-      this.deleteClick.emit(this.lastRightClickEvent.node);
+      this.deleteClick.emit(this.rightClickedEvent.node);
     });
   }
 
@@ -544,7 +568,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
-      this.newFolderClick.emit(this.lastRightClickEvent.node);
+      this.newFolderClick.emit(this.rightClickedEvent.node);
     });
   }
   
@@ -560,6 +584,37 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.addChild(rightClickedFile, true);
       }
     });
+  }
+
+  toggleSearch() {
+    this.showSearch = !this.showSearch;
+    if (this.showSearch) {
+      this.focusSearchInput();
+      this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
+      if (this.searchInputCtrl.value) {
+        this.searchInputChanged(this.searchInputCtrl.value)
+      }
+    } else {
+      if (this.dataCached) {
+        this.data = this.dataCached; // We don't care about deep clone because we just want to get dataCached back
+      }
+    }
+  }
+  
+  // TODO: There's an app2app opportunity here, where an app using the File Tree could spawn with a pre-filtered list of nodes
+  focusSearchInput(attemptCount?: number): void {
+    if (this.searchInputUSS) {
+      this.searchInputUSS.nativeElement.focus();
+      return;
+    }
+    const maxAttempts = 10;
+    if (typeof attemptCount !== 'number') {
+      attemptCount = maxAttempts;
+    }
+    if (attemptCount > 0) {
+      attemptCount--;
+      setTimeout(() => this.focusSearchInput(attemptCount), 100);
+    }
   }
 
   // onNewFileClick($event: any): void {
@@ -610,7 +665,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.rightClickedFile = node;
-    this.lastRightClickEvent = $event;
+    this.rightClickedEvent = $event;
     this.rightClick.emit($event.node);
     $event.originalEvent.preventDefault(); 
   }
@@ -653,16 +708,18 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       path = this.root; 
     }
     if (path === '') {
-      this.log.warn("Please enter a valid path. For example: '/'");
+      this.snackBar.open("Please enter a valid path. For example: '/'", 
+              'Dismiss', quickSnackbarOptions);
       this.data = [];
+      this.dataCached = [];
       return;
     }
     this.isLoading = true;
-    this.ussData = this.ussSrv.getFile(path); 
-    this.ussData.subscribe(
+    let ussData = this.ussSrv.getFile(path); 
+    ussData.subscribe(
     files => {
       files.entries.sort(this.sortFn);
-      const tempChildren: TreeNode[] = [];
+      const tempChildren: FileTreeNode[] = [];
       for (let i: number = 0; i < files.entries.length; i++) {
         if (files.entries[i].directory) {
           files.entries[i].children = [];
@@ -683,9 +740,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       if (update == true) {//Tree is displayed to update existing opened nodes, while maintaining currently opened trees 
 
         let indexArray: number[];
-        let dataArray: TreeNode[];//represents the working TreeNode[] that will eventually be added to tempChildren and make up the tree
-        let networkArray: TreeNode[];//represents the TreeNode[] obtained from the uss server, will iteratively replace dataArray as need be
-        let parentNode: TreeNode;
+        let dataArray: FileTreeNode[];//represents the working FileTreeNode[] that will eventually be added to tempChildren and make up the tree
+        let networkArray: FileTreeNode[];//represents the FileTreeNode[] obtained from the uss server, will iteratively replace dataArray as need be
+        let parentNode: FileTreeNode;
         indexArray = [0];
         dataArray = this.data;
         networkArray = tempChildren;
@@ -737,6 +794,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.log.debug("Tree has been updated.");
       this.log.debug(tempChildren);
       this.data = tempChildren;
+      if (this.showSearch) {
+        this.dataCached = this.data; // TODO: Implement logic to update tree of search queried results (so reverting the search filter doesn't fail)
+        if (!update) { // When a fresh tree is requested, it will get rid of this.data search queried results, so hide search bar
+          this.showSearch = false;
+        }
+      }
       this.path = path;
       this.onPathChanged(this.path);
 
@@ -754,8 +817,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         if (error.status == '403') { //Permission denied
           this.snackBar.open('Failed to open: Permission denied.', 
           'Dismiss', defaultSnackbarOptions);
+        } else if (error.status == '0') {
+          this.snackBar.open("Failed to communicate with the App server: " + error.status, 
+              'Dismiss', defaultSnackbarOptions);
+        } else if (error.status == '404') {
+          this.snackBar.open("File/folder not found. " + error.status, 
+              'Dismiss', quickSnackbarOptions);
+        } else {
+          this.snackBar.open("An unknown error occurred: " + error.status, 
+              'Dismiss', defaultSnackbarOptions);
         }
-        this.errorMessage = <any>error;
+        this.log.severe(error);
       }
     );
     this.refreshHistory(this.path);
@@ -784,14 +856,20 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       else {
         node.expanded = true;
       }
+      if (this.showSearch) { // Update node in cached data as well
+        let nodeCached = this.findNodeByPath(this.dataCached, path)[0];
+        if (nodeCached) {
+          nodeCached.expanded = node.expanded;
+        }
+      }
     } 
     else //When the selected node has no children or we want to fetch new data
     {
       this.refreshFile(node);
       node.expanded = expand !== undefined ? expand : true;
-      this.ussData = this.ussSrv.getFile(path);
-      let tempChildren: TreeNode[] = [];
-      this.ussData.subscribe(
+      let ussData = this.ussSrv.getFile(path);
+      let tempChildren: FileTreeNode[] = [];
+      ussData.subscribe(
         files => {
           files.entries.sort(this.sortFn);
           //TODO: Could be turned into a util service...
@@ -832,6 +910,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           }
           if (index != -1) {
             this.data[index] = node;
+            if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
+              index = -1; // which may be in a different index due to filtering by search query
+              for (let i: number = 0; i < this.dataCached.length; i++) { // We could use this.findNodeByPath, but we need search only parent level
+                if (this.dataCached[i].label == node.label) {
+                  index = i; break;
+                }
+              }
+              if (index != -1) {
+                this.dataCached[index] = node;
+              } else {
+                this.log.debug("Though node added in working directory, failed to find index in cached data");
+              }
+            }
             // this.persistentDataService.getData()
             //   .subscribe(data => {
             //     this.dataObject = data.contents;
@@ -888,20 +979,45 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       ); 
   }
 
-  updateUss(path: string): void {
-    this.displayTree(path, true);
+  searchInputChanged(input: string) {
+    if (this.dataCached) {
+      this.data = _.cloneDeep(this.dataCached); 
+    }
+    this.filterNodesByLabel(this.data, input);
   }
 
-  addFile(): void {
-    this.log.debug('add:' + this.selectedItem);
-    this.ussSrv.saveFile(this.checkPath(this.newPath), '')
-      .subscribe(
-        resp => {
-          this.updateUss(this.path);
-          this.newPath = '';
-        },
-        error => this.errorMessage = <any>error
-      );
+  filterNodesByLabel(data: any, label: string) {
+    for (let i = 0; i < data.length; i++) {
+      if (!(data[i]).label.includes(label)) {
+        if (data[i].children && data[i].children.length > 0) {
+          this.filterNodesByLabel(data[i].children, label);
+        }
+        if (!(data[i].children && data[i].children.length > 0)) {
+          data.splice(i, 1);
+          i--;
+        } else if (data[i].data = "Folder") { // If some children didn't get filtered out (aka we got some matches) and we have a folder
+        // then we want to expand the node so the user can see their results in the search bar
+          data[i].expanded = true;
+        }
+      }
+    }
+  }
+
+  // TODO: Could be optimized to do breadth first search vs depth first search
+  findNodeByPath(data: any, path: string) {
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].path == path) {
+        return [data[i], i]; // 0 - node, 1 - index
+      }
+      if (data[i].children && data[i].children.length > 0) {
+        return this.findNodeByPath(data[i].children, path);
+      }
+    }
+    return [null, null];
+  }
+
+  updateUss(path: string): void {
+    this.displayTree(path, true);
   }
 
   createFolder(pathAndName: string, node: any, update: boolean): void {
@@ -933,6 +1049,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   size: result.size
                 }
                 node.children.push(nodeToAdd); //Add node to right clicked node
+                if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
+                  let nodeCached = this.findNodeByPath(this.dataCached, node.path)[0];
+                  if (nodeCached) {
+                    nodeCached.children.push(nodeToAdd);
+                  }
+                }
               }
               // ..otherwise treat folder creation without any context.
               else {
@@ -940,10 +1062,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   this.displayTree(path, true);
                 } else if (update) { // If we want to update the tree
                   this.addChild(node);
-                } else { // If we want a fresh fetch of the tree
+                } else { // If we are creating a new folder in a location we're not looking at
                   this.displayTree(pathAndName, false); // ...plop the Explorer into the newly created location.
                 }
-                this.newPath = pathAndName;
               }
             }
           ); 
@@ -953,30 +1074,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             this.snackBar.open("Failed to create directory: '" + pathAndName + "' This is probably due to a server agent problem.", 
             'Dismiss', defaultSnackbarOptions);
           }
-          this.errorMessage = <any>error; 
+          this.log.severe(error);
         }
-      );
-  }
-
-  copy(): void {
-    this.log.debug('copy:' + this.selectedItem);
-    this.ussSrv.copyFile(this.selectedItem, this.checkPath(this.newPath))
-      .subscribe(
-        resp => {
-          this.updateUss(this.path);
-        },
-        error => this.errorMessage = <any>error
-      );
-  }
-
-  delete(e: EventTarget): void {
-    this.ussSrv.deleteFileOrFolder(this.selectedItem)
-      .subscribe(
-        resp => {
-          this.log.debug('Deleted: ' + this.selectedItem);
-          this.updateUss(this.path);
-        },
-        error => this.errorMessage = <any>error
       );
   }
 
@@ -1015,7 +1114,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.deletionQueue.delete(rightClickedFile.path);
         this.isLoading = false;
         rightClickedFile.styleClass = "";
-        this.errorMessage = <any>error;
+        this.log.severe(error);
       }
     );
 
@@ -1037,18 +1136,29 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       children = this.data; // ...just use the UI nodes as our children
     }
 
-    let length = children.length;
-    let i = 0;
-    while (i < length) {
-      if (children[i] && (children[i].path == node.path) && (children[i].name == node.name)) { // If we catch the node we wanted to remove,
-        children.splice(i, 1); // ...remove it
-        if (node.parent && node.parent.children) { // Update the children to no longer include removed node
-          node.parent.children = children;
-        } else {
-          this.data = children;
+    let nodeData = this.findNodeByPath(children, node.path);
+    if (nodeData) { // If we catch the node we wanted to remove,
+      let nodeObj = nodeData[0];
+      let nodeIndex = nodeData[1];
+      children.splice(nodeIndex, 1); // ...remove it
+      if (node.parent && node.parent.children) { // Update the children to no longer include removed node
+        node.parent.children = children;
+      } else {
+        this.data = children;
+      }
+    }
+
+    if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
+      let nodeDataCached = this.findNodeByPath(this.dataCached, node.path);
+      if (nodeDataCached) {
+        let nodeCached = nodeDataCached[0];
+        let indexCached = nodeDataCached[1];
+        if (nodeCached.parent) {
+          if (indexCached != -1) {
+            nodeCached.parent.children.splice(indexCached, 1);
+          }
         }
       }
-      i++;
     }
   }
 
@@ -1096,7 +1206,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   checkPathSlash(event: any) {
     if (this.path == "") {
       this.path = "/";
-      this.fileExplorerUSSInput.nativeElement.value="/";
+      this.pathInputUSS.nativeElement.value="/";
     }
   }
 

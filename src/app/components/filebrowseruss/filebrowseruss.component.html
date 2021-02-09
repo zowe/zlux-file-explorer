@@ -20,7 +20,7 @@
     *ngIf="showUpArrow">
   
   <div class="filebrowseruss-search" [ngStyle] = "searchStyle">
-    <input #fileExplorerUSSInput 
+    <input #pathInputUSS 
       [(ngModel)]="path" 
       list="searchUSSHistory" 
       placeholder="Enter an absolute path..."  
@@ -46,6 +46,15 @@
       (rightClickEvent)="onNodeRightClick($event)"
       (panelRightClickEvent)="onPanelRightClick($event)"
     ></tree-root>
+  </div>
+
+  <div class="ui-inputgroup filebrowseruss-search-bottom-group" *ngIf="showSearch">
+    <span class="ui-inputgroup-addon"><i class="fa fa-search filebrowseruss-search-bottom-icon"></i></span>
+    <input type="text" pInputText 
+      placeholder="Search opened files/folders by name..." 
+      class="filebrowseruss-search-bottom-input" 
+      [formControl]="searchInputCtrl"
+      #searchInputUSS>       
   </div>
 </div>
 

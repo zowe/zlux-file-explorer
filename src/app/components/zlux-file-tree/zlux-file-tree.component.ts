@@ -20,7 +20,7 @@ import {
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
@@ -64,6 +64,10 @@ import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-prop
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
+import { KeybindingService } from '../../services/keybinding.service';
+import { InputTextModule } from 'primeng/inputtext';
+import { KeyCode } from '../../services/keybinding.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -75,9 +79,10 @@ import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.compo
 
 export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
-  currentIndex: number;
-  tabs: Array<tab>;
-  showUpArrow: boolean;
+  private currentIndex: number;
+  private tabs: Array<tab>;
+  private showUpArrow: boolean;
+  private keyBindingSub: Subscription = new Subscription();
 
   @ViewChild(FileBrowserUSSComponent)
   private ussComponent: FileBrowserUSSComponent;
@@ -85,9 +90,14 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserMVSComponent)
   private mvsComponent: FileBrowserMVSComponent;
 
+  @ViewChild('fileExplorerGlobal')
+  fileExplorerGlobal: ElementRef<any>;
+
   constructor(/*private persistentDataService: PersistentDataService,*/
-    private utils: UtilsService, private elemRef: ElementRef,
-    private cd: ChangeDetectorRef)
+    private utils: UtilsService, 
+    private elemRef: ElementRef,
+    private cd: ChangeDetectorRef,
+    private appKeyboard: KeybindingService)
   {
     //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
@@ -183,7 +193,16 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
         this.treeStyle = {'filter': 'brightness(3)', 'color':'white'};
          break; 
       } 
-   } 
+    }
+    const fileExplorerGlobalElement = this.fileExplorerGlobal.nativeElement;
+    this.appKeyboard.registerKeyUpEvent(fileExplorerGlobalElement);
+    this.appKeyboard.registerKeyDownEvent(fileExplorerGlobalElement); 
+    this.keyBindingSub.add(this.appKeyboard.keydownEvent
+      .subscribe((event) => {
+        if (event.which === KeyCode.KEY_P && !event.ctrlKey) {
+          this.toggleSearch();
+        }
+    }));
   }
 
   ngOnDestroy() {
@@ -225,6 +244,14 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
     if (this.mvsComponent) {
       this.mvsComponent.hideExplorer = true;
+    }
+  }
+
+  toggleSearch() {
+    if (this.currentIndex == 0) {
+      this.ussComponent.toggleSearch();
+    } else {
+      this.mvsComponent.toggleSearch();
     }
   }
 
@@ -369,7 +396,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     MatTooltipModule,
     MatAutocompleteModule,
     ZluxTabbingModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    InputTextModule,
+    ReactiveFormsModule
   ],
   exports: [ZluxFileTreeComponent],
   entryComponents: [
@@ -382,6 +411,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DeleteFileModal,
     CreateFolderModal,
   ],
+  providers: [
+    KeybindingService
+  ]
 })
 export class ZluxFileTreeModule { }
 

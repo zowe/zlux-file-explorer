@@ -12,11 +12,10 @@
 
 import {TreeNode} from 'primeng/primeng';
 
-export class childEvent{ 
+export class FileTreeNode implements TreeNode { 
   public label: string;
-  public fileFolderType:'folder' | 'file';
-  public children: TreeNode[];
-  public parent: TreeNode;
+  public children: FileTreeNode[];
+  public parent: FileTreeNode;
   public path: string;
   public size: number;
   public type: string;
@@ -24,6 +23,7 @@ export class childEvent{
   public expanded: boolean;
   public expandedIcon: any;
   public collapsedIcon: any;
+  public data: 'Folder' | 'File';
 
   toJSON() {
     return {
