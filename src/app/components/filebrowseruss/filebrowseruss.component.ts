@@ -1100,7 +1100,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           this.snackBar.open("Failed to delete '" + pathAndName + "' Server returned with: " + error._body, 
           'Dismiss', longSnackbarOptions);
         } else if (error.status == '404') { //Not Found
-          this.snackBar.open("Failed to delete '" + pathAndName + ' Already been deleted or does not exist.', 
+          this.snackBar.open("Failed to delete '" + pathAndName + "'. Already been deleted or does not exist.", 
           'Dismiss', defaultSnackbarOptions);
           this.removeChild(rightClickedFile);
         } else if (error.status == '400' || error.status == '403') { //Bad Request
