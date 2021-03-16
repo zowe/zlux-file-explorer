@@ -35,7 +35,7 @@
     </datalist>
   </div>
   <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading" style="margin-left: 9px;"></div>
-  <div class="fa fa-refresh filebrowseruss-loading-icon" (click)="displayTree(path, false);" [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
+  <div class="fa fa-refresh filebrowseruss-loading-icon" title="Refresh whole directory" (click)="displayTree(path, false);" [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
 
   <!-- Main tree -->
   <div [hidden]="hideExplorer" style="height: 100%;">

@@ -506,6 +506,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       if (error.status == '0') {
         this.snackBar.open("Failed to communicate with the App server: " + error.status, 
             'Dismiss', defaultSnackbarOptions);
+      } else if (error.status == '400' && path == '') {
+        this.snackBar.open("No dataset name specified: " + error.status, 
+            'Dismiss', defaultSnackbarOptions);
+      } else if (error.status == '400') {
+        this.snackBar.open("Bad request: " + error.status, 
+            'Dismiss', defaultSnackbarOptions);
       } else {
         this.snackBar.open("An unknown error occurred: " + error.status, 
             'Dismiss', defaultSnackbarOptions);
