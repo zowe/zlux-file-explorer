@@ -79,6 +79,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
   @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
   @ViewChild('searchInputUSS') searchInputUSS: ElementRef;
+  @ViewChild('invisibleFileDialog') invisibleFileDialog: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -239,6 +240,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Create a Directory...", action:() => { 
         this.showCreateFolderDialog(this.rightClickedFile);
       }},
+      { text: "Upload...", action:() => { 
+        this.showUploadDialog(this.rightClickedFile);
+      }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Rename", action:() => {
@@ -258,7 +262,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         }
         this.showCreateFolderDialog(nodeToUse);
         
-      }}
+      }},
+      { text: "Upload...", action:() => { 
+        this.showUploadDialog(this.rightClickedFile);
+      }},
     ];
   }
 
@@ -570,6 +577,24 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
       this.newFolderClick.emit(this.rightClickedEvent.node);
     });
+  }
+
+  showUploadDialog(rightClickedFile: any) {
+    if (rightClickedFile && rightClickedFile.path) { // If this came from a node object
+      // console.log("Upload into path: ", rightClickedFile.path);
+    } else { // Or if this is just a path
+      // console.log("Upload into path: ", this.getSelectedPath());
+    }
+
+    if (this.invisibleFileDialog) {
+      this.invisibleFileDialog.nativeElement.click();
+    }
+  }
+
+  onFileUploaded(event: any) {
+    // TODO: Hook up back-end upload
+    let file = event.target.files[0];
+    // console.log(file);
   }
   
   showTaggingDialog(rightClickedFile: any) {

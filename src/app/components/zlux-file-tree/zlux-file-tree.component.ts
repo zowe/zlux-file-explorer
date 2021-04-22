@@ -120,6 +120,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
         : this.ussComponent.showDeleteDialog(data);
     } else if (type == 'createFolder' && !isDataset) {
       this.ussComponent.showCreateFolderDialog(data);
+    } else if (type == 'requestUpload' && !isDataset) {
+      this.ussComponent.showUploadDialog(data);
     }
   }
 
@@ -328,6 +330,14 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     this.currentIndex = 0;
     if (this.ussComponent) {
       this.ussComponent.hideExplorer = false;
+    }
+  }
+
+  spawnUploadModal() {
+    if (this.ussComponent) {
+      this.ussComponent.showUploadDialog(null);
+    } else {
+      // ... Disabled for DS mode for now
     }
   }
 

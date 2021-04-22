@@ -56,6 +56,9 @@
       [formControl]="searchInputCtrl"
       #searchInputUSS>       
   </div>
+
+  <input type="file" style="display: none" #fileUpload (change)="onFileUploaded($event)">
+    <button (click)="fileUpload.click()" #invisibleFileDialog>Open File Dialog</button>
 </div>
 
 <!-- 
