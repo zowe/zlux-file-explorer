@@ -11,7 +11,8 @@
 <zlux-tab-trap></zlux-tab-trap>
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <mat-icon style="font-size: 30px; position: absolute;">cloud_upload</mat-icon>
-<h2 mat-dialog-title class="create-folder-content-body">Upload Files</h2>
+<!-- Intentional lazy recycling of "create" modal CSS, TODO: move to shared/modal css -->
+<h2 mat-dialog-title class="modal-content-body">Upload Files</h2>
 
   <button mat-button class="modal-mat-button add" (click)="addFile()">Add +</button>
 
