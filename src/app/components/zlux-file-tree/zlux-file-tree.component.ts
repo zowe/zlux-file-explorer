@@ -68,6 +68,8 @@ import { KeybindingService } from '../../services/keybinding.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { KeyCode } from '../../services/keybinding.service';
 import { Subscription } from 'rxjs';
+import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
+import { UploaderService } from '../../services/uploader.service';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -385,6 +387,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
+    UploadModal,
     TreeComponent],
   imports: [
     CommonModule, 
@@ -420,9 +423,11 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
+    UploadModal
   ],
   providers: [
-    KeybindingService
+    KeybindingService,
+    UploaderService
   ]
 })
 export class ZluxFileTreeModule { }

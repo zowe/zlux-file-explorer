@@ -36,6 +36,7 @@ import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
@@ -570,8 +571,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       width: '600px'
     }
 
-    let fileDeleteRef:MatDialogRef<CreateFolderModal>  = this.dialog.open(CreateFolderModal, folderCreateConfig);
-    const createFolder = fileDeleteRef.componentInstance.onCreate.subscribe(onCreateResponse => {
+    let fileCreateRef:MatDialogRef<CreateFolderModal>  = this.dialog.open(CreateFolderModal, folderCreateConfig);
+    const createFolder = fileCreateRef.componentInstance.onCreate.subscribe(onCreateResponse => {
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
@@ -586,9 +587,27 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       // console.log("Upload into path: ", this.getSelectedPath());
     }
 
-    if (this.invisibleFileDialog) {
-      this.invisibleFileDialog.nativeElement.click();
+    const folderUploadConfig = new MatDialogConfig();
+    folderUploadConfig.data = {
+      event: rightClickedFile || this.path,
+      width: '600px'
     }
+
+    let fileUploadRef:MatDialogRef<UploadModal>  = this.dialog.open(UploadModal, folderUploadConfig);
+    const upload = fileUploadRef.componentInstance.onUpload.subscribe(onUploadResponse => {
+      if (rightClickedFile && rightClickedFile.path && rightClickedFile.path != this.path) {
+        this.refreshFile(rightClickedFile);
+      } else {
+        this.displayTree(this.path, false);
+      }
+      // if (this.invisibleFileDialog) {
+      //   this.invisibleFileDialog.nativeElement.click();
+      // }
+      // /* pathAndName - Path and name obtained from create folder prompt
+      // updateExistingTree - Should the existing tree update or fetch a new one */
+      // this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
+      // this.newFolderClick.emit(this.rightClickedEvent.node);
+    });
   }
 
   onFileUploaded(event: any) {
