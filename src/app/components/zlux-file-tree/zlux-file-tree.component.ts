@@ -108,6 +108,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   }
 
   @Input() set spawnModal(typeAndData:any) {
+    if (typeAndData == undefined) {
+      return;
+    }
     let type = typeAndData.type;
     let data = typeAndData.data;
     let isDataset = data.volser ? true : false;
@@ -139,6 +142,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
   // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
@@ -281,6 +285,10 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
 
   onNewFolderClick($event:any){
     this.newFolderClick.emit($event);
+  }
+
+  onFileUploaded($event:any){
+    this.fileUploaded.emit($event);
   }
 
   onNodeClick($event:any){

@@ -11,11 +11,15 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { longSnackbarOptions } from '../shared/snackbar-options';
+import { MatSnackBar } from '@angular/material';
 
 @Injectable()
 export class UploaderService {
     constructor(private http: HttpClient, 
-        @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) { }
+        @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+        private snackBar: MatSnackBar) { }
 
     // uploadDirPath should be a directory on the remote server without a / at the end.
     // Example: '/u/ts6531'
@@ -32,7 +36,7 @@ export class UploaderService {
                 const uri = ZoweZLUX.uriBroker.unixFileUri('contents', uploadDirPath.slice(1) + '/' + file.name,
                 sourceEncoding, targetEncoding, undefined, true);
 
-                console.table({'URI': uri, 'File Name': file.name, 'File Size': fileSize, 'Chunk Size': chunkSize});
+                //console.table({'URI': uri, 'File Name': file.name, 'File Size': fileSize, 'Chunk Size': chunkSize}); - easy to see, useful for dev
 
                 // Initiate connection with the zssServer
                 const getSessionID = () => {
@@ -70,7 +74,7 @@ export class UploaderService {
                             this.log.debug('Sending last chunk');
                         }
 
-                        // console.table({'offset': offset, 'fileSize': fileSize, 'progress': offset / fileSize});
+                        // console.table({'offset': offset, 'fileSize': fileSize, 'progress': offset / fileSize}); - easy to see, useful for dev
                         observer.next(offset / fileSize);
 
                         const commaIdx = event.target.result.indexOf(',');
@@ -110,6 +114,8 @@ export class UploaderService {
                         sessionID = response['sessionID'];
                         chunkReaderBlock(offset, chunkSize, file);
                     }, (error: any) => {
+                        this.snackBar.open(("An error occurred while uploading " + file.name + " - " + error.error.error),
+          'Dismiss', longSnackbarOptions);
                         this.log.debug(error);
                     });
             }

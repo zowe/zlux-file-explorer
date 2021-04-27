@@ -11,7 +11,7 @@
 import { Component, Inject, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
 import { UploaderService } from '../../services/uploader.service';
-import { defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
+import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'upload-files-modal',
@@ -196,7 +196,6 @@ export class UploadModal {
     this.files = new Array<File>();
     this.fileEncodings = new Array<string>(); 
     this.filteredOptions = this.fileEncodings;
-    this.selectedOption = this.encodings[0].value;
   }
 
   addFile() {
@@ -234,9 +233,7 @@ export class UploadModal {
           .subscribe(
             value => { // TODO: Future upload progress bar
             },
-            error => { // TODO: This doesn't actually work, need to reformat network request
-              this.snackBar.open(("An error occurred uploading " + file.name + error),
-          'Dismiss', longSnackbarOptions);
+            error => { // Error caught upstream in service
             },
             () => {
               this.onUpload.emit();

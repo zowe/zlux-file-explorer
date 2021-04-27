@@ -12,9 +12,9 @@
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <mat-icon style="font-size: 30px; position: absolute;">cloud_upload</mat-icon>
 <!-- Intentional lazy recycling of "create" modal CSS, TODO: move to shared/modal css -->
-<h2 mat-dialog-title class="modal-content-body">Upload Files</h2>
+<h2 mat-dialog-title class="modal-content-body">Upload Files in {{folderPath}}</h2>
 
-  <button mat-button class="modal-mat-button add" (click)="addFile()">Add +</button>
+  <button mat-button class="modal-mat-button add" (click)="addFile()">Select File</button>
 
   <div style="max-height: 400px; overflow-y:scroll;">
     <ul>
@@ -29,6 +29,7 @@
                 [matAutocomplete]="auto"
                 [errorStateMatcher]="matcher"
                 #encodingInput="ngModel"
+                placeholder="Select target encoding"
               >
               <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
                 <mat-option *ngFor="let option of encodings" [value]="option.value">
@@ -39,6 +40,9 @@
                 Encoding is required
               </mat-error>
             </mat-form-field>
+            <a href="https://www.ibm.com/docs/en/zos/2.1.0?topic=ccsids-encoding-scheme" target="_blank">
+              <i class="fa fa-question-circle dataset-properties-question-circle"></i>
+            </a>
         </li>
     </ul>
 </div>

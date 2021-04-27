@@ -112,6 +112,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -590,8 +591,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     const upload = fileUploadRef.componentInstance.onUpload.subscribe(onUploadResponse => {
       if (rightClickedFile && rightClickedFile.path && rightClickedFile.path != this.path) {
         this.refreshFile(rightClickedFile);
+        this.fileUploaded.emit(this.rightClickedEvent.node.path);
       } else {
         this.displayTree(this.path, false);
+        this.fileUploaded.emit(this.path);
       }
     });
   }
