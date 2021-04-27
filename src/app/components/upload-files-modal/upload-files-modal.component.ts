@@ -249,11 +249,6 @@ export class UploadModal {
       uploadFiles();
   }
 
-  private filter(options: any[], value: string): any[] {
-    const filterValue = value.toLowerCase();
-    return options.filter(option => option.name.toLowerCase().includes(filterValue));
-  }
-
 }
 
 /*

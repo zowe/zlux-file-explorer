@@ -8,13 +8,14 @@
   Copyright Contributors to the Zowe Project.
 */
 
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class UploaderService {
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, 
+        @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger) { }
 
     // uploadDirPath should be a directory on the remote server without a / at the end.
     // Example: '/u/ts6531'
@@ -66,7 +67,7 @@ export class UploaderService {
                         if (offset >= fileSize) {
                             offset = fileSize;
                             lastChunk = true;
-                            console.log('Sending last chunk');
+                            this.log.debug('Sending last chunk');
                         }
 
                         // console.table({'offset': offset, 'fileSize': fileSize, 'progress': offset / fileSize});
@@ -77,7 +78,7 @@ export class UploaderService {
                         sendChunk(event.target.result.slice(commaIdx + 1), lastChunk, sessionID)
                             .subscribe(
                                 (response: any) => { // successful PUT
-                                    console.log('Chunk sent - chunkIdx:', chunkIdx, ', offset:', offset);
+                                    this.log.debug('Chunk sent - chunkIdx:', chunkIdx, ', offset:', offset);
                                     if (offset < fileSize) {
                                         chunkReaderBlock(offset, chunkSize, file);
                                         chunkIdx++;
@@ -86,12 +87,12 @@ export class UploaderService {
                                     }
                                 },
                                 (error: any) => {
-                                    console.log(error);
+                                    this.log.debug(error);
                                     observer.error();
                                 }
                             );
                     } else {
-                        console.log('Read Error: ' + event.target.error);
+                        this.log.debug('Read Error: ' + event.target.error);
                         return;
                     }
                 };
@@ -109,7 +110,7 @@ export class UploaderService {
                         sessionID = response['sessionID'];
                         chunkReaderBlock(offset, chunkSize, file);
                     }, (error: any) => {
-                        console.log(error);
+                        this.log.debug(error);
                     });
             }
         );
