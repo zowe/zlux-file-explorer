@@ -8,35 +8,12 @@
   
   Copyright Contributors to the Zowe Project.
 -->
-<zlux-tab-trap hiddenIds="createfolderclearicon1,createfolderclearicon2" hiddenPos="2,4"></zlux-tab-trap>
+<zlux-tab-trap></zlux-tab-trap>
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <mat-icon style="font-size: 30px; position: absolute;">cloud_upload</mat-icon>
-<!-- <i class="{{fileIcon}}" style="font-size: 30px;position: absolute;margin-top: 2px;margin-left: 3px;color: #000000;"></i> -->
 <h2 mat-dialog-title class="create-folder-content-body">Upload Files</h2>
 
-<!-- <mat-dialog-content style="padding-top: 30px;">
-  Directory name:
-  <mat-form-field style="margin-left: 15px;">
-    <input id="create-directory-input" name="name" [pattern]="folderPattern" matInput type="text"
-      [(ngModel)]="folderName">
-    <button class="create-folder-clear-button" mat-button *ngIf="folderName" matSuffix mat-icon-button aria-label="Clear" (click)="folderName=''">
-      <mat-icon class="create-folder-clear-icon">close</mat-icon>
-    </button>
-  </mat-form-field>
-</mat-dialog-content>
-
-<mat-dialog-content>
-  Path:
-  <mat-form-field style="margin-left: 80px;">
-    <input id="create-path-input" [pattern]="empty" matInput type="text"
-      [(ngModel)]="folderPath">
-    <button class="create-folder-clear-button" mat-button *ngIf="folderPath" matSuffix mat-icon-button aria-label="Clear" (click)="folderPath=''">
-      <mat-icon class="create-folder-clear-icon">close</mat-icon>
-    </button>
-  </mat-form-field>
-</mat-dialog-content> -->
-
-  <button mat-button class="modal-mat-button add" (click)="doSomethingElse()">Add +</button>
+  <button mat-button class="modal-mat-button add" (click)="addFile()">Add +</button>
 
   <div style="max-height: 400px; overflow-y:scroll;">
     <ul>
@@ -64,7 +41,6 @@
         </li>
     </ul>
 </div>
-  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
 
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="modal-mat-button cancel">Cancel</button>

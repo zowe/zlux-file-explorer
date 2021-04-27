@@ -199,7 +199,7 @@ export class UploadModal {
     this.selectedOption = this.encodings[0].value;
   }
 
-  doSomethingElse() {
+  addFile() {
     if (this.fileUpload) {
       this.fileUpload.nativeElement.click();
     }

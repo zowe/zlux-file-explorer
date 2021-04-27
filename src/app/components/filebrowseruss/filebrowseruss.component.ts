@@ -80,7 +80,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
   @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
   @ViewChild('searchInputUSS') searchInputUSS: ElementRef;
-  @ViewChild('invisibleFileDialog') invisibleFileDialog: ElementRef;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -581,12 +580,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   showUploadDialog(rightClickedFile: any) {
-    if (rightClickedFile && rightClickedFile.path) { // If this came from a node object
-      // console.log("Upload into path: ", rightClickedFile.path);
-    } else { // Or if this is just a path
-      // console.log("Upload into path: ", this.getSelectedPath());
-    }
-
     const folderUploadConfig = new MatDialogConfig();
     folderUploadConfig.data = {
       event: rightClickedFile || this.path,
@@ -600,20 +593,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       } else {
         this.displayTree(this.path, false);
       }
-      // if (this.invisibleFileDialog) {
-      //   this.invisibleFileDialog.nativeElement.click();
-      // }
-      // /* pathAndName - Path and name obtained from create folder prompt
-      // updateExistingTree - Should the existing tree update or fetch a new one */
-      // this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
-      // this.newFolderClick.emit(this.rightClickedEvent.node);
     });
-  }
-
-  onFileUploaded(event: any) {
-    // TODO: Hook up back-end upload
-    let file = event.target.files[0];
-    // console.log(file);
   }
   
   showTaggingDialog(rightClickedFile: any) {
