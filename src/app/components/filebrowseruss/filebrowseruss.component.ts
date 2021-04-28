@@ -205,7 +205,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
       { text: "Refresh Metadata", action:() => { 
-        this.refreshFile(this.rightClickedFile);
+        this.refreshFileMetadata(this.rightClickedFile);
       }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
@@ -892,7 +892,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     } 
     else //When the selected node has no children or we want to fetch new data
     {
-      this.refreshFile(node);
+      this.refreshFileMetadata(node);
       node.expanded = expand !== undefined ? expand : true;
       let ussData = this.ussSrv.getFile(path);
       let tempChildren: FileTreeNode[] = [];
@@ -966,7 +966,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  refreshFile(node: any) {
+  refreshFileMetadata(node: any) {
     let path = node.path;
     let someData = this.ussSrv.getFileMetadata(path);
       someData.subscribe(
