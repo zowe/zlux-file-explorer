@@ -590,7 +590,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let fileUploadRef:MatDialogRef<UploadModal>  = this.dialog.open(UploadModal, folderUploadConfig);
     const upload = fileUploadRef.componentInstance.onUpload.subscribe(onUploadResponse => {
       if (rightClickedFile && rightClickedFile.path && rightClickedFile.path != this.path) {
-        this.refreshFile(rightClickedFile);
+        this.addChild(rightClickedFile, true);
         this.fileUploaded.emit(this.rightClickedEvent.node.path);
       } else {
         this.displayTree(this.path, false);
