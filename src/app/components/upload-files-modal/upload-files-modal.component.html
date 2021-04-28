@@ -26,6 +26,7 @@
             <mat-form-field appearance="standard" style="margin-left: 36px;">
               <input matInput required type="text"
                 [(ngModel)]="selectedOption"
+                (ngModelChange)="onValueChange($event)"
                 [matAutocomplete]="auto"
                 [errorStateMatcher]="matcher"
                 #encodingInput="ngModel"
@@ -49,7 +50,7 @@
 
 <mat-dialog-actions>
   <button mat-button mat-dialog-close class="modal-mat-button cancel">Cancel</button>
-  <button mat-button mat-dialog-close class="modal-mat-button create" (click)="uploadHandlerSetup()">Upload</button>
+  <button mat-button mat-dialog-close class="modal-mat-button create" (click)="uploadHandlerSetup()" [disabled]="!selectedOptionValid">Upload</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
 </mat-dialog-actions>
 

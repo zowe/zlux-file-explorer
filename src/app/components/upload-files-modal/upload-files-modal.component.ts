@@ -22,13 +22,11 @@ import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 export class UploadModal {
 
   private folderPath = "";
-  // Block unallowed characters and "." and ".." etc
-  public folderPattern = /(([^\x00-\x1F!"$'\(\)*,\/:;<>\?\[\\\]\{\|\}\x7F\s]+)$)/; 
-  onUpload = new EventEmitter();
+  public onUpload = new EventEmitter();
   @ViewChild('fileUpload') fileUpload: ElementRef;
-  files: Array<File>;
-  fileEncodings: Array<string>;
-  encodings = [
+  private files: Array<File>;
+  private fileEncodings: Array<string>;
+  private encodings = [
     // { TODO: API Bug - Upload fails with Binary as target for now
     //     name: 'BINARY',
     //     value: 'BINARY',
@@ -49,139 +47,140 @@ export class UploadModal {
         value: 'IBM-1047',
         selected: false
     },
-    {
-        name: 'German/Austrian EBCDIC 273',
-        value: 'IBM-273',
-        selected: false
-    },
-    {
-        name: 'Danish/Norwegian EBCDIC 277',
-        value: 'IBM-277',
-        selected: false
-    },
-    {
-        name: 'Finnish/Swedish EBCDIC 278',
-        value: 'IBM-278',
-        selected: false
-    },
-    {
-        name: 'Italian EBCDIC 278',
-        value: 'IBM-278',
-        selected: false
-    },
-    {
-        name: 'Japanese Katakana 290',
-        value: 'IBM-290',
-        selected: false
-    },
-    {
-        name: 'French EBCDIC 297',
-        value: 'IBM-297',
-        selected: false
-    },
-    {
-        name: 'Arabic (type 4) EBCDIC 420',
-        value: 'IBM-420',
-        selected: false
-    },
-    {
-        name: 'Hebrew EBCDIC 424',
-        value: 'IBM-424',
-        selected: false
-    },
-    {
-        name: 'International EBCDIC 500',
-        value: 'IBM-500',
-        selected: false
-    },
-    {
-        name: 'Thai EBCDIC 838',
-        value: 'IBM-838',
-        selected: false
-    },
-    {
-        name: 'Croat/Czech/Polish/Serbian/Slovak EBCDIC 870',
-        value: 'IBM-870',
-        selected: false
-    },
-    {
-        name: 'Greek EBCDIC 875',
-        value: 'IBM-875',
-        selected: false
-    },
-    {
-        name: 'Urdu EBCDIC 918',
-        value: 'IBM-918',
-        selected: false
-    },
-    {
-        name: 'Cyrillic(Russian) EBCDIC 1025',
-        value: 'IBM-1025',
-        selected: false
-    },
-    {
-        name: 'Turkish EBCDIC 1026',
-        value: 'IBM-1026',
-        selected: false
-    },
-    {
-        name: 'Farsi Bilingual EBCDIC 1097',
-        value: 'IBM-1097',
-        selected: false
-    },
-    {
-        name: 'Baltic Multilingual EBCDIC 1112',
-        value: 'IBM-1112',
-        selected: false
-    },
-    {
-        name: 'Devanagari EBCDIC 1137',
-        value: 'IBM-1137',
-        selected: false
-    },
-    {
-        name: 'Chinese Traditional EBCDIC 937',
-        value: 'IBM-937',
-        selected: false
-    },
-    {
-        name: 'Chinese Simplified EBCDIC 935',
-        value: 'IBM-935',
-        selected: false
-    },
-    {
-        name: 'Japanese EBCDIC 930',
-        value: 'IBM-930',
-        selected: false
-    },
-    {
-        name: 'Japanese EBCDIC 931',
-        value: 'IBM-931',
-        selected: false
-    },
-    {
-        name: 'Japanese EBCDIC 939',
-        value: 'IBM-939',
-        selected: false
-    },
-    {
-        name: 'Japanese EBCDIC 1390',
-        value: 'IBM-1390',
-        selected: false
-    },
-    {
-        name: 'Japanese EBCDIC 1399',
-        value: 'IBM-1399',
-        selected: false
-    },
-    {
-        name: 'Korean EBCDIC 933',
-        value: 'IBM-933',
-        selected: false
-    }
+    // { TODO: These encodings don't work yet in API
+    //     name: 'German/Austrian EBCDIC 273',
+    //     value: 'IBM-273',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Danish/Norwegian EBCDIC 277',
+    //     value: 'IBM-277',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Finnish/Swedish EBCDIC 278',
+    //     value: 'IBM-278',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Italian EBCDIC 278',
+    //     value: 'IBM-278',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Japanese Katakana 290',
+    //     value: 'IBM-290',
+    //     selected: false
+    // },
+    // {
+    //     name: 'French EBCDIC 297',
+    //     value: 'IBM-297',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Arabic (type 4) EBCDIC 420',
+    //     value: 'IBM-420',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Hebrew EBCDIC 424',
+    //     value: 'IBM-424',
+    //     selected: false
+    // },
+    // {
+    //     name: 'International EBCDIC 500',
+    //     value: 'IBM-500',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Thai EBCDIC 838',
+    //     value: 'IBM-838',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Croat/Czech/Polish/Serbian/Slovak EBCDIC 870',
+    //     value: 'IBM-870',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Greek EBCDIC 875',
+    //     value: 'IBM-875',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Urdu EBCDIC 918',
+    //     value: 'IBM-918',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Cyrillic(Russian) EBCDIC 1025',
+    //     value: 'IBM-1025',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Turkish EBCDIC 1026',
+    //     value: 'IBM-1026',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Farsi Bilingual EBCDIC 1097',
+    //     value: 'IBM-1097',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Baltic Multilingual EBCDIC 1112',
+    //     value: 'IBM-1112',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Devanagari EBCDIC 1137',
+    //     value: 'IBM-1137',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Chinese Traditional EBCDIC 937',
+    //     value: 'IBM-937',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Chinese Simplified EBCDIC 935',
+    //     value: 'IBM-935',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Japanese EBCDIC 930',
+    //     value: 'IBM-930',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Japanese EBCDIC 931',
+    //     value: 'IBM-931',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Japanese EBCDIC 939',
+    //     value: 'IBM-939',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Japanese EBCDIC 1390',
+    //     value: 'IBM-1390',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Japanese EBCDIC 1399',
+    //     value: 'IBM-1399',
+    //     selected: false
+    // },
+    // {
+    //     name: 'Korean EBCDIC 933',
+    //     value: 'IBM-933',
+    //     selected: false
+    // }
   ];
-  filteredOptions = [];
-  selectedOption = "";
+  private filteredOptions = [];
+  private selectedOption = "";
+  private selectedOptionValid = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data, private uploader: UploaderService, private snackBar: MatSnackBar
@@ -216,6 +215,18 @@ export class UploadModal {
         //this.fileEncodings.push('BINARY');
       }
     }
+  }
+
+  onValueChange(value?: string): void {
+    if (value) {
+      for (let i = 0; i < this.encodings.length; i++) {
+        if (this.encodings[i].value == value) {
+          this.selectedOptionValid = true;
+          return;
+        }
+      }
+    }
+    this.selectedOptionValid = false;
   }
 
   uploadHandlerSetup(): void {
