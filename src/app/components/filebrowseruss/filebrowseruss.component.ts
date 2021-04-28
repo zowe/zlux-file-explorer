@@ -36,6 +36,7 @@ import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
@@ -111,6 +112,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -203,7 +205,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
       { text: "Refresh Metadata", action:() => { 
-        this.refreshFile(this.rightClickedFile);
+        this.refreshFileMetadata(this.rightClickedFile);
       }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
@@ -239,6 +241,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Create a Directory...", action:() => { 
         this.showCreateFolderDialog(this.rightClickedFile);
       }},
+      { text: "Upload...", action:() => { 
+        this.showUploadDialog(this.rightClickedFile);
+      }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
       { text: "Rename", action:() => {
@@ -258,7 +263,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         }
         this.showCreateFolderDialog(nodeToUse);
         
-      }}
+      }},
+      { text: "Upload...", action:() => { 
+        this.showUploadDialog(this.rightClickedFile);
+      }},
     ];
   }
 
@@ -563,12 +571,31 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       width: '600px'
     }
 
-    let fileDeleteRef:MatDialogRef<CreateFolderModal>  = this.dialog.open(CreateFolderModal, folderCreateConfig);
-    const createFolder = fileDeleteRef.componentInstance.onCreate.subscribe(onCreateResponse => {
+    let fileCreateRef:MatDialogRef<CreateFolderModal>  = this.dialog.open(CreateFolderModal, folderCreateConfig);
+    const createFolder = fileCreateRef.componentInstance.onCreate.subscribe(onCreateResponse => {
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
       this.newFolderClick.emit(this.rightClickedEvent.node);
+    });
+  }
+
+  showUploadDialog(rightClickedFile: any) {
+    const folderUploadConfig = new MatDialogConfig();
+    folderUploadConfig.data = {
+      event: rightClickedFile || this.path,
+      width: '600px'
+    }
+
+    let fileUploadRef:MatDialogRef<UploadModal>  = this.dialog.open(UploadModal, folderUploadConfig);
+    const upload = fileUploadRef.componentInstance.onUpload.subscribe(onUploadResponse => {
+      if (rightClickedFile && rightClickedFile.path && rightClickedFile.path != this.path) {
+        this.addChild(rightClickedFile, true);
+        this.fileUploaded.emit(this.rightClickedEvent.node.path);
+      } else {
+        this.displayTree(this.path, false);
+        this.fileUploaded.emit(this.path);
+      }
     });
   }
   
@@ -865,7 +892,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     } 
     else //When the selected node has no children or we want to fetch new data
     {
-      this.refreshFile(node);
+      this.refreshFileMetadata(node);
       node.expanded = expand !== undefined ? expand : true;
       let ussData = this.ussSrv.getFile(path);
       let tempChildren: FileTreeNode[] = [];
@@ -939,7 +966,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
-  refreshFile(node: any) {
+  refreshFileMetadata(node: any) {
     let path = node.path;
     let someData = this.ussSrv.getFileMetadata(path);
       someData.subscribe(

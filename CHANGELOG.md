@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 0.9.0
+
+* Added a right click Upload file feature
+
 ## 0.8.0
 
 * Added a quick search that filters opened files, folders, and datasets (Alt + P)

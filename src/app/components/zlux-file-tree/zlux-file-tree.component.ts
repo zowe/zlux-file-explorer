@@ -68,6 +68,8 @@ import { KeybindingService } from '../../services/keybinding.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { KeyCode } from '../../services/keybinding.service';
 import { Subscription } from 'rxjs';
+import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
+import { UploaderService } from '../../services/uploader.service';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -106,6 +108,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   }
 
   @Input() set spawnModal(typeAndData:any) {
+    if (typeAndData == undefined) {
+      return;
+    }
     let type = typeAndData.type;
     let data = typeAndData.data;
     let isDataset = data.volser ? true : false;
@@ -120,6 +125,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
         : this.ussComponent.showDeleteDialog(data);
     } else if (type == 'createFolder' && !isDataset) {
       this.ussComponent.showCreateFolderDialog(data);
+    } else if (type == 'requestUpload' && !isDataset) {
+      this.ussComponent.showUploadDialog(data);
     }
   }
 
@@ -135,6 +142,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
   // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
@@ -279,6 +287,10 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     this.newFolderClick.emit($event);
   }
 
+  onFileUploaded($event:any){
+    this.fileUploaded.emit($event);
+  }
+
   onNodeClick($event:any){
     this.nodeClick.emit($event);
   }
@@ -331,6 +343,14 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
   }
 
+  spawnUploadModal() {
+    if (this.ussComponent) {
+      this.ussComponent.showUploadDialog(null);
+    } else {
+      // ... Disabled for DS mode for now
+    }
+  }
+
   updateDirectory(dirName: string) {
     this.showUss();
     this.ussComponent.updateUss(dirName);
@@ -375,6 +395,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
+    UploadModal,
     TreeComponent],
   imports: [
     CommonModule, 
@@ -410,9 +431,11 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
+    UploadModal
   ],
   providers: [
-    KeybindingService
+    KeybindingService,
+    UploaderService
   ]
 })
 export class ZluxFileTreeModule { }
