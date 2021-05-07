@@ -31,7 +31,7 @@
     "@angular/router": "~6.0.9",
     "carbon-components": "~8.23.0",
     "primeng": "~6.1.7",
-    "lodash": "~4.17.10"
+    "lodash": "~4.17.21"
   },
   "devDependencies": {
     "angular2-template-loader": "~0.6.2",
