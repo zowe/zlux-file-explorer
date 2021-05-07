@@ -50,33 +50,24 @@ export enum ConfigVariables {
 @Injectable({
   providedIn: "root",
 })
-export class DownloadService {
-    progres: number;
+export class DownloaderService {
     abortController: AbortController;
     abortSignal: AbortSignal;
-    reader:ReadableStreamReader;
-    download = true;
-    fileName = "";
     currentWriter ;
     downObj = null;
     finalObj = null;
-    downloadedSize = 0;
     totalSize = 1;
-    downloadInprogressList: string[] = [];
     startTime = 0;
     completeStatus = ConfigVariables.statusComplete;
 
     constructor(private http: HttpClient) {
-      this.downloadedSize = 0;
     }
 
     //main function to handle the large downloads.
     async fetchFileHandler(fetchPath: string, fileName: string, remoteFile:string, downloadObject:any): Promise<any> {
       this.abortController =  new AbortController();
       this.abortSignal = this.abortController.signal;
-      this.fileName = fileName;
       this.totalSize = downloadObject.size;
-      this.initializeDownloadObject(downloadObject);
 
       //define the endcoding type.
       if(downloadObject.sourceEncoding != undefined && downloadObject.targetEncoding != undefined){
@@ -93,12 +84,11 @@ export class DownloadService {
 
       //mock size for now
       // this.totalSize =  Number(response.headers.get('X-zowe-filesize'));
-      this.downloadedSize = 0;
 
       this.startTime = new Date().getTime();
 
       //get the stream from the resposnse body.
-      const readbleStream = response.body != null ? response.body : Promise.reject("Cannot recieve data from the host machine");
+      const readbleStream = response.body != null ? response.body : Promise.reject("Cannot receive data from the host machine");
       //queieng stratergy.
       const queuingStrategy = new CountQueuingStrategy({ highWaterMark: 5 });
       //for browsers not supporting writablestram make sure to assign the polyfil writablestream.
@@ -110,8 +100,7 @@ export class DownloadService {
       });
       const writer = fileStream.getWriter();
       this.currentWriter = writer;
-      //assign _.this to context.
-      const context = this;
+
       await new Promise(async resolve => {
         new ReadableStream({
           start(controller) {
@@ -123,14 +112,11 @@ export class DownloadService {
                 if (done) {
                   writer.close();
                   controller.close();
-                  context.updateInProgressObject(context.completeStatus);
                   console.log("finished writing the content to the target file in host machine "+ fileName);
                   resolve();
                 }
                 if(value != undefined){
                   writer.write(value);
-                  context.downloadedSize++;
-                  context.writeProgress(context.downloadedSize);
                   read();
                 }
               }).catch(error => {
@@ -154,28 +140,6 @@ export class DownloadService {
       }, []).join('&');
     };
 
-    //push the object to inprogress list.
-    initializeDownloadObject(downloadObject: any){
-      this.downloadInprogressList.push(downloadObject);
-    }
-
-    writeProgress(size){
-      this.downloadedSize = size;
-    }
-  
-    //expose the current progress.
-    getProgress(){
-      return this.downloadedSize;
-    }
-
-    //update in progress object.
-    updateInProgressObject(status){
-      if(this.downloadInprogressList.length > 0){
-        this.finalObj = this.downloadInprogressList.shift();
-        this.finalObj.status = status;
-      }
-    }
-
     //cancel current download.
     cancelDownload(): void {
       if(this.currentWriter){
@@ -183,8 +147,6 @@ export class DownloadService {
         this.currentWriter.releaseLock();
         this.abortController.abort();
         this.totalSize = 1;
-        this.downloadedSize = 0; 
-        this.updateInProgressObject(ConfigVariables.statusInprogress);
       }
     }
 }

@@ -12,14 +12,14 @@
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <mat-icon style="font-size: 30px; position: absolute;">create_new_folder</mat-icon>
 <!-- <i class="{{fileIcon}}" style="font-size: 30px;position: absolute;margin-top: 2px;margin-left: 3px;color: #000000;"></i> -->
-<h2 mat-dialog-title class="create-folder-content-body">Create a Directory</h2>
+<h2 mat-dialog-title class="modal-content-body">Create a Directory</h2>
 
 <mat-dialog-content style="padding-top: 30px;">
   Directory name:
   <mat-form-field style="margin-left: 15px;">
     <input id="create-directory-input" name="name" [pattern]="folderPattern" matInput type="text"
       [(ngModel)]="folderName">
-    <button class="create-folder-clear-button" mat-button *ngIf="folderName" matSuffix mat-icon-button aria-label="Clear" (click)="folderName=''">
+    <button class="modal-clear-button" mat-button *ngIf="folderName" matSuffix mat-icon-button aria-label="Clear" (click)="folderName=''">
       <mat-icon class="create-folder-clear-icon">close</mat-icon>
     </button>
   </mat-form-field>
@@ -30,7 +30,7 @@
   <mat-form-field style="margin-left: 80px;">
     <input id="create-path-input" [pattern]="empty" matInput type="text"
       [(ngModel)]="folderPath">
-    <button class="create-folder-clear-button" mat-button *ngIf="folderPath" matSuffix mat-icon-button aria-label="Clear" (click)="folderPath=''">
+    <button class="modal-clear-button" mat-button *ngIf="folderPath" matSuffix mat-icon-button aria-label="Clear" (click)="folderPath=''">
       <mat-icon class="create-folder-clear-icon">close</mat-icon>
     </button>
   </mat-form-field>

@@ -20,13 +20,13 @@
     *ngIf="showUpArrow">
   
   <div class="filebrowseruss-search" [ngStyle] = "searchStyle">
-    <input #fileExplorerUSSInput 
+    <input #pathInputUSS 
       [(ngModel)]="path" 
       list="searchUSSHistory" 
       placeholder="Enter an absolute path..."  
       [ngStyle] = "inputStyle" 
       class="filebrowseruss-search-input"
-      (keydown.enter)="displayTree(path, false); onPathChanged(path);" 
+      (keydown.enter)="displayTree(path, false);" 
       [disabled]="isLoading" 
       (ngModelChange)="checkPathSlash($event)">
     <!-- TODO: make search history a directive to use in both uss and mvs-->
@@ -35,9 +35,10 @@
     </datalist>
   </div>
   <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading" style="margin-left: 9px;"></div>
+  <div class="fa fa-refresh filebrowseruss-loading-icon" title="Refresh whole directory" (click)="displayTree(path, false);" [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
 
   <!-- Main tree -->
-  <div (click)="onClick($event);" [hidden]="hideExplorer" style="height: 100%;">
+  <div [hidden]="hideExplorer" style="height: 100%;">
     <tree-root [treeData]="data" 
       (clickEvent)="onNodeClick($event)"
       (dblClickEvent)="onNodeDblClick($event)" 
@@ -46,6 +47,16 @@
       (panelRightClickEvent)="onPanelRightClick($event)"
     ></tree-root>
   </div>
+
+  <div class="ui-inputgroup filebrowseruss-search-bottom-group" *ngIf="showSearch">
+    <span class="ui-inputgroup-addon"><i class="fa fa-search filebrowseruss-search-bottom-icon"></i></span>
+    <input type="text" pInputText 
+      placeholder="Search opened files/folders by name..." 
+      class="filebrowseruss-search-bottom-input" 
+      [formControl]="searchInputCtrl"
+      #searchInputUSS>       
+  </div>
+
 </div>
 
 <!-- 

@@ -9,11 +9,8 @@
   Copyright Contributors to the Zowe Project.
 */
 
-
-export interface FileContents {
-  filePath: string;
-  fileName: string;
-  fileContents:Array<string>;
+.modal-mat-button.add {
+  color: black;
 }
 
 
@@ -26,4 +23,3 @@ export interface FileContents {
   
   Copyright Contributors to the Zowe Project.
 */
-

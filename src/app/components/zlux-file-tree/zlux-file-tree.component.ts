@@ -20,7 +20,7 @@ import {
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../tree/tree.component';
 import { UtilsService } from '../../services/utils.service';
@@ -45,10 +45,31 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
-import { MatDialogModule, MatTableModule, MatSnackBarModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatCheckboxModule, MatButtonModule, MatButtonToggleModule, MatSlideToggleModule } from '@angular/material';
+import {
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatCheckboxModule,
+  MatDialogModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
+  MatTableModule,
+  MatTooltipModule,
+} from '@angular/material';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
+import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
+import { KeybindingService } from '../../services/keybinding.service';
+import { InputTextModule } from 'primeng/inputtext';
+import { KeyCode } from '../../services/keybinding.service';
+import { Subscription } from 'rxjs';
+import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
+import { UploaderService } from '../../services/uploader.service';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -60,9 +81,10 @@ import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal
 
 export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
-  currentIndex: number;
-  tabs: Array<tab>;
-  showUpArrow: boolean;
+  private currentIndex: number;
+  private tabs: Array<tab>;
+  private showUpArrow: boolean;
+  private keyBindingSub: Subscription = new Subscription();
 
   @ViewChild(FileBrowserUSSComponent)
   private ussComponent: FileBrowserUSSComponent;
@@ -70,17 +92,25 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserMVSComponent)
   private mvsComponent: FileBrowserMVSComponent;
 
+  @ViewChild('fileExplorerGlobal')
+  fileExplorerGlobal: ElementRef<any>;
+
   constructor(/*private persistentDataService: PersistentDataService,*/
-    private utils: UtilsService, private elemRef: ElementRef,
-    private cd: ChangeDetectorRef)
+    private utils: UtilsService, 
+    private elemRef: ElementRef,
+    private cd: ChangeDetectorRef,
+    private appKeyboard: KeybindingService)
   {
     //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
-    this.tabs = [{ index: 0, name: "USS" }, { index: 1, name: "Datasets (Beta)" }];
+    this.tabs = [{ index: 0, name: "USS" }, { index: 1, name: "Datasets" }];
     this.showUpArrow = true;
   }
 
   @Input() set spawnModal(typeAndData:any) {
+    if (typeAndData == undefined) {
+      return;
+    }
     let type = typeAndData.type;
     let data = typeAndData.data;
     let isDataset = data.volser ? true : false;
@@ -95,6 +125,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
         : this.ussComponent.showDeleteDialog(data);
     } else if (type == 'createFolder' && !isDataset) {
       this.ussComponent.showCreateFolderDialog(data);
+    } else if (type == 'requestUpload' && !isDataset) {
+      this.ussComponent.showUploadDialog(data);
     }
   }
 
@@ -110,9 +142,11 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
-  @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
+  // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() datasetSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -167,7 +201,16 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
         this.treeStyle = {'filter': 'brightness(3)', 'color':'white'};
          break; 
       } 
-   } 
+    }
+    const fileExplorerGlobalElement = this.fileExplorerGlobal.nativeElement;
+    this.appKeyboard.registerKeyUpEvent(fileExplorerGlobalElement);
+    this.appKeyboard.registerKeyDownEvent(fileExplorerGlobalElement); 
+    this.keyBindingSub.add(this.appKeyboard.keydownEvent
+      .subscribe((event) => {
+        if (event.which === KeyCode.KEY_P && !event.ctrlKey) {
+          this.toggleSearch();
+        }
+    }));
   }
 
   ngOnDestroy() {
@@ -212,6 +255,14 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
   }
 
+  toggleSearch() {
+    if (this.currentIndex == 0) {
+      this.ussComponent.toggleSearch();
+    } else {
+      this.mvsComponent.toggleSearch();
+    }
+  }
+
   displayUpArrow(show: boolean) {
     this.showUpArrow = show;
   }
@@ -224,12 +275,20 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     this.deleteClick.emit($event);
   }
 
-  onNewFileClick($event:any){
-    this.newFileClick.emit($event);
+  onUSSRenameEvent($event:any){
+    this.ussRenameEvent.emit($event);
   }
+
+  // onNewFileClick($event:any){
+  //   this.newFileClick.emit($event);
+  // }
 
   onNewFolderClick($event:any){
     this.newFolderClick.emit($event);
+  }
+
+  onFileUploaded($event:any){
+    this.fileUploaded.emit($event);
   }
 
   onNodeClick($event:any){
@@ -284,6 +343,14 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
   }
 
+  spawnUploadModal() {
+    if (this.ussComponent) {
+      this.ussComponent.showUploadDialog(null);
+    } else {
+      // ... Disabled for DS mode for now
+    }
+  }
+
   updateDirectory(dirName: string) {
     this.showUss();
     this.ussComponent.updateUss(dirName);
@@ -324,9 +391,11 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     FilePropertiesModal,
     FilePermissionsModal,
     FileOwnershipModal,
+    FileTaggingModal,
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
+    UploadModal,
     TreeComponent],
   imports: [
     CommonModule, 
@@ -345,11 +414,29 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     MatCheckboxModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatTooltipModule,
+    MatAutocompleteModule,
     ZluxTabbingModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    InputTextModule,
+    ReactiveFormsModule
   ],
   exports: [ZluxFileTreeComponent],
-  entryComponents: [ZluxFileTreeComponent, FilePermissionsModal, FilePropertiesModal, FileOwnershipModal, DatasetPropertiesModal, DeleteFileModal, CreateFolderModal],
+  entryComponents: [
+    ZluxFileTreeComponent,
+    FilePermissionsModal,
+    FilePropertiesModal,
+    FileOwnershipModal,
+    FileTaggingModal,
+    DatasetPropertiesModal,
+    DeleteFileModal,
+    CreateFolderModal,
+    UploadModal
+  ],
+  providers: [
+    KeybindingService,
+    UploaderService
+  ]
 })
 export class ZluxFileTreeModule { }
 

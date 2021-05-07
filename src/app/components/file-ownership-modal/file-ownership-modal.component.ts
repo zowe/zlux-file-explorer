@@ -9,9 +9,10 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
+import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'file-ownership-modal',
@@ -26,12 +27,15 @@ export class FileOwnershipModal {
   public mode = 0;
   public modeSym = '';
   public icon = '';
-  public ownerName = "";
-  public groupName = "";
+  public owner = '';
+  public group = '';
+  public isDirectory = false;
+  public recursive = false;
   public node = null;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
+    private dialogRef: MatDialogRef<FileOwnershipModal>,
     private http: Http,
     private snackBar: MatSnackBar,
   ) 
@@ -40,8 +44,9 @@ export class FileOwnershipModal {
     this.name = this.node.name;
     this.path = this.node.path;
     this.mode = this.node.mode;
-    this.ownerName = this.node.user;
-    this.groupName = this.node.group;
+    this.owner = this.node.owner;
+    this.group = this.node.group;
+    this.isDirectory = this.node.directory;
 
     if (this.node.icon) {
       this.icon = this.node.icon;
@@ -94,17 +99,18 @@ export class FileOwnershipModal {
   }
 
   saveOwnerInfo() {
-    let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, undefined, this.ownerName, this.groupName);
+    let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, this.recursive, this.owner, this.group);
     this.http.post(url, null)
+    .finally(() => this.closeDialog())
     .map(res=>{
       if (res.status == 200) {
-        this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.ownerName + " Group: " + this.groupName + ".", 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
-        this.node.user = this.ownerName;
-        this.node.group = this.groupName;
+        this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
+          'Dismiss', defaultSnackbarOptions);
+        this.node.owner = this.owner;
+        this.node.group = this.group;
       } else {
         this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     })
     .catch(this.handleErrorObservable).subscribe(
@@ -112,9 +118,15 @@ export class FileOwnershipModal {
       },
       error => { 
         this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
-          'Dismiss', { duration: 5000,   panelClass: 'center' });
+          'Dismiss', defaultSnackbarOptions);
       }
     );
+  }
+  
+    
+  closeDialog() {
+    const needUpdate = this.isDirectory;
+    this.dialogRef.close(needUpdate);
   }
 
   private handleErrorObservable (error: Response | any) {

@@ -41,14 +41,26 @@
   </div>
 
   <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
+  <div class="fa fa-refresh filebrowseruss-loading-icon" title="Refresh dataset list" (click)="updateTreeView(path);" [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
+
   <!-- Main tree -->
   <div [hidden]="hideExplorer" style="height: 100%;">
     <tree-root [treeData]="data" 
       (clickEvent)="onNodeClick($event)"
       (dblClickEvent)="onNodeDblClick($event)" 
       [style]="style"
-      (rightClickEvent)="onNodeRightClick($event)">
+      (rightClickEvent)="onNodeRightClick($event)"
+      (panelRightClickEvent)="onPanelRightClick($event)">
     </tree-root>
+  </div>
+
+  <div class="ui-inputgroup filebrowseruss-search-bottom-group" *ngIf="showSearch">
+    <span class="ui-inputgroup-addon"><i class="fa fa-search filebrowseruss-search-bottom-icon"></i></span>
+    <input type="text" pInputText 
+      placeholder="Search datasets/members by name..." 
+      class="filebrowseruss-search-bottom-input" 
+      [formControl]="searchInputCtrl"
+      #searchInputMVS>         
   </div>
 </div>
 <!-- 

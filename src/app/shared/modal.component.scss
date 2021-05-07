@@ -17,6 +17,10 @@ mat-dialog-actions {
   width: 50%;
 }
 
+.modal-column-full-width {
+  width: 100%;
+}
+
 /* Clear floats after the columns */
 .modal-row:after {
   content: "";
@@ -115,6 +119,34 @@ mat-dialog-actions {
 .modal-mat-header {
   margin-left: 33px; 
   margin-bottom: 15px;
+}
+
+.modal-icon {
+  font-size: 24px;
+  position: absolute;
+  margin-top: 4px;
+  margin-left: 3px;
+}
+
+.modal-content-body {
+  margin-left: 45px;
+  margin-bottom: -5px;
+  margin-top: 1px;
+  font-size: 17px;
+  min-width: 400px;
+}
+
+.modal-clear-button {
+  border-radius: 100%;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.modal-clear-button:hover {
+  background-color: rgba(0, 0, 0, 0.12) !important;
+  transition: 0 !important;
+  -webkit-transition-duration: 0 !important;
+  transition-duration: 0 !important;
 }
 
 /*

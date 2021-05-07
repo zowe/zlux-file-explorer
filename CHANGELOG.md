@@ -1,5 +1,38 @@
 # ZLUX Angular File Tree
 
+## 0.9.0
+
+* Added a right click Upload file feature
+
+## 0.8.0
+
+* Added a quick search that filters opened files, folders, and datasets (Alt + P)
+
+## 0.7.0
+
+* Added refresh button to right click folder menu & file menu
+
+## 0.6.0
+
+* Added refresh buttons for USS/Dataset views
+
+## 0.5.0
+
+* Added cut, copy, and paste functionality to USS files.
+* onPathChanged emitter now fires from MVS as well
+* Removed unused & dead code.
+
+## 0.4.0
+
+* Add rename functionality to USS browser
+* Add right click menu to tag files and folders with a  popup modal to choose the encoding to tag (autofills to current tag)
+
+## 0.3.0
+
+* Added modals, available via right click, to change ownership & permission information of files & folders.
+* Some CSS has been refactored.
+* Node-sass has been updated to support Node 12.
+
 ## 0.2.0
 
 * Allow users of this component to invoke its modals by using the spawnModal input with a javascript object containing the property 'type' equal to the type of modal to open, and 'data' equal to the FileNode object to be handled
