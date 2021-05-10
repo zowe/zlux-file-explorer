@@ -1,5 +1,5 @@
 {
-  "extends": "../../zlux/zlux-app-manager/virtual-desktop/plugin-config/tsconfig.base.json",
+  "extends": "./zlux/zlux-app-manager/virtual-desktop/plugin-config/tsconfig.base.json",
   "include": [
     "src/**/*.ts",
     //"../zlux-platform/interface/src/mvd-hosting.d.ts"
@@ -22,8 +22,5 @@
       "dom"
     ],
     "paths": {}
-  },
-  "exclude": [
-    "*node_modules/prime*"
-  ]
+  }
 }
