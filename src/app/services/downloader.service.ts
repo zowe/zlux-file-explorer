@@ -22,8 +22,6 @@ export class DownloaderService {
     abortController: AbortController;
     abortSignal: AbortSignal;
     currentWriter: any;
-    downObj = null;
-    finalObj = null;
     totalSize = 1;
     startTime = 0;
 
@@ -46,12 +44,11 @@ export class DownloaderService {
         fetchPath = fetchPath+"?"+await this.getQueryString(queriesObject);
       }
 
+      this.startTime = new Date().getTime();
       const response = await fetch(fetchPath, {signal: this.abortSignal})
 
       // Mock size for now
       // this.totalSize =  Number(response.headers.get('X-zowe-filesize'));
-
-      this.startTime = new Date().getTime();
 
       // TODO: The following core download logic is from the FTA & may require refactoring or future bug-proofing
       // get the stream from the resposnse body.
