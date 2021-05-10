@@ -17,8 +17,6 @@ import {
 import { FormControl } from '@angular/forms'
 import { Observable, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { UtilsService } from '../../services/utils.service';
-import { UssCrudService } from '../../services/uss.crud.service';
 // import { PersistentDataService } from '../../services/persistentData.service';
 /*import { ComponentClass } from '../../../../../../zlux-platform/interface/src/registry/classes';
 import { FileBrowserFileSelectedEvent, IFileBrowserUSS }
@@ -27,11 +25,8 @@ import { Capability, FileBrowserCapabilities }
   from '../../../../../../zlux-platform/interface/src/registry/capabilities';*/
 //Commented out to fix compilation errors from zlux-platform changes, does not affect program
 //TODO: Implement new capabilities from zlux-platform
-import { UssDataObject } from '../../structures/persistantdata';
-import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
-import { SearchHistoryService } from '../../services/searchHistoryService';
 import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
@@ -39,11 +34,16 @@ import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.co
 import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
-import { DownloaderService } from '../../services/downloader.service';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
 import { FileTreeNode } from '../../structures/child-event';
 import * as _ from 'lodash';
+
+/* Services */
+import { UtilsService } from '../../services/utils.service';
+import { UssCrudService } from '../../services/uss.crud.service';
+import { DownloaderService } from '../../services/downloader.service';
+import { SearchHistoryService } from '../../services/searchHistoryService';
 
 @Component({
   selector: 'file-browser-uss',
@@ -76,7 +76,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //TODO:define interface types for uss-data/data
   private data: FileTreeNode[];
   private dataCached: FileTreeNode[]; // Used for filtering against search bar
-  private dataObject: UssDataObject;
   private intervalId: any;
   private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
   @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
@@ -565,7 +564,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let downloadObject = rightClickedFile;
     let url:string = ZoweZLUX.uriBroker.unixFileUri('contents', remotePath);
 
-    this.downloadService.fetchFileHandler(url,filename,remotePath, downloadObject).then((res) => {
+    this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
                     // TODO: Download queue code for progress bar could go here
                 }).catch((err) => {
                     return Promise.reject(err);

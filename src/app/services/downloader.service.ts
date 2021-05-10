@@ -6,70 +6,36 @@
 //   Copyright Contributors to the Zowe Project.
 // */
 
-import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Inject, Injectable } from '@angular/core';
 import * as streamSaver from 'streamsaver'
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
-import { WritableStream, TransformStream, ReadableStream, CountQueuingStrategy } from 'web-streams-polyfill'
-import * as uuid from 'uuid';
-import { ReplaySubject } from 'rxjs';
+import { WritableStream, ReadableStream, CountQueuingStrategy } from 'web-streams-polyfill'
 
 export enum ConfigVariables {
-  limitofActivityHistory = 10,
-  downloadQueueLength = 5,
-  uploadAction = "Upload",
-  transferAction = "Transfer", 
-  downloadAction = "Download",
-  statusInprogress = "In progress",
-  statusComplete = "Complete", 
-  statusCancel = "Cancel", 
-  statusQueued = "Queued",
-  upload = "<<--",
-  download = "-->>",
-  transfer = "<-->",
-  HighPriority = "High",
-  LowPriority = "Normal",
-  TableHeader1 = "Server Local file",
-  TableHeader2 = "Direction",
-  TableHeader3 = "Remote file",
-  TableHeader4 = "Size",
-  TableHeader5 = "Priority",
-  TableHeader6 = "Status",
-  TableHeader7 = "Actions",
-  InProgressTab = "InProgress",
-  CancelTab = "Cancel",
-  CompletedTab = "Completed",
-  DownloadQueueHelperText = "Donwload Queue size to maintain", 
-  DownloadHistoryHelperText = "History of the download objects to keep in memory",
   ASCII = "819", 
   EBCDIC = "1047",
   UTF8 = "1208"
 }
 
-@Injectable({
-  providedIn: "root",
-})
+@Injectable()
 export class DownloaderService {
     abortController: AbortController;
     abortSignal: AbortSignal;
-    currentWriter ;
+    currentWriter: any;
     downObj = null;
     finalObj = null;
     totalSize = 1;
     startTime = 0;
-    completeStatus = ConfigVariables.statusComplete;
 
-    constructor(private http: HttpClient) {
+    constructor(@Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,) {
     }
 
-    //main function to handle the large downloads.
-    async fetchFileHandler(fetchPath: string, fileName: string, remoteFile:string, downloadObject:any): Promise<any> {
+    async fetchFileHandler(fetchPath: string, fileName: string, downloadObject:any): Promise<any> {
       this.abortController =  new AbortController();
       this.abortSignal = this.abortController.signal;
       this.totalSize = downloadObject.size;
 
-      //define the endcoding type.
+      // Define the endcoding type.
       if(downloadObject.sourceEncoding != undefined && downloadObject.targetEncoding != undefined){
         let queriesObject =
           {
@@ -82,24 +48,26 @@ export class DownloaderService {
 
       const response = await fetch(fetchPath, {signal: this.abortSignal})
 
-      //mock size for now
+      // Mock size for now
       // this.totalSize =  Number(response.headers.get('X-zowe-filesize'));
 
       this.startTime = new Date().getTime();
 
-      //get the stream from the resposnse body.
+      // TODO: The following core download logic is from the FTA & may require refactoring or future bug-proofing
+      // get the stream from the resposnse body.
       const readbleStream = response.body != null ? response.body : Promise.reject("Cannot receive data from the host machine");
-      //queieng stratergy.
+      // queueing strategy.
       const queuingStrategy = new CountQueuingStrategy({ highWaterMark: 5 });
-      //for browsers not supporting writablestram make sure to assign the polyfil writablestream.
+      // for browsers not supporting writablestram make sure to assign the polyfil writablestream.
       streamSaver.WritableStream = WritableStream;
-      //create the write stream.
+      // create the write stream.
       const fileStream = streamSaver.createWriteStream(fileName, {
-        writableStrategy:queuingStrategy,
+        writableStrategy: queuingStrategy,
         readableStrategy: queuingStrategy
       });
       const writer = fileStream.getWriter();
       this.currentWriter = writer;
+      const context = this;
 
       await new Promise(async resolve => {
         new ReadableStream({
@@ -108,11 +76,10 @@ export class DownloaderService {
             read();
             function read() {
               reader.read().then(({done, value}) => {
-                //end of download.
-                if (done) {
+                if (done) { // If download completes...
                   writer.close();
                   controller.close();
-                  console.log("finished writing the content to the target file in host machine "+ fileName);
+                  context.log.debug("Finished writing the content to the target file " + fileName + " in host machine. Cleaning up...");
                   resolve();
                 }
                 if(value != undefined){
@@ -120,8 +87,7 @@ export class DownloaderService {
                   read();
                 }
               }).catch(error => {
-                console.log("error in download "+ error);
-                console.error(error);
+                context.log.severe("An error occurred downloading " + fileName + " : ", error)
                 controller.error(error);   
                 resolve(error);               
               })
@@ -131,16 +97,14 @@ export class DownloaderService {
       });
     }
 
-    //create query strings to append in the request.
+    // Create query strings to append in the request.
     getQueryString(queries){
       return Object.keys(queries).reduce((result, key) => {
-          console.log(key);
-          console.log(ConfigVariables[queries[key]]);
           return [...result, `${encodeURIComponent(key)}=${encodeURIComponent(ConfigVariables[queries[key]])}`]
       }, []).join('&');
     };
 
-    //cancel current download.
+    // Cancel current download.
     cancelDownload(): void {
       if(this.currentWriter){
         this.currentWriter.abort();

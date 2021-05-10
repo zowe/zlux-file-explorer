@@ -16,17 +16,13 @@ import {
   NgModule, Component,
   Input, Output, ViewChild, ViewEncapsulation,
   ElementRef, ChangeDetectorRef,
-  OnChanges, SimpleChanges, AfterViewChecked, EventEmitter, OnInit, OnDestroy
+  EventEmitter, OnInit, OnDestroy
 } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ContextMenuModule, TreeModule, MenuItem, MenuModule, DialogModule } from 'primeng/primeng';
+import { ContextMenuModule, TreeModule, MenuModule, DialogModule } from 'primeng/primeng';
 import { TreeComponent } from '../tree/tree.component';
-import { UtilsService } from '../../services/utils.service';
-import { MvsDataObject, UssDataObject } from '../../structures/persistantdata';
 import { ZluxTabbingModule } from '@zlux/widgets';
-
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
@@ -64,12 +60,16 @@ import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-prop
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
-import { KeybindingService } from '../../services/keybinding.service';
 import { InputTextModule } from 'primeng/inputtext';
-import { KeyCode } from '../../services/keybinding.service';
 import { Subscription } from 'rxjs';
 import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
+
+/* Services */
 import { UploaderService } from '../../services/uploader.service';
+import { DownloaderService } from '../../services/downloader.service';
+import { UtilsService } from '../../services/utils.service';
+import { KeyCode } from '../../services/keybinding.service';
+import { KeybindingService } from '../../services/keybinding.service';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -435,7 +435,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   ],
   providers: [
     KeybindingService,
-    UploaderService
+    UploaderService,
+    DownloaderService
   ]
 })
 export class ZluxFileTreeModule { }
