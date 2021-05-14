@@ -97,7 +97,11 @@ export class DownloaderService {
     // Create query strings to append in the request.
     getQueryString(queries){
       return Object.keys(queries).reduce((result, key) => {
+        if (ConfigVariables[queries[key]]) {
           return [...result, `${encodeURIComponent(key)}=${encodeURIComponent(ConfigVariables[queries[key]])}`]
+        } else {
+          return []
+        }
       }, []).join('&');
     };
 

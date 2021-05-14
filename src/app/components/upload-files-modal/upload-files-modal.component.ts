@@ -27,11 +27,11 @@ export class UploadModal {
   private files: Array<File>;
   private fileEncodings: Array<string>;
   private encodings = [
-    // { TODO: API Bug - Upload fails with Binary as target for now
-    //     name: 'BINARY',
-    //     value: 'BINARY',
-    //     selected: true
-    // },
+    {
+        name: 'BINARY',
+        value: 'BINARY',
+        selected: false
+    },
     {
         name: 'UTF-8',
         value: 'UTF-8',
@@ -187,8 +187,10 @@ export class UploadModal {
   ) 
   {
     const node = data.event;
-    if (node.path) {
+    if (node.data && node.data == "Folder") {
       this.folderPath = node.path;
+    } else if (node.data) { // Takes folder name from folder name + path
+      this.folderPath = node.path.replace(/\/$/, '').replace(/\/[^\/]+$/, '');
     } else {
       this.folderPath = node;
     }

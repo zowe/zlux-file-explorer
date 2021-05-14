@@ -6,7 +6,7 @@
 
 ## 0.9.0
 
-* Added a right click Upload file feature
+* Added a right click Upload file feature, NOTE: BINARY is still unsupported
 
 ## 0.8.0
 
