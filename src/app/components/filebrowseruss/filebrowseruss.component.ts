@@ -36,7 +36,7 @@ import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 import { DownloaderService } from '../../services/downloader.service';
 import { SearchHistoryService } from '../../services/searchHistoryService';
-// TODO: re-implement import { PersistentDataService } from '../../services/persistentData.service';
+// TODO: re-implement to add fetching of previously opened tree view data --- import { PersistentDataService } from '../../services/persistentData.service';
 
 @Component({
   selector: 'file-browser-uss',

@@ -27,11 +27,11 @@ export class UploadModal {
   private files: Array<File>;
   private fileEncodings: Array<string>;
   private encodings = [
-    {
-        name: 'BINARY',
-        value: 'BINARY',
-        selected: false
-    },
+    // { TODO: API Bug - Upload fails with Binary as target for now
+    //     name: 'BINARY',
+    //     value: 'BINARY',
+    //     selected: true
+    // },
     {
         name: 'UTF-8',
         value: 'UTF-8',
