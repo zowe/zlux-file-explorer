@@ -66,7 +66,7 @@ export class DownloaderService {
       this.currentWriter = writer;
       const context = this;
 
-      await new Promise(async resolve => {
+      await new Promise<void>((resolve, reject) => {
         new ReadableStream({
           start(controller) {
             const reader = response.body.getReader();
@@ -85,8 +85,8 @@ export class DownloaderService {
                 }
               }).catch(error => {
                 context.log.severe("An error occurred downloading " + fileName + " : ", error)
-                controller.error(error);   
-                resolve(error);               
+                controller.error(error);  
+                reject(error);
               })
             }
           }

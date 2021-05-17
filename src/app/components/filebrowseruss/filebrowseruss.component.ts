@@ -17,14 +17,6 @@ import {
 import { FormControl } from '@angular/forms'
 import { Observable, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-// import { PersistentDataService } from '../../services/persistentData.service';
-/*import { ComponentClass } from '../../../../../../zlux-platform/interface/src/registry/classes';
-import { FileBrowserFileSelectedEvent, IFileBrowserUSS }
-  from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
-import { Capability, FileBrowserCapabilities }
-  from '../../../../../../zlux-platform/interface/src/registry/capabilities';*/
-//Commented out to fix compilation errors from zlux-platform changes, does not affect program
-//TODO: Implement new capabilities from zlux-platform
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
@@ -44,6 +36,7 @@ import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 import { DownloaderService } from '../../services/downloader.service';
 import { SearchHistoryService } from '../../services/searchHistoryService';
+// TODO: re-implement import { PersistentDataService } from '../../services/persistentData.service';
 
 @Component({
   selector: 'file-browser-uss',
@@ -566,8 +559,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
                     // TODO: Download queue code for progress bar could go here
-                }).catch((err) => {
-                    return Promise.reject(err);
                 });
   }
 

@@ -24,15 +24,6 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 
-//import { ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-/*import {FileBrowserFileSelectedEvent,
-  IFileBrowserMVS
-} from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
-import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platform/interface/src/registry/capabilities';
-*/
-//Commented out to fix compilation errors from zlux-platform changes, does not affect program
-//TODO: Implement new capabilities from zlux-platform
-
 /* Services */
 import { SearchHistoryService } from '../../services/searchHistoryService';
 import { UtilsService } from '../../services/utils.service';
