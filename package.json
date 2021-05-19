@@ -1,6 +1,6 @@
 {
   "name": "@zowe/zlux-angular-file-tree",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "main": "dist/main.js",
   "homepage": "https://github.com/zowe/zlux-file-explorer/blob/staging/README.md",
   "bugs": {
@@ -50,14 +50,16 @@
     "source-map-loader": "~0.2.3",
     "style-loader": "~0.21.0",
     "sass-loader": "~7.1.0",
+    "streamsaver": "^2.0.3",
     "ts-loader": "~4.4.2",
     "tslint": "~5.10.0",
-    "typescript": "~2.9.0",
+    "typescript": "~3.7.5",
     "url-loader": "~1.0.1",
     "webpack": "~4.41.0",
     "webpack-cli": "~3.3.0",
     "webpack-config": "~7.5.0",
     "@zlux/widgets": "git+https://github.com:zowe/zlux-widgets.git",
+    "web-streams-polyfill": "^2.0.5",
     "zone.js": "~0.8.26"
   }
 }

@@ -13,29 +13,23 @@
 
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional, ViewChild } from '@angular/core';
 import { take, finalize, debounceTime } from 'rxjs/operators';
-//import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
-import { UtilsService } from '../../services/utils.service';
-import { ProjectStructure, RecordFormat, DatasetOrganization, DatasetAttributes, Member } from '../../structures/editor-project';
-//import { PersistentDataService } from '../../services/persistentData.service';
+import { ProjectStructure, DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
-import { SearchHistoryService } from '../../services/searchHistoryService';
 import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
-import { DatasetCrudService } from '../../services/dataset.crud.service';
-import { defaultSnackbarOptions, quickSnackbarOptions } from '../../shared/snackbar-options';
+import { defaultSnackbarOptions, longSnackbarOptions, quickSnackbarOptions } from '../../shared/snackbar-options';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 
-/*import {FileBrowserFileSelectedEvent,
-  IFileBrowserMVS
-} from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
-import {Capability, FileBrowserCapabilities} from '../../../../../../zlux-platform/interface/src/registry/capabilities';
-*/
-//Commented out to fix compilation errors from zlux-platform changes, does not affect program
-//TODO: Implement new capabilities from zlux-platform
+/* Services */
+import { SearchHistoryService } from '../../services/searchHistoryService';
+import { UtilsService } from '../../services/utils.service';
+import { DatasetCrudService } from '../../services/dataset.crud.service';
+
+const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
 
 @Component({
   selector: 'file-browser-mvs',
@@ -200,7 +194,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   deleteNonVsamDataset(rightClickedFile: any): void {
     this.isLoading = true;
     this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
-    rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
+    rightClickedFile.styleClass = CSS_NODE_DELETING;
     let deleteSubscription = this.datasetService.deleteNonVsamDatasetOrMember(rightClickedFile)
     .subscribe(
       resp => {
@@ -224,7 +218,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
           this.snackBar.open("Unknown error '" + error.status + "' occurred for: " + rightClickedFile.data.path, 
-          'Dismiss', defaultSnackbarOptions);
+          'Dismiss', longSnackbarOptions);
           // Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.data.path);
@@ -237,7 +231,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', defaultSnackbarOptions);
+          'Dismiss', quickSnackbarOptions);
       }
     }, 4000);
   }
@@ -245,7 +239,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   deleteVsamDataset(rightClickedFile: any): void {
     this.isLoading = true;
     this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
-    rightClickedFile.styleClass = "filebrowsermvs-node-deleting";
+    rightClickedFile.styleClass = CSS_NODE_DELETING;
     let deleteSubscription = this.datasetService.deleteVsamDataset(rightClickedFile)
     .subscribe(
       resp => {
@@ -273,7 +267,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           'Dismiss', defaultSnackbarOptions);
         } else { //Unknown
           this.snackBar.open("Unknown error '" + error.status + "' occurred for: " + rightClickedFile.data.path, 
-          'Dismiss', defaultSnackbarOptions);
+          'Dismiss', longSnackbarOptions);
           //Error info gets printed in uss.crud.service.ts
         }
         this.deletionQueue.delete(rightClickedFile.data.path);
@@ -286,7 +280,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     setTimeout(() => {
       if (deleteSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
-          'Dismiss', defaultSnackbarOptions);
+          'Dismiss', quickSnackbarOptions);
       }
     }, 4000);
   }

@@ -17,21 +17,8 @@ import {
 import { FormControl } from '@angular/forms'
 import { Observable, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { UtilsService } from '../../services/utils.service';
-import { UssCrudService } from '../../services/uss.crud.service';
-// import { PersistentDataService } from '../../services/persistentData.service';
-/*import { ComponentClass } from '../../../../../../zlux-platform/interface/src/registry/classes';
-import { FileBrowserFileSelectedEvent, IFileBrowserUSS }
-  from '../../../../../../zlux-platform/interface/src/registry/component-classes/file-browser';
-import { Capability, FileBrowserCapabilities }
-  from '../../../../../../zlux-platform/interface/src/registry/capabilities';*/
-//Commented out to fix compilation errors from zlux-platform changes, does not affect program
-//TODO: Implement new capabilities from zlux-platform
-import { UssDataObject } from '../../structures/persistantdata';
-import { TreeNode } from 'primeng/primeng';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
-import { SearchHistoryService } from '../../services/searchHistoryService';
 import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
@@ -43,6 +30,13 @@ import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.compo
 import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
 import { FileTreeNode } from '../../structures/child-event';
 import * as _ from 'lodash';
+
+/* Services */
+import { UtilsService } from '../../services/utils.service';
+import { UssCrudService } from '../../services/uss.crud.service';
+import { DownloaderService } from '../../services/downloader.service';
+import { SearchHistoryService } from '../../services/searchHistoryService';
+// TODO: re-implement to add fetching of previously opened tree view data --- import { PersistentDataService } from '../../services/persistentData.service';
 
 @Component({
   selector: 'file-browser-uss',
@@ -75,7 +69,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   //TODO:define interface types for uss-data/data
   private data: FileTreeNode[];
   private dataCached: FileTreeNode[]; // Used for filtering against search bar
-  private dataObject: UssDataObject;
   private intervalId: any;
   private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
   @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
@@ -88,6 +81,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     private ussSearchHistory:SearchHistoryService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private downloadService:DownloaderService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
@@ -213,6 +207,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Tag...", action:() => { 
         this.showTaggingDialog(this.rightClickedFile) }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile);
+      }},
       { text: "Cut", action:() => { 
         this.cutFile(this.rightClickedFile)
       }},
@@ -552,6 +549,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.deleteFileOrFolder(rightClickedFile);
       this.deleteClick.emit(this.rightClickedEvent.node);
     });
+  }
+
+  attemptDownload(rightClickedFile: any) {
+    let remotePath = rightClickedFile.path;
+    let filename = rightClickedFile.name;
+    let downloadObject = rightClickedFile;
+    let url:string = ZoweZLUX.uriBroker.unixFileUri('contents', remotePath);
+
+    this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
+                    // TODO: Download queue code for progress bar could go here
+                });
   }
 
   showCreateFolderDialog(rightClickedFile: any) {

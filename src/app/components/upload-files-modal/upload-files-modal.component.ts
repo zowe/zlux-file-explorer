@@ -187,8 +187,10 @@ export class UploadModal {
   ) 
   {
     const node = data.event;
-    if (node.path) {
+    if (node.data && node.data == "Folder") {
       this.folderPath = node.path;
+    } else if (node.data) { // Takes folder name from folder name + path
+      this.folderPath = node.path.replace(/\/$/, '').replace(/\/[^\/]+$/, '');
     } else {
       this.folderPath = node;
     }
