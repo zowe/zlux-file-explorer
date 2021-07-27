@@ -361,6 +361,10 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     this.mvsComponent.updateTreeView(query);
   }
 
+  refreshFileMetadatdaByPath(path: string) {
+    return this.ussComponent.refreshFileMetadatdaUsingPath(path);
+   }
+
   zluxOnMessage(eventContext: any): Promise<any> {
     return new Promise((resolve,reject)=> {
 
