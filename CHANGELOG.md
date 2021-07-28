@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 0.11.0
+
+* Added a function to refresh file/directory metadata based by using the USS path 
+
 ## 0.10.0
 
 * Added a right click Download file feature
