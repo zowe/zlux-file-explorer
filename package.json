@@ -1,6 +1,6 @@
 {
   "name": "@zowe/zlux-angular-file-tree",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "main": "dist/main.js",
   "homepage": "https://github.com/zowe/zlux-file-explorer/blob/staging/README.md",
   "bugs": {
