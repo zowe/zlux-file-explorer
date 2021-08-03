@@ -2,7 +2,7 @@
 
 ## 0.11.0
 
-* Added a function to refresh file/directory metadata based by using the USS path 
+* Added a function to refresh file/directory metadata using the USS path 
 
 ## 0.10.0
 
