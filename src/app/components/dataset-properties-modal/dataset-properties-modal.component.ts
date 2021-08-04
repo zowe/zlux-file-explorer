@@ -38,7 +38,10 @@ export class DatasetPropertiesModal implements OnInit {
     @Inject(MAT_DIALOG_DATA) data,
   ) 
   {
-    const node = data.event;
+    let node = data.event;
+    if(node && !node.data) {
+      node = { data: { datasetAttrs: JSON.parse(JSON.stringify(node)), fileName: node.fullName}}
+    }
     if (node.data) {
       const data = node.data;
       this.datasetName = data.fileName;
