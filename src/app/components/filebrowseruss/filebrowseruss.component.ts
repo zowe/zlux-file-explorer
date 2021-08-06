@@ -1016,7 +1016,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   refreshFileMetadatdaUsingPath(path: string) {
     let foundNode = this.findNodeByPath(this.data , path)[0];
-    if ( foundNode ) {
+    if (foundNode) {
       this.refreshFileMetadata(foundNode);  
     }
   }
