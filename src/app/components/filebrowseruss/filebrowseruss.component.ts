@@ -15,8 +15,8 @@ import {
   Output, ViewEncapsulation, Inject, Optional, ViewChild
 } from '@angular/core';
 import { FormControl } from '@angular/forms'
-import { Observable, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Observable, of, Subscription } from 'rxjs';
+import { catchError, debounceTime, finalize, map, timeout } from 'rxjs/operators';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import 'rxjs/add/operator/toPromise';
 import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
@@ -133,7 +133,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   ngOnInit() {
-    this.loadUserHomeDirectory();
+    this.loadUserHomeDirectory().pipe(
+      catchError(err => {
+        this.log.warn(`Unsuccessful in loading user home directory: ${err}`);
+        return of('/');
+      }),
+    ).subscribe(home => {
+      this.path = home;
+      this.updateUss(home);
+    });
     this.initializeRightClickProperties();
     // TODO: Uncomment & fix auto-update of node data based on an interval. Maybe future setting?
     // this.persistentDataService.getData()
@@ -146,7 +154,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     //     this.displayTree(this.root, false);
     //   })
       // this.intervalId = setInterval(() => {
-        this.updateUss(this.path);
+      //  this.updateUss(this.path);
       // }, this.updateInterval);
   }
 
@@ -166,28 +174,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     return this.path;
   }
 
-  loadUserHomeDirectory(): void {
+  loadUserHomeDirectory(): Observable<string> {
     this.isLoading = true;
-    const observable: Observable<any> = this.ussSrv.getUserHomeFolder()
-    const subscription: Subscription = observable.subscribe(
-        resp => {
-          if(resp && resp.home){
-            this.path = resp.home.trim();
-          }else{
-            this.path = '/';
-          }
-          this.displayTree(this.path, true);
-          this.isLoading = false;
-        },
-        error => {
-          this.isLoading = false;
-          this.log.warn("Unsuccessful in loading user home directory: ", error);
-        }
-      );
-    setTimeout(() => {
-      this.isLoading = false;
-      subscription.unsubscribe();
-    }, 2000);
+    return this.ussSrv.getUserHomeFolder().pipe(
+      timeout(2000),
+      map(resp => resp.home.trim()),
+      finalize(() => this.isLoading = false)
+    );
   }
 
   initalizeCapabilities() {
