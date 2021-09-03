@@ -92,7 +92,7 @@ export class UssCrudService {
   }
   
   getUserHomeFolder(): Observable<{home: string}>{
-    let url :string = ZoweZLUX.uriBroker.omvsSegmentUri();
+    let url :string = ZoweZLUX.uriBroker.userInfoUri();
     return this.http.get(url)
     .map(res=>res.json())
     .catch(this.handleErrorObservable);
