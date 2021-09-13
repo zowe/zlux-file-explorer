@@ -12,6 +12,13 @@ mat-dialog-actions {
   justify-content: flex-end;
 }
 
+.close-dialog-btn {
+  float: right;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
 .modal-column {
   float: left;
   width: 50%;
