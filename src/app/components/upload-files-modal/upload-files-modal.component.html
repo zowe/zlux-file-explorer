@@ -12,6 +12,7 @@
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
 <mat-icon style="font-size: 30px; position: absolute;">cloud_upload</mat-icon>
 <!-- Intentional lazy recycling of "create" modal CSS, TODO: move to shared/modal css -->
+<button mat-dialog-close class="close-dialog-btn"><i class="fa fa-close"></i></button>
 <h2 mat-dialog-title class="modal-content-body">Upload Files in {{folderPath}}</h2>
 
   <button mat-button class="modal-mat-button add" (click)="addFile()">Select File</button>
@@ -49,7 +50,6 @@
 </div>
 
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close class="modal-mat-button cancel">Cancel</button>
   <button mat-button mat-dialog-close class="modal-mat-button create" (click)="uploadHandlerSetup()" [disabled]="!selectedOptionValid">Upload</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
 </mat-dialog-actions>
