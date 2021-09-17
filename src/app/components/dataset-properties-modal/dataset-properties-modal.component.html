@@ -10,12 +10,9 @@
 -->
 <zlux-tab-trap></zlux-tab-trap>
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
-<div class="modal-title">
-  <i class="{{datasetIcon}} dataset-properties-main-icon">
-    <button mat-dialog-close class="close-dialog-btn"><i class="fa fa-close"></i></button>
-    <h2 mat-dialog-title class="dataset-properties-header selectable-text">{{datasetName}} - Properties</h2>
-  </i>
-</div>
+<i class="{{datasetIcon}}" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 3px;"></i>
+<button mat-dialog-close class="close-dialog-btn"><i class="fa fa-close"></i></button>
+<h2 mat-dialog-title class="modal-mat-header">{{datasetName}} - Properties</h2>
 
 <!-- Main properties (non X type, non C (VSAM) type, non MIGRAT/ARCIVE status) -->
 <div class="modal-row" *ngIf="datasetCSIEntryType[0] != 'X' && datasetCSIEntryType[0] != 'C' && datasetVolser != 'MIGRAT' && datasetVolser != 'ARCIVE'">
