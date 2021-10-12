@@ -4,7 +4,7 @@
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies
   this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
-  
+   f
   SPDX-License-Identifier: EPL-2.0
   
   Copyright Contributors to the Zowe Project.
@@ -58,7 +58,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private dataCached: any;
   public isLoading: boolean;
   private rightClickedFile: any;
-  private rightClickPropertiesDataset: ContextMenuItem[];
+  private rightClickPropertiesDatasetFile: ContextMenuItem[];
+  private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
 
@@ -155,7 +156,16 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }*/
 
   initializeRightClickProperties() {
-    this.rightClickPropertiesDataset = [
+    this.rightClickPropertiesDatasetFile = [
+      { text: "Open in new Window", action:() => {
+        this.openInNewWindow(this.rightClickedFile) }},
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile) }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile); }
+      }
+    ];
+    this.rightClickPropertiesDatasetFolder = [
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
@@ -168,7 +178,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }}
     ];
   }
-
+  openInNewWindow(rightClickedFile: any) {
+    const baseURI = `${window.location.origin}${window.location.pathname}`;
+    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openDataset","name":"${rightClickedFile.data.path}","toggleTree":true}`, '_blank');
+    newWindow.focus();
+  }
   showDeleteDialog(rightClickedFile: any) {
     if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.data.path, "This is already being deleted.") == true) {
       return;
@@ -462,8 +476,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onNodeRightClick(event:any) {
     let node = event.node;
-    let rightClickProperties = this.rightClickPropertiesDataset;
-
+    let rightClickProperties;
+    if(node.type === 'file'){
+      rightClickProperties = this.rightClickPropertiesDatasetFile;
+    }
+    else{
+      rightClickProperties = this.rightClickPropertiesDatasetFolder;
+    }
     if (this.windowActions) {
       let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
       // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.
