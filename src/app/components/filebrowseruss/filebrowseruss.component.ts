@@ -500,7 +500,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   openInNewWindow(rightClickedFile: any) {
     const baseURI = `${window.location.origin}${window.location.pathname}`;
-    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openFile","name":"${rightClickedFile.path}"}`, '_blank');
+    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openFile","name":"${rightClickedFile.path}","toggleTree":true}`, '_blank');
     newWindow.focus();
   }
 
