@@ -194,6 +194,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Refresh Metadata", action:() => { 
         this.refreshFileMetadata(this.rightClickedFile);
       }},
+      { text: "Open in new Window", action:() => {
+        this.openInNewWindow(this.rightClickedFile) }},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
       { text: "Change Owners...", action:() => { 
@@ -494,6 +496,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     selectedNode.parentNode.replaceChild(renameField, selectedNode);
     renameField.focus();
     renameField.select();
+  }
+  
+  openInNewWindow(rightClickedFile: any) {
+    const baseURI = `${window.location.origin}${window.location.pathname}`;
+    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openFile","name":"${rightClickedFile.path}"}`, '_blank');
+    newWindow.focus();
   }
 
   showPermissionsDialog(rightClickedFile: any) {
