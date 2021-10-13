@@ -157,8 +157,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesDatasetFile = [
-      { text: "Open in new Window", action:() => {
-        this.openInNewWindow(this.rightClickedFile) }},
+      { text: "Open in new Tab", action:() => {
+        this.openInNewTab(this.rightClickedFile) }},
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
@@ -178,9 +178,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }}
     ];
   }
-  openInNewWindow(rightClickedFile: any) {
+  openInNewTab(rightClickedFile: any) {
     const baseURI = `${window.location.origin}${window.location.pathname}`;
-    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openDataset","name":"${rightClickedFile.data.path}","toggleTree":true}`, '_blank');
+    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openDataset","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":true}`, '_blank');
     newWindow.focus();
   }
   showDeleteDialog(rightClickedFile: any) {

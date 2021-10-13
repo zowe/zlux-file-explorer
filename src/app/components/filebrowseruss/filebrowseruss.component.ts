@@ -191,11 +191,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
+      { text: "Open in new Tab", action:() => {
+        this.openInNewTab(this.rightClickedFile) }},
       { text: "Refresh Metadata", action:() => { 
-        this.refreshFileMetadata(this.rightClickedFile);
-      }},
-      { text: "Open in new Window", action:() => {
-        this.openInNewWindow(this.rightClickedFile) }},
+        this.refreshFileMetadata(this.rightClickedFile);}},
       { text: "Change Mode/Permissions...", action:() => {
         this.showPermissionsDialog(this.rightClickedFile) }},
       { text: "Change Owners...", action:() => { 
@@ -498,9 +497,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     renameField.select();
   }
   
-  openInNewWindow(rightClickedFile: any) {
+  openInNewTab(rightClickedFile: any) {
     const baseURI = `${window.location.origin}${window.location.pathname}`;
-    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openFile","name":"${rightClickedFile.path}","toggleTree":true}`, '_blank');
+    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openFile","name":"${encodeURIComponent(rightClickedFile.path)}","toggleTree":true}`, '_blank');
     newWindow.focus();
   }
 
