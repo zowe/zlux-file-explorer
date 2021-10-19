@@ -93,7 +93,7 @@ jobs:
 
       - name: '[Build 2] Nodejs project build'
         run: |
-          MVD_DESKTOP_DIR=zlux/zlux-app-manager/virtual-desktop
+          export MVD_DESKTOP_DIR=zlux/zlux-app-manager/virtual-desktop
           npm run build
 
       # note: this step is not actually doing upload to artifactory because no artifact input is provided.
