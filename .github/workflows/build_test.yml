@@ -79,13 +79,13 @@ jobs:
           publish-registry-username: ${{ secrets.NPM_PRIVATE_REGISTRY_USERNAME }}
           publish-registry-password: ${{ secrets.NPM_PRIVATE_REGISTRY_PASSWORD }}
           
-      - name: 'Prepare zlux Dependencies'
+      - name: '[Build 1] Prepare zlux Dependencies'
         run: | 
           jfrog rt dl --sort-by=created --sort-order=desc --limit=1 --flat=true ${{ github.event.inputs.ZLUX_CORE_ARTIFACTORY_PATTERN }} zlux/
           cd zlux
           tar xvf zlux-core-*.tar
 
-      - name: '[Build] Nodejs project build'
+      - name: '[Build 2] Nodejs project build'
         run: |
           MVD_DESKTOP_DIR=zlux/zlux-app-manager/virtual-desktop
           npm run build
