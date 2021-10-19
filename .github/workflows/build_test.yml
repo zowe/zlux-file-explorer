@@ -80,8 +80,14 @@ jobs:
           publish-registry-password: ${{ secrets.NPM_PRIVATE_REGISTRY_PASSWORD }}
           
       - name: '[Build 1] Prepare zlux Dependencies'
-        run: | 
-          jfrog rt dl --sort-by=created --sort-order=desc --limit=1 --flat=true ${{ github.event.inputs.ZLUX_CORE_ARTIFACTORY_PATTERN }} zlux/
+        run: |
+          if [ -z "${{ github.event.inputs.ZLUX_CORE_ARTIFACTORY_PATTERN }}" ]; 
+          then
+            export ZLUX_CORE_ARTIFACTORY_PATTERN="libs-snapshot-local/org/zowe/zlux/zlux-core/*-STAGING/zlux-core-*.tar"
+          else
+            export ZLUX_CORE_ARTIFACTORY_PATTERN="${{ github.event.inputs.ZLUX_CORE_ARTIFACTORY_PATTERN }}"
+          fi
+          jfrog rt dl --sort-by=created --sort-order=desc --limit=1 --flat=true $ZLUX_CORE_ARTIFACTORY_PATTERN zlux/
           cd zlux
           tar xvf zlux-core-*.tar
 
