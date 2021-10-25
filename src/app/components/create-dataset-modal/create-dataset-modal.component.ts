@@ -12,6 +12,60 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 
+interface DatasetCreationParams {
+  organization :string,
+  allocationUnit :string,
+  primarySpace :string,
+  secondarySpace :string,
+  directoryBlocks :string,
+  recordFormat :string,
+  blockSize :string,
+  recordLength :string,
+}
+
+const PRESETS = new Map<string, DatasetCreationParams> ([
+  ['JCL', {
+    allocationUnit: 'TRKS',
+    primarySpace: '300',
+    secondarySpace: '100',
+    directoryBlocks: '20',
+    recordFormat: 'FB',
+    recordLength: '80',
+    blockSize: '0',
+    organization: 'PO'
+  }],
+  ['COBOL', {
+    allocationUnit: 'TRKS',
+    primarySpace: '300',
+    secondarySpace: '150',
+    directoryBlocks: '20',
+    recordFormat: 'FB',
+    recordLength: '133',
+    blockSize: '0',
+    organization: 'PO'
+  }],
+  ['PLX', {
+    allocationUnit: 'TRKS',
+    primarySpace: '300',
+    secondarySpace: '150',
+    directoryBlocks: '20',
+    recordFormat: 'VBA',
+    recordLength: '132',
+    blockSize: '0',
+    organization: 'PO'
+  }],
+  ['XML', {
+    allocationUnit: 'TRKS',
+    primarySpace: '200',
+    secondarySpace: '100',
+    directoryBlocks: '20',
+    recordFormat: 'VBA',
+    recordLength: '16383',
+    blockSize: '0',
+    organization: 'PO'
+  }],
+]);
+
 @Component({
   selector: 'create-dataset-modal',
   templateUrl: './create-dataset-modal.component.html',
@@ -20,6 +74,7 @@ import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 })
 export class CreateDatasetModal {
   private properties = {
+    preset: '',
     name: '',
     managementClass: '',
     storageClass: '',
@@ -35,12 +90,12 @@ export class CreateDatasetModal {
     recordLength: '',
     blockSize: '',
     datasetNameType: '',
-    averageBlockLength: '',
     organization: ''
   };
   private numericPattern = "^[0-9]*$";
   private datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,4}$";
   private alphaNumericPattern = "^[a-zA-Z0-9]*$";
+  private presetOptions: string[];
   private allocationUnitOptions: string[];
   private datasetNameTypeOptions: string[];
   private recordFormatOptions: string[];
@@ -53,44 +108,44 @@ export class CreateDatasetModal {
   ) 
   {
     const datasetProperties = data.datasetProperties;
+    this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
-    this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U'];
+    this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U', 'VBA'];
     this.datasetNameTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
+
+    if (datasetProperties.preset) {
+      this.properties.preset = datasetProperties.preset;
+    }
     if (datasetProperties.name) {
       this.properties.name = datasetProperties.name;
-    }
-    if (datasetProperties.allocationUnit) {
-      this.properties.allocationUnit = datasetProperties.allocationUnit;
     }
     if (datasetProperties.averageRecordUnit) {
       this.properties.averageRecordUnit = datasetProperties.averageRecordUnit;
     }
-    if (datasetProperties.primarySpace) {
-      this.properties.primarySpace = datasetProperties.primarySpace;
-    }
-    if (datasetProperties.directoryBlocks) {
-      this.properties.directoryBlocks = datasetProperties.directoryBlocks;
-    }
-    if (datasetProperties.recordFormat) {
-      this.properties.recordFormat = datasetProperties.recordFormat;
-    }
-    if (datasetProperties.recordLength) {
-      this.properties.recordLength = datasetProperties.recordLength;
-    }
-    if (datasetProperties.blockSize) {
-      this.properties.blockSize = datasetProperties.blockSize;
-    }
     if (datasetProperties.datasetNameType) {
       this.properties.datasetNameType = datasetProperties.datasetNameType;
     }
-    if (datasetProperties.organization) {
-      this.properties.organization = datasetProperties.organization;
-    }
+    this.updateProperties(this.properties.preset);
   }
   
   ngOnInit() {
+  }
+  
+  onPresetChange(value: string): void {
+    this.updateProperties(value);
+  }
+
+  updateProperties(preset: string) {
+    this.properties.allocationUnit = PRESETS.get(preset).allocationUnit;
+    this.properties.primarySpace = PRESETS.get(preset).primarySpace;
+    this.properties.secondarySpace = PRESETS.get(preset).secondarySpace;
+    this.properties.directoryBlocks = PRESETS.get(preset).directoryBlocks;
+    this.properties.recordFormat = PRESETS.get(preset).recordFormat;
+    this.properties.recordLength = PRESETS.get(preset).recordLength;
+    this.properties.blockSize = PRESETS.get(preset).blockSize;
+    this.properties.organization = PRESETS.get(preset).organization;
   }
 }
 

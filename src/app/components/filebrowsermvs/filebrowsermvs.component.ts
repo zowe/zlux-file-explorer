@@ -663,16 +663,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     const datasetPropConfig = new MatDialogConfig();
     datasetPropConfig.data = {
       datasetProperties: { 
+        preset: 'JCL',
         name: 'PUBLIC.DATASET.NEW',
-        allocationUnit: 'CYLS',
         averageRecordUnit: 'U',
-        primarySpace: '1',
-        directoryBlocks: '25',
-        recordFormat: 'FB',
-        recordLength: '80',
-        blockSize: '800',
         datasetNameType: 'PDS',
-        organization: 'PO'
       },
       width: '50px',
       height: '475px'
