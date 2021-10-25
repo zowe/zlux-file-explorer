@@ -660,19 +660,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   createDatasetDialog() {
-    const datasetPropConfig = new MatDialogConfig();
-    datasetPropConfig.data = {
-      datasetProperties: { 
-        preset: 'JCL',
-        name: 'PUBLIC.DATASET.NEW',
-        averageRecordUnit: 'U',
-        datasetNameType: 'PDS',
-      },
-      width: '50px',
-      height: '475px'
-    }
-
-    let saveRef = this.dialog.open(CreateDatasetModal, datasetPropConfig);
+    let saveRef = this.dialog.open(CreateDatasetModal, {
+      maxWidth: '600px'
+    });
 
     saveRef.afterClosed().subscribe(result => {
     if (result) {

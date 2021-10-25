@@ -9,7 +9,6 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 
 interface DatasetCreationParams {
@@ -92,9 +91,9 @@ export class CreateDatasetModal {
     datasetNameType: '',
     organization: ''
   };
-  private numericPattern = "^[0-9]*$";
-  private datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,4}$";
-  private alphaNumericPattern = "^[a-zA-Z0-9]*$";
+  private numericPattern: string;
+  private datasetNamePattern: string;
+  private alphaNumericPattern: string;
   private presetOptions: string[];
   private allocationUnitOptions: string[];
   private datasetNameTypeOptions: string[];
@@ -103,41 +102,30 @@ export class CreateDatasetModal {
   private recordUnitOptions: string[];
   private matcher = new CustomErrorStateMatcher();
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) data
-  ) 
-  {
-    const datasetProperties = data.datasetProperties;
+  constructor() { }
+  
+  ngOnInit() {
+    this.numericPattern = "^[0-9]*$";
+    this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,4}$";
+    this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
     this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U', 'VBA'];
     this.datasetNameTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
-
-    if (datasetProperties.preset) {
-      this.properties.preset = datasetProperties.preset;
-    }
-    if (datasetProperties.name) {
-      this.properties.name = datasetProperties.name;
-    }
-    if (datasetProperties.averageRecordUnit) {
-      this.properties.averageRecordUnit = datasetProperties.averageRecordUnit;
-    }
-    if (datasetProperties.datasetNameType) {
-      this.properties.datasetNameType = datasetProperties.datasetNameType;
-    }
-    this.updateProperties(this.properties.preset);
-  }
-  
-  ngOnInit() {
+    this.properties.preset = 'JCL';
+    this.properties.name = 'PUBLIC.DATASET.NEW';
+    this.properties.averageRecordUnit = 'U';
+    this.properties.datasetNameType = 'PDS';
+    this.setProperties(this.properties.preset);
   }
   
   onPresetChange(value: string): void {
-    this.updateProperties(value);
+    this.setProperties(value);
   }
 
-  updateProperties(preset: string) {
+  setProperties(preset: string): void  {
     this.properties.allocationUnit = PRESETS.get(preset).allocationUnit;
     this.properties.primarySpace = PRESETS.get(preset).primarySpace;
     this.properties.secondarySpace = PRESETS.get(preset).secondarySpace;
