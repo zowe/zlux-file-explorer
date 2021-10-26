@@ -28,6 +28,7 @@ import * as _ from 'lodash';
 import { SearchHistoryService } from '../../services/searchHistoryService';
 import { UtilsService } from '../../services/utils.service';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
+import { CreateDatasetModal } from '../create-dataset-modal/create-dataset-modal.component';
 
 const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
 
@@ -657,6 +658,19 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     } 
     return false;
   }
+
+  createDatasetDialog() {
+    let saveRef = this.dialog.open(CreateDatasetModal, {
+      maxWidth: '600px'
+    });
+
+    saveRef.afterClosed().subscribe(result => {
+    if (result) {
+      console.log('RESULT: ', result);
+    }
+    });
+  }
+
 }
 
 
