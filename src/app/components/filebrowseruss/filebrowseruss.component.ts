@@ -111,6 +111,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -191,8 +192,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
-      { text: "Open in new Tab", action:() => {
-        this.openInNewTab(this.rightClickedFile) }},
+      { text: "Open in New Browser Tab", action:() => {
+        this.openInNewTab.emit(this.rightClickedFile) }},
       { text: "Refresh Metadata", action:() => { 
         this.refreshFileMetadata(this.rightClickedFile);}},
       { text: "Change Mode/Permissions...", action:() => {
@@ -495,12 +496,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     selectedNode.parentNode.replaceChild(renameField, selectedNode);
     renameField.focus();
     renameField.select();
-  }
-  
-  openInNewTab(rightClickedFile: any) {
-    const baseURI = `${window.location.origin}${window.location.pathname}`;
-    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openFile","name":"${encodeURIComponent(rightClickedFile.path)}","toggleTree":true}`, '_blank');
-    newWindow.focus();
   }
 
   showPermissionsDialog(rightClickedFile: any) {

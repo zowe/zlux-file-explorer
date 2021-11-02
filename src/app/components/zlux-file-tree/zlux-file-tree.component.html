@@ -35,6 +35,7 @@
     <file-browser-uss #ussComponent
       [hidden]="currentIndex != 0"
       (nodeClick)="onNodeClick($event)"
+      (openInNewTab)="onOpenInNewTab($event)"
       (nodeDblClick)="onNodeDblClick($event)"
       (newFolderClick)="onNewFolderClick($event)"
       (fileUploaded)="onFileUploaded($event)"
@@ -52,6 +53,7 @@
     <file-browser-mvs #mvsComponent
       [hidden]="currentIndex != 1"
       (nodeClick)="onNodeClick($event)"
+      (openInNewTab)="onOpenInNewTab($event)"
       (nodeDblClick)="onNodeDblClick($event)"
       (rightClick)="onRightClick($event)"
       (pathChanged)="onPathChanged($event)"

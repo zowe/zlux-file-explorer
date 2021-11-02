@@ -97,6 +97,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){
@@ -157,8 +158,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesDatasetFile = [
-      { text: "Open in new Tab", action:() => {
-        this.openInNewTab(this.rightClickedFile) }},
+      { text: "Open in New Browser Tab", action:() => {
+        this.openInNewTab.emit(this.rightClickedFile) }},
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile) }},
       { text: "Delete", action:() => { 
@@ -178,11 +179,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }}
     ];
   }
-  openInNewTab(rightClickedFile: any) {
-    const baseURI = `${window.location.origin}${window.location.pathname}`;
-    const newWindow = window.open(`${baseURI}?pluginId=org.zowe.editor:data:{"type":"openDataset","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":true}`, '_blank');
-    newWindow.focus();
-  }
+
   showDeleteDialog(rightClickedFile: any) {
     if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.data.path, "This is already being deleted.") == true) {
       return;
