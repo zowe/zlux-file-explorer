@@ -14,6 +14,7 @@ on:
       PERFORM_RELEASE:
         description: 'perform release'
         required: false
+        default: 'false'
       PRE_RELEASE_STRING:
         description: 'Pre-release string for a release. For example: rc.1, beta.1, etc. This is required if the release is not performed on branches which "allowFormalRelease" is true.'
         required: false
