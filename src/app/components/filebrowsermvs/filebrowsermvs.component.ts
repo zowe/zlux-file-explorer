@@ -159,7 +159,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesDatasetFile = [
-      { text: "Open in New Browser Tab", action:() => {
+      { text: "Request Open in New Browser Tab", action:() => {
         this.openInNewTab.emit(this.rightClickedFile);
       }},
       { text: "Properties", action:() => { 

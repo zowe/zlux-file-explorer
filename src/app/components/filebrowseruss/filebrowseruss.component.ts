@@ -192,7 +192,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
-      { text: "Open in New Browser Tab", action:() => {
+      { text: "Request Open in New Browser Tab", action:() => {
         this.openInNewTab.emit(this.rightClickedFile);
       }},
       { text: "Refresh Metadata", action:() => { 
