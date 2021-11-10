@@ -16,6 +16,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 if (process.env.MVD_DESKTOP_DIR == null) {
   throw new Error('You must specify MVD_DESKTOP_DIR in your environment');
 }
+
 var config = {
   'entry': [
     path.resolve(__dirname, './src/plugin.ts')
@@ -25,25 +26,24 @@ var config = {
     'filename': 'main.js',
   },
   'module': {
-    'rules': [
-      {
-        test: /\.svg$/,
-        use: ['svg-inline-loader']
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          'exports-loader?module.exports.toString()',
-          {
-            loader: 'css-loader',
-            options: {
-              'sourceMap': false
-            }
-          },
-          'sass-loader'
-        ]
-      }
-    ],
+    'rules': [{
+      test: /\.svg$/,
+      loader: 'svg-inline-loader'
+    },
+    {
+      test: /\.scss$/,
+      'use': [
+        'exports-loader?module.exports.toString()',
+        {
+          'loader': 'css-loader',
+          'options': {
+            'sourceMap': false
+          }
+        },
+        'sass-loader'
+      ]
+    }
+  ],
   },
   'plugins': [
     new CopyWebpackPlugin([
