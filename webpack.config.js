@@ -31,7 +31,7 @@ var config = {
     },
     {
       test: /\.scss$/,
-      'use': [
+      use: [
         'exports-loader?module.exports.toString()',
         {
           'loader': 'css-loader',
