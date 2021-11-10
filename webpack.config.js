@@ -32,8 +32,8 @@ var config = {
     {
       test: /\.scss$/,
       use: [
+        'exports-loader?module.exports.toString()',
         {
-          'loader': 'css-loader',
           'options': {
             'sourceMap': false
           }
