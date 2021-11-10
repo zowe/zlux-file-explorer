@@ -16,7 +16,6 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 if (process.env.MVD_DESKTOP_DIR == null) {
   throw new Error('You must specify MVD_DESKTOP_DIR in your environment');
 }
-
 var config = {
   'entry': [
     path.resolve(__dirname, './src/plugin.ts')
@@ -35,7 +34,7 @@ var config = {
       'use': [
         'exports-loader?module.exports.toString()',
         {
-          'loader': ['css-loader'],
+          'loader': 'css-loader',
           'options': {
             'sourceMap': false
           }
