@@ -72,7 +72,7 @@ jobs:
           node-version: 14
 
       - name: '[Setup] NodeJS project setup'
-        uses: zowe-actions/nodejs-actions/setup@users/jack/test1
+        uses: zowe-actions/nodejs-actions/setup@main
         with:
           package-name: 'org.zowe.zlux-angular-file-tree'
           install-registry-url: ${{ env.DEFAULT_NPM_PRIVATE_INSTALL_REGISTRY }}
