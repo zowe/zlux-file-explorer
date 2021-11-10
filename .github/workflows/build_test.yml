@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: '[Prep 1] Validate package.json'
-        uses: zowe-actions/shared-actions/validate-package-json@users/jack/validate-package-json
+        uses: zowe-actions/shared-actions/validate-package-json@main
 
       - name: '[Prep 2] Cache node modules'
         uses: actions/cache@v2
