@@ -28,7 +28,7 @@ var config = {
   'module': {
     'rules': [{
       test: /\.svg$/,
-      loader: 'svg-inline-loader'
+      use: 'svg-inline-loader'
     },
     {
       test: /\.scss$/,
@@ -48,8 +48,10 @@ var config = {
   'plugins': [
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, './src/assets'),
-        to: path.resolve('./dist/assets')
+        patterns: [{
+          from: path.resolve(__dirname, './src/assets'),
+          to: path.resolve('./dist/assets')
+        }]
       }
     ])
   ]

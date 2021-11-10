@@ -11,8 +11,8 @@
     "url": "https://github.com/zowe/zlux-file-explorer.git"
   },
   "scripts": {
-    "start": "webpack --progress --colors --watch",
-    "build": "webpack --progress --colors",
+    "start": "webpack --progress --color --watch",
+    "build": "webpack --progress --color",
     "lint": "ng lint"
   },
   "license": "EPL-2.0",
