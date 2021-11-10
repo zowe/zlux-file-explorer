@@ -25,26 +25,25 @@ var config = {
     'filename': 'main.js',
   },
   'module': {
-    'rules': [{
-      test: /\.svg$/,
-      use: ['svg-inline-loader']
-    },
-    {
-      test: /\.scss$/,
-      use: [
-        'exports-loader?module.exports.toString()',
-        {
-          'loader': 'css-loader',
-          'options': {
-            'sourceMap': false
-          }
-        },
-        {
-          loader: 'sass-loader'
-        },
-      ]
-    }
-  ],
+    'rules': [
+      {
+        test: /\.svg$/,
+        use: ['svg-inline-loader']
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'exports-loader?module.exports.toString()',
+          {
+            loader: 'css-loader',
+            options: {
+              'sourceMap': false
+            }
+          },
+          'sass-loader'
+        ]
+      }
+    ],
   },
   'plugins': [
     new CopyWebpackPlugin([
