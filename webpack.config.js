@@ -27,7 +27,7 @@ var config = {
   'module': {
     'rules': [{
       test: /\.svg$/,
-      use: 'svg-inline-loader'
+      use: ['svg-inline-loader']
     },
     {
       test: /\.scss$/,
