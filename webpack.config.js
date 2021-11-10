@@ -25,11 +25,13 @@ var config = {
     'filename': 'main.js',
   },
   'module': {
-    'rules': [
+    'rules': [{
+      test: /\.svg$/,
+      use: ['svg-inline-loader']
+    },
     {
       test: /\.scss$/,
       use: [
-        'exports-loader?module.exports.toString()',
         {
           'loader': 'css-loader',
           'options': {
