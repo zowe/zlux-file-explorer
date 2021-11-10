@@ -35,7 +35,7 @@ var config = {
       'use': [
         'exports-loader?module.exports.toString()',
         {
-          'loader': 'css-loader',
+          'use': ['css-loader'],
           'options': {
             'sourceMap': false
           }
