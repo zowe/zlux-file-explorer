@@ -111,6 +111,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -191,31 +192,39 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesFile = [
+      { text: "Request Open in New Browser Tab", action:() => {
+        this.openInNewTab.emit(this.rightClickedFile);
+      }},
       { text: "Refresh Metadata", action:() => { 
         this.refreshFileMetadata(this.rightClickedFile);
       }},
       { text: "Change Mode/Permissions...", action:() => {
-        this.showPermissionsDialog(this.rightClickedFile) }},
+        this.showPermissionsDialog(this.rightClickedFile);
+      }},
       { text: "Change Owners...", action:() => { 
-        this.showOwnerDialog(this.rightClickedFile) }},
+        this.showOwnerDialog(this.rightClickedFile);
+      }},
       { text: "Tag...", action:() => { 
-        this.showTaggingDialog(this.rightClickedFile) }},
+        this.showTaggingDialog(this.rightClickedFile);
+      }},
       { text: "Download", action:() => { 
         this.attemptDownload(this.rightClickedFile);
       }},
       { text: "Cut", action:() => { 
-        this.cutFile(this.rightClickedFile)
+        this.cutFile(this.rightClickedFile);
       }},
       { text: "Copy", action:() => { 
-        this.copyFile(this.rightClickedFile)
+        this.copyFile(this.rightClickedFile);
       }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
       }},
       { text: "Rename", action:() => {
-        this.showRenameField(this.rightClickedFile) }},
+        this.showRenameField(this.rightClickedFile);
+      }},
       { text: "Properties", action:() => { 
-        this.showPropertiesDialog(this.rightClickedFile) }},
+        this.showPropertiesDialog(this.rightClickedFile);
+      }},
     ];
 
     this.rightClickPropertiesFolder = [

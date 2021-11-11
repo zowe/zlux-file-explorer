@@ -58,9 +58,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private dataCached: any;
   public isLoading: boolean;
   private rightClickedFile: any;
-  private rightClickPropertiesDataset: ContextMenuItem[];
+  private rightClickPropertiesDatasetFile: ContextMenuItem[];
+  private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
+  
 
   constructor(private elementRef:ElementRef,
               private utils:UtilsService,
@@ -96,6 +98,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){
@@ -155,12 +158,24 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }*/
 
   initializeRightClickProperties() {
-    this.rightClickPropertiesDataset = [
+    this.rightClickPropertiesDatasetFile = [
+      { text: "Request Open in New Browser Tab", action:() => {
+        this.openInNewTab.emit(this.rightClickedFile);
+      }},
       { text: "Properties", action:() => { 
-        this.showPropertiesDialog(this.rightClickedFile) }},
+        this.showPropertiesDialog(this.rightClickedFile);
+      }},
       { text: "Delete", action:() => { 
-        this.showDeleteDialog(this.rightClickedFile); }
-      }
+        this.showDeleteDialog(this.rightClickedFile); 
+      }}
+    ];
+    this.rightClickPropertiesDatasetFolder = [
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile);
+      }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile);
+      }}
     ];
     this.rightClickPropertiesPanel = [
       { text: "Show/Hide Search", action:() => { 
@@ -462,8 +477,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   onNodeRightClick(event:any) {
     let node = event.node;
-    let rightClickProperties = this.rightClickPropertiesDataset;
-
+    let rightClickProperties;
+    if(node.type === 'file'){
+      rightClickProperties = this.rightClickPropertiesDatasetFile;
+    }
+    else{
+      rightClickProperties = this.rightClickPropertiesDatasetFolder;
+    }
     if (this.windowActions) {
       let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
       // TODO: Fix Zowe's context menu such that if it doesn't have enough space to spawn, it moves itself accordingly to spawn.

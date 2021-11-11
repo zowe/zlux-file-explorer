@@ -1,7 +1,9 @@
 # ZLUX Angular File Tree
 
-## 0.11.0
+## 0.12.0
+* Added the option to open a file in new browser tab
 
+## 0.11.0
 * Added a function to refresh file/directory metadata using the USS path 
 
 ## 0.10.0
