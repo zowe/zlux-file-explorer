@@ -48,10 +48,8 @@ var config = {
   'plugins': [
     new CopyWebpackPlugin([
       {
-        patterns: [{
-          from: path.resolve(__dirname, './src/assets'),
-          to: path.resolve('./dist/assets')
-        }]
+        from: path.resolve(__dirname, './src/assets'),
+        to: path.resolve('./dist/assets')
       }
     ])
   ]
