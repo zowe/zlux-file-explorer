@@ -108,7 +108,7 @@ export class CreateDatasetModal {
   ngOnInit() {
     this.numericPattern = "^[0-9]*$";
     this.numericPatternExZero = "^[1-9][0-9]*$";
-    this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,4}$";
+    this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,21}$";
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];

@@ -23,7 +23,7 @@
   <p></p>
   <label class="required">Dataset Name:</label>
   <mat-form-field>
-    <input matInput type="text" [pattern]="datasetNamePattern" [(ngModel)]="properties.name" #nameInput="ngModel" [errorStateMatcher]="matcher">
+    <input matInput type="text" maxlength="44" [pattern]="datasetNamePattern" [(ngModel)]="properties.name" #nameInput="ngModel" [errorStateMatcher]="matcher">
     <mat-error>Invalid Name</mat-error>
   </mat-form-field>
   <p></p>
