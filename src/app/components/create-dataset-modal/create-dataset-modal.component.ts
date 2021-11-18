@@ -88,15 +88,16 @@ export class CreateDatasetModal {
     recordFormat: '',
     recordLength: '',
     blockSize: '',
-    datasetNameType: '',
+    datasetType: '',
     organization: ''
   };
   private numericPattern: string;
+  private numericPatternExZero: string;
   private datasetNamePattern: string;
   private alphaNumericPattern: string;
   private presetOptions: string[];
   private allocationUnitOptions: string[];
-  private datasetNameTypeOptions: string[];
+  private datasetTypeOptions: string[];
   private recordFormatOptions: string[];
   private organizationOptions: string[];
   private recordUnitOptions: string[];
@@ -106,18 +107,18 @@ export class CreateDatasetModal {
   
   ngOnInit() {
     this.numericPattern = "^[0-9]*$";
+    this.numericPatternExZero = "^[1-9][0-9]*$";
     this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,4}$";
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
-    this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U', 'VBA'];
-    this.datasetNameTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
+    this.recordFormatOptions = ['A', 'B', 'F', 'FB', 'V', 'VB', 'U', 'VBA'];
+    this.datasetTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
     this.properties.preset = 'JCL';
-    this.properties.name = 'PUBLIC.DATASET.NEW';
     this.properties.averageRecordUnit = 'U';
-    this.properties.datasetNameType = 'PDS';
+    this.properties.datasetType = 'PDS';
     this.setProperties(this.properties.preset);
   }
   

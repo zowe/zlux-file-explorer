@@ -53,6 +53,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private showSearch: boolean;
   private rightClickPropertiesPanel: ContextMenuItem[];
   @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
+  @ViewChild('nodeMVS') nodeMVS: ElementRef;
 
   //TODO:define interface types for mvs-data/data
   private data: any;
@@ -664,10 +665,27 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       maxWidth: '600px'
     });
 
-    saveRef.afterClosed().subscribe(result => {
-    if (result) {
-      console.log('RESULT: ', result);
-    }
+    saveRef.afterClosed().subscribe(attributes => {
+      if (attributes) {
+        const datasetAttributes = {
+          ndisp: "CATALOG",
+          status: "NEW",
+          dsorg: attributes.organization,
+          blksz: attributes.blockSize,
+          lrecl: attributes.recordLength,
+          recfm: attributes.recordFormat,
+          close: "true"
+        }
+        this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
+          this.snackBar.open(`Dataset created successfully.`, 'Dismiss', defaultSnackbarOptions);
+          this.isLoading = false;
+          const path = attributes.name.substring(0,6);
+          this.updateTreeView(path);
+        }, error => {
+          this.snackBar.open(`Failed to create the dataset: ${error._body}`, 'Dismiss', defaultSnackbarOptions);
+          }
+        );
+      }
     });
   }
 

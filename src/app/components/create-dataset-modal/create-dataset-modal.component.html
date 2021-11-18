@@ -45,7 +45,7 @@
   <p></p>
   <label class="required">Primary Space:</label>
   <mat-form-field>
-    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher">
+    <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher">
     <mat-error>Invalid Primary Space</mat-error>
   </mat-form-field>
   <p></p>
@@ -81,11 +81,11 @@
     <mat-error>Invalid Block Size</mat-error>
   </mat-form-field>
   <p></p>
-  <label class="required">Dataset Name Type:</label>
+  <label class="required">Dataset Type:</label>
   <mat-form-field>
-    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetNameType">
-      <mat-option *ngFor="let datasetNameType of datasetNameTypeOptions" [value]="datasetNameType">
-      {{datasetNameType}}</mat-option>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetType">
+      <mat-option *ngFor="let datasetType of datasetTypeOptions" [value]="datasetType">
+      {{datasetType}}</mat-option>
     </mat-select>
   </mat-form-field>
   <p></p>
