@@ -1,0 +1,150 @@
+
+<!-- 
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+  
+  SPDX-License-Identifier: EPL-2.0
+  
+  Copyright Contributors to the Zowe Project.
+-->
+<zlux-tab-trap></zlux-tab-trap>
+<button mat-dialog-close class="close-dialog-btn"><i class="fa fa-close"></i></button>
+<h2 mat-dialog-title>CREATE DATASET</h2>
+<p class="mandatory">Mandatory fields are marked with an asterisk</p>
+<mat-dialog-content>
+  <label>Preset:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.preset" #presetInput (selectionChange)="onPresetChange(presetInput.value)">
+      <mat-option *ngFor="let preset of presetOptions" [value]="preset">
+      {{preset}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Dataset Name:</label>
+  <mat-form-field>
+    <input matInput type="text" [pattern]="datasetNamePattern" [(ngModel)]="properties.name" #nameInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Name</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Allocation Unit:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.allocationUnit">
+      <mat-option *ngFor="let allocationUnit of allocationUnitOptions" [value]="allocationUnit">
+      {{allocationUnit}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Average Record Unit:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.averageRecordUnit">
+      <mat-option *ngFor="let averageRecordUnit of recordUnitOptions" [value]="averageRecordUnit">
+      {{averageRecordUnit}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Primary Space:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Primary Space</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label>Secondary Space:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.secondarySpace" #secSpaceInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Secondary Space</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Directory Blocks:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.directoryBlocks" #dirBlockInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Directory Blocks</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Record Format:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.recordFormat">
+      <mat-option *ngFor="let recordFormat of recordFormatOptions" [value]="recordFormat">
+      {{recordFormat}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Record Length:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.recordLength" #recLengthInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Record Length</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Block Size :</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.blockSize" #blockSize="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Block Size</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Dataset Type:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetType">
+      <mat-option *ngFor="let datasetType of datasetTypeOptions" [value]="datasetType">
+      {{datasetType}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Dataset Organization:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.organization">
+      <mat-option *ngFor="let organization of organizationOptions" [value]="organization">
+      {{organization}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label>Management Class:</label>
+  <mat-form-field>
+    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.managementClass" #managementClassInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Management Class</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label>Storage Class:</label>
+  <mat-form-field>
+    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.storageClass" #storageClassInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Storage Class</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label>Volume Serial:</label>
+  <mat-form-field>
+    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.volumeSerial" #volserInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Volume Serial</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label>Device Type:</label>
+  <mat-form-field>
+    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.deviceType" #deviceTypeInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Device Type</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label>Data Class:</label>
+  <mat-form-field>
+    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.dataClass" #dataClassInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Data Class</mat-error>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button 
+    mat-button 
+    mat-stroked-button 
+    class="right" 
+    color="primary" 
+    [mat-dialog-close]="properties"
+    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || managementClassInput.invalid || storageClassInput.invalid || volserInput.invalid || deviceTypeInput.invalid || dataClassInput.invalid">
+    Save
+  </button>
+</mat-dialog-actions>
+
+<!-- 
+  This program and the accompanying materials are
+  made available under the terms of the Eclipse Public License v2.0 which accompanies
+  this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+  
+  SPDX-License-Identifier: EPL-2.0
+  
+  Copyright Contributors to the Zowe Project.
+-->

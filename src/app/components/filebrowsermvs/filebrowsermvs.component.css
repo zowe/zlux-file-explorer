@@ -11,6 +11,7 @@
 */
 
 .searchRowFlex {
+  width: 200px;
   display: flex;
   flex-direction: row;
 }
@@ -60,6 +61,12 @@
 .qualButton:not(.mat-button-toggle-checked) {
   background-color: #464646;
   color:#757575;
+}
+
+.filebrowsermvs-plus-icon {
+  margin-left: -15px;
+  font-size: large;
+  cursor: pointer;
 }
 
 /*

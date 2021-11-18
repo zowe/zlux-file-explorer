@@ -28,6 +28,8 @@ import * as _ from 'lodash';
 import { SearchHistoryService } from '../../services/searchHistoryService';
 import { UtilsService } from '../../services/utils.service';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
+import { CreateDatasetModal } from '../create-dataset-modal/create-dataset-modal.component';
+
 
 const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
 
@@ -677,6 +679,36 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     } 
     return false;
   }
+
+  createDatasetDialog() {
+    let saveRef = this.dialog.open(CreateDatasetModal, {
+      maxWidth: '600px'
+    });
+
+    saveRef.afterClosed().subscribe(attributes => {
+      if (attributes) {
+        const datasetAttributes = {
+          ndisp: "CATALOG",
+          status: "NEW",
+          dsorg: attributes.organization,
+          blksz: attributes.blockSize,
+          lrecl: attributes.recordLength,
+          recfm: attributes.recordFormat,
+          close: "true"
+        }
+        this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
+          this.snackBar.open(`Dataset created successfully.`, 'Dismiss', defaultSnackbarOptions);
+          this.isLoading = false;
+          const path = attributes.name.substring(0,6);
+          this.updateTreeView(path);
+        }, error => {
+          this.snackBar.open(`Failed to create the dataset: ${error._body}`, 'Dismiss', defaultSnackbarOptions);
+          }
+        );
+      }
+    });
+  }
+
 }
 
 
