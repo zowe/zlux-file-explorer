@@ -688,15 +688,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     saveRef.afterClosed().subscribe(attributes => {
       if (attributes) {
         const datasetAttributes = {
-          'ndisp': 'CATALOG',
-          'status': 'NEW',
-          'dsorg': attributes.organization,
-          'blksz': attributes.blockSize,
-          'lrecl': attributes.recordLength,
-          'recfm': attributes.recordFormat,
-          'close': 'true'
+          ndisp: 'CATALOG',
+          status: 'NEW',
+          dsorg: attributes.organization,
+          blksz: attributes.blockSize,
+          lrecl: attributes.recordLength,
+          recfm: attributes.recordFormat,
+          close: 'true'
         }
-        this.datasetService.createDataset(JSON.stringify(datasetAttributes), attributes.name).subscribe(resp => {
+        this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
           this.snackBar.open(`Dataset created successfully.`, 'Dismiss', defaultSnackbarOptions);
           this.isLoading = false;
           const path = attributes.name.substring(0,6);
