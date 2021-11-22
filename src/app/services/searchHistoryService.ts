@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Injectable, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import { of } from 'rxjs';

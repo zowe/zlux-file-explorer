@@ -18,7 +18,6 @@ import { FormControl } from '@angular/forms'
 import { Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, finalize, map, timeout } from 'rxjs/operators';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
-import 'rxjs/add/operator/toPromise';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';

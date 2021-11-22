@@ -13,8 +13,7 @@ import { TreeNode } from 'primeng/primeng';
 
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
+import { Observable } from 'rxjs';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 @Injectable()
