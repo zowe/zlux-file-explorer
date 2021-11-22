@@ -11,7 +11,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 import { FormControl } from '@angular/forms';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
@@ -63,7 +63,7 @@ export class FilePermissionsModal {
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
     private dialogRef: MatDialogRef<FilePermissionsModal>,
-    private http: Http,
+    private http: HttpClient,
     private snackBar: MatSnackBar,
   ) 
   {

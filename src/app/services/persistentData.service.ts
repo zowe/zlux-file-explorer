@@ -12,7 +12,7 @@
 import { TreeNode } from 'primeng/primeng';
 
 import { Injectable, Inject } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
@@ -24,7 +24,7 @@ export class PersistentDataService {
     private resourcePath: string = "persistance";
     private fileName: string = "zlux-file-explorer.json"
     
-    constructor(private http: Http,
+    constructor(private http: HttpClient,
         @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
 
     ) { }

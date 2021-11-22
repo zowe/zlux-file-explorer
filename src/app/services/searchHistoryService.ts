@@ -1,4 +1,4 @@
-import { Http, Headers, RequestOptions } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { Injectable, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
@@ -18,7 +18,7 @@ export class SearchHistoryService {
   private type:string;
 
   constructor(@Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition
-  ,  private http: Http) {
+  ,  private http: HttpClient) {
     
   }
 
@@ -33,8 +33,8 @@ export class SearchHistoryService {
 
   private getData(): void {
 
-    let headers = new Headers({ 'Content-Type': 'application/json' });
-    let options = new RequestOptions({ headers: headers });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let options = { headers: headers };
 
     const getRequest =  this.http
       .get(this.uri, options)
@@ -57,8 +57,8 @@ export class SearchHistoryService {
 
   private saveData(history: string[]): Observable<any> {
 
-    let headers = new Headers({ 'Content-Type': 'application/json' });
-    let options = new RequestOptions({ headers: headers });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let options = { headers: headers };
 
     let params = {
         "history": history

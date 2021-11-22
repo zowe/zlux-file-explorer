@@ -11,7 +11,7 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { DatasetAttributes } from '../structures/editor-project';
 import { catchError, switchMap, map } from 'rxjs/operators';
@@ -21,7 +21,7 @@ import { of, throwError } from 'rxjs';
 @Injectable()
 export class DatasetCrudService {
   constructor(
-    private http: Http,
+    private http: HttpClient,
     private utils: UtilsService
   ){}
 

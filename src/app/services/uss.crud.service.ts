@@ -11,7 +11,7 @@
 */
 
 import { Injectable   } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable   } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -25,7 +25,7 @@ export class UssCrudService {
     console.error(error.message || error);
     return Observable.throw(error.message || error);
   }
-  constructor(private http: Http, private utils:UtilsService){}
+  constructor(private http: HttpClient, private utils:UtilsService){}
   makeDirectory(path:string, forceOverwrite?: boolean): Observable<any>{
     let url:string = ZoweZLUX.uriBroker.unixFileUri('mkdir', path, undefined, undefined, undefined, forceOverwrite);
     return this.http.post(url, null)
