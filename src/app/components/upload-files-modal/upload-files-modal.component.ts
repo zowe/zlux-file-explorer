@@ -9,7 +9,8 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, Inject, EventEmitter, ViewChild, ElementRef } from '@angular/core';
-import { MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { UploaderService } from '../../services/uploader.service';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 

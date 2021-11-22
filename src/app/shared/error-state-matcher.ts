@@ -9,7 +9,7 @@
 */
 
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
-import { ErrorStateMatcher } from '@angular/material';
+import { ErrorStateMatcher } from '@angular/material/core';
 
 /*
   By default, the error messages associated with matInput inside <mat-form-field>

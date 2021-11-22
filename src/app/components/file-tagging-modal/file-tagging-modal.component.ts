@@ -9,7 +9,8 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 import { fileTagList, findFileTagByCodeset, FileTag } from '../../shared/file-tag';
