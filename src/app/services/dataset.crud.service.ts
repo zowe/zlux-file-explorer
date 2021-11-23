@@ -75,7 +75,6 @@ export class DatasetCrudService {
   deleteNonVsamDatasetOrMember(rightClickedFile: any): Observable<any>{
     let url = ZoweZLUX.uriBroker.datasetContentsUri(rightClickedFile.data.path);
     return this.http.delete(url).pipe(
-      // map(res=>res.json()),
       catchError(this.handleErrorObservable)
     )
   }
@@ -83,7 +82,6 @@ export class DatasetCrudService {
   deleteVsamDataset(rightClickedFile: any): Observable<any> {
     let url = ZoweZLUX.uriBroker.VSAMdatasetContentsUri(rightClickedFile.data.path);
     return this.http.delete(url).pipe(
-      // map(res => res.json()),
       catchError(this.handleErrorObservable)
     )
   }
@@ -92,7 +90,6 @@ export class DatasetCrudService {
     let url:string;
     url = ZoweZLUX.uriBroker.datasetMetadataUri(encodeURIComponent(query.toUpperCase( ).replace(/\.$/, '')), detail.toString(), undefined, true, undefined, undefined, undefined, undefined, undefined, includeAdditionalQualifiers.toString());
     return this.http.get(url).pipe(
-      // map(res=>res.json()),
       catchError(this.handleErrorObservable)
     )
   }
@@ -100,7 +97,6 @@ export class DatasetCrudService {
   getDataset(path:string) {
     let url:string = ZoweZLUX.uriBroker.datasetContentsUri(path.trim().toUpperCase());
     return this.http.get(url).pipe(
-      // map(res=>res.json()),
       catchError(this.handleErrorObservable)
     )
   }

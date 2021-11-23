@@ -39,7 +39,6 @@ export class SearchHistoryService {
 
     const getRequest =  this.http
       .get(this.uri, options).pipe(
-        // map(res => res.json()),
         catchError((err => {
           let type = this.type;
           console.log(err);
