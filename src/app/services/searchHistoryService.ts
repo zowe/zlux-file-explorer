@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { Injectable, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 
 @Injectable()
@@ -37,13 +38,14 @@ export class SearchHistoryService {
     let options = { headers: headers };
 
     const getRequest =  this.http
-      .get(this.uri, options)
-      .map(res => res.json())
-      .catch((err => {
+      .get(this.uri, options).pipe(
+        map(res => res.json()),
+        catchError((err => {
           let type = this.type;
           console.log(err);
           return null;
-      }));
+        }))
+      )
 
       const sub = getRequest.subscribe((data) => {
         if (data && data.contents && data.contents.history) {
@@ -65,12 +67,13 @@ export class SearchHistoryService {
     };
 
     return this.http
-      .put(this.uri, params, options)
-      .catch((err => {
+      .put(this.uri, params, options).pipe(
+        catchError((err => {
           let type = this.type;
           console.log(`save${type}SearchHistory error`, err);
           return null
-      }));
+        }))
+      )
   }
 
   public saveSearchHistory(path: string):Observable<any> {

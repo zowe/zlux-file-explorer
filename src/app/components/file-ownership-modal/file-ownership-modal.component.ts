@@ -14,6 +14,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
+import { finalize, catchError, map } from "rxjs/operators";
+
 
 @Component({
   selector: 'file-ownership-modal',
@@ -101,27 +103,21 @@ export class FileOwnershipModal {
 
   saveOwnerInfo() {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, this.recursive, this.owner, this.group);
-    this.http.post(url, null)
-    .finally(() => this.closeDialog())
-    .map(res=>{
-      if (res.status == 200) {
-        this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
-          'Dismiss', defaultSnackbarOptions);
-        this.node.owner = this.owner;
-        this.node.group = this.group;
-      } else {
-        this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
-          'Dismiss', defaultSnackbarOptions);
-      }
-    })
-    .catch(this.handleErrorObservable).subscribe(
-      resp => {
-      },
-      error => { 
-        this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
-          'Dismiss', defaultSnackbarOptions);
-      }
-    );
+    this.http.post(url, null).pipe(
+      finalize(() => this.closeDialog()),
+      map(res=>{
+        if (res.status == 200) {
+          this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
+            'Dismiss', defaultSnackbarOptions);
+          this.node.owner = this.owner;
+          this.node.group = this.group;
+        } else {
+          this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
+            'Dismiss', defaultSnackbarOptions);
+        }
+      }),
+      catchError(this.handleErrorObservable)
+    )
   }
   
     
@@ -132,6 +128,8 @@ export class FileOwnershipModal {
 
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
+    this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
+            'Dismiss', defaultSnackbarOptions);
     return Observable.throw(error.message || error);
   }
 }

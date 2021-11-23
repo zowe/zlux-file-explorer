@@ -369,7 +369,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     return this.ussComponent.refreshFileMetadatdaUsingPath(path);
    }
 
-  zluxOnMessage(eventContext: any): Promise<any> {
+  zluxOnMessage(eventContext: any): Promise<void> {
     return new Promise((resolve,reject)=> {
 
       if (!eventContext || !eventContext.action){

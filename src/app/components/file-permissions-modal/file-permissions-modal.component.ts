@@ -11,11 +11,12 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 import { FormControl } from '@angular/forms';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
+import { finalize, catchError, map } from "rxjs/operators";
 
 @Component({
   selector: 'file-permissions-modal',
@@ -276,26 +277,20 @@ export class FilePermissionsModal {
 
   savePermissions() {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chmod', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, this.octalMode, this.recursive);
-    this.http.post(url, null)
-    .finally(() => this.closeDialog())
-    .map(res=>{
-      if (res.status == 200) {
-        this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
-          'Dismiss', defaultSnackbarOptions);
-        this.node.mode = parseInt(this.octalMode, 10);
-      } else {
-        this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
-          'Dismiss', defaultSnackbarOptions);
-      }
-    })
-    .catch(this.handleErrorObservable).subscribe(
-      resp => {
-      },
-      error => { 
-        this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
-          'Dismiss', defaultSnackbarOptions);
-      }
-    );
+    this.http.post(url, null).pipe(
+      finalize(() => this.closeDialog()),
+      map(res=>{
+        if (res.status == 200) {
+          this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
+            'Dismiss', defaultSnackbarOptions);
+          this.node.mode = parseInt(this.octalMode, 10);
+        } else {
+          this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
+            'Dismiss', defaultSnackbarOptions);
+        }
+      }),
+      catchError(this.handleErrorObservable)
+    )
   }
   
   closeDialog() {
@@ -325,7 +320,9 @@ export class FilePermissionsModal {
 
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
-    return Observable.throw(error.message || error);
+    this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
+    'Dismiss', defaultSnackbarOptions);
+    return throwError(error.message || error);
   }
 }
 
