@@ -39,7 +39,7 @@ export class SearchHistoryService {
 
     const getRequest =  this.http
       .get(this.uri, options).pipe(
-        map(res => res.json()),
+        // map(res => res.json()),
         catchError((err => {
           let type = this.type;
           console.log(err);
@@ -47,7 +47,7 @@ export class SearchHistoryService {
         }))
       )
 
-      const sub = getRequest.subscribe((data) => {
+      const sub = getRequest.subscribe((data:any) => {
         if (data && data.contents && data.contents.history) {
           this.searchHistory = Array.from(new Set(this.searchHistory.concat(data.contents.history)));
         };

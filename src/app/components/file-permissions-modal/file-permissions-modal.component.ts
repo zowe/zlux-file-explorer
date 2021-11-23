@@ -279,7 +279,7 @@ export class FilePermissionsModal {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chmod', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, this.octalMode, this.recursive);
     this.http.post(url, null).pipe(
       finalize(() => this.closeDialog()),
-      map(res=>{
+      map((res: any)=>{
         if (res.status == 200) {
           this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
             'Dismiss', defaultSnackbarOptions);
