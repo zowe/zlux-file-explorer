@@ -91,7 +91,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserMVSComponent)
   private mvsComponent: FileBrowserMVSComponent;
 
-  @ViewChild('fileExplorerGlobal')
+  @ViewChild('fileExplorerGlobal', { static: true })
   fileExplorerGlobal: ElementRef<any>;
 
   constructor(/*private persistentDataService: PersistentDataService,*/
