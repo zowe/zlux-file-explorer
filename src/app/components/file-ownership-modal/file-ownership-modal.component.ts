@@ -16,6 +16,8 @@ import { HttpClient } from '@angular/common/http';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 import { finalize, catchError, map } from "rxjs/operators";
 
+const OWNERSHIP_SUCCESS_MSG = "Successfully Modify ";
+
 @Component({
   selector: 'file-ownership-modal',
   templateUrl: './file-ownership-modal.component.html',
@@ -104,19 +106,22 @@ export class FileOwnershipModal {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chown', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, undefined, this.recursive, this.owner, this.group);
     this.http.post(url, null).pipe(
       finalize(() => this.closeDialog()),
-      map((res: any)=>{
-        if (res.status == 200) {
-          this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
-            'Dismiss', defaultSnackbarOptions);
-          this.node.owner = this.owner;
-          this.node.group = this.group;
-        } else {
-          this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
-            'Dismiss', defaultSnackbarOptions);
+    ).subscribe(
+        (res: any) => {
+          if (res.msg == OWNERSHIP_SUCCESS_MSG) {
+            this.snackBar.open(this.path + ' has been successfully changed to Owner: ' + this.owner + " Group: " + this.group + ".",
+              'Dismiss', defaultSnackbarOptions);
+            this.node.owner = this.owner;
+            this.node.group = this.group;
+          } else {
+            this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
+              'Dismiss', defaultSnackbarOptions);
+          }
+        },
+        err => {
+          this.handleErrorObservable(err);
         }
-      }),
-      catchError(this.handleErrorObservable)
-    )
+      );
   }
   
     
