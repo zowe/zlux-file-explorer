@@ -18,8 +18,6 @@ import { FormControl } from '@angular/forms';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 import { finalize, catchError, map } from "rxjs/operators";
 
-const PERMISSIONS_SUCCESS_MSG = "successfully modify modes";
-
 @Component({
   selector: 'file-permissions-modal',
   templateUrl: './file-permissions-modal.component.html',
@@ -279,11 +277,11 @@ export class FilePermissionsModal {
 
   savePermissions() {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chmod', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, this.octalMode, this.recursive);
-    this.http.post(url, null).pipe(
+    this.http.post(url, null, {observe: 'response'}).pipe(
       finalize(() => this.closeDialog()),
     ).subscribe(
       (res: any) => {
-        if (res.msg == PERMISSIONS_SUCCESS_MSG) {
+        if (res.status == 200) {
           this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
             'Dismiss', defaultSnackbarOptions);
           this.node.mode = parseInt(this.octalMode, 10);
