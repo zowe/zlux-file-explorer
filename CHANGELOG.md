@@ -3,6 +3,7 @@
 ## 0.12.0
 * Added the option to open a file in new browser tab
 * Make Properties title text selectable
+* Adding the option to submit the Job from Dataset Explorer
 
 ## 0.11.0
 * Added a function to refresh file/directory metadata using the USS path 
