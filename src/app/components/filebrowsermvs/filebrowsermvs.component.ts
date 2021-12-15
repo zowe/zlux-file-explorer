@@ -159,6 +159,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesDatasetFile = [
+      { text: "Submit Job", action:() => {
+        this.submitJob(this.rightClickedFile);
+      }},
       { text: "Request Open in New Browser Tab", action:() => {
         this.openInNewTab.emit(this.rightClickedFile);
       }},
@@ -354,6 +357,38 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     }
     return [null, null];
+  }
+
+  submitJob(rightClickedFile: any) {
+    const stringJsonBody = '{ "file": "'+rightClickedFile.data.path+'"}';
+    fetch('/jes', {method: 'PUT', body: stringJsonBody,
+                    credentials: 'include',
+                    mode: 'cors',
+                    headers:{ 'Content-Type': 'application/json'}})
+      .then((response)=> {
+        if (!response.ok) {
+          response.text().then(text => {
+            let ref1= this.snackBar.open('Error submitting JCL: ' + text + ', Status: ' + response.status, 'Dismiss', {duration: 5000, panelClass: 'center' })
+          });
+        } else {
+          response.json().then((response) => {
+            if (response.jobId) {
+              let jobId = response.jobId;
+              let ref = this.snackBar.open('JCL Submitted. ID='+jobId,' View in Explorer', {duration: 5000, panelClass: 'center' })
+                .onAction().subscribe(()=> {
+                  const dispatcher = ZoweZLUX.dispatcher;
+                  const argumentFormatter = {data: {op:'deref',source:'event',path:['data']}};
+                  let action = dispatcher.makeAction('org.zowe.editor.jcl.view', 'View JCL',
+                                                      dispatcher.constants.ActionTargetMode.PluginFindAnyOrCreate,
+                                                      dispatcher.constants.ActionType.Launch,'org.zowe.explorer-jes',argumentFormatter);
+                  dispatcher.invokeAction(action,{'data':{'owner':'*','prefix':'*','jobId':jobId}});
+                });
+            } else {
+              this.snackBar.open('Warning: JCL submitted but Job ID not found.', 'Dismiss', {duration: 5000, panelClass: 'center' });
+            }
+          });
+        }
+      });
   }
 
   showPropertiesDialog(rightClickedFile: any) {
