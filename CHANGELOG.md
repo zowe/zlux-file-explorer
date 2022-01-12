@@ -1,5 +1,8 @@
 # ZLUX Angular File Tree
 
+## 1.0.0
+* File Tree upgraded to conform to Zowe V2: Angular 6->12, Typescript 2->4 etc.
+
 ## 0.12.0
 * Added the option to open a file in new browser tab
 * Make Properties title text selectable
