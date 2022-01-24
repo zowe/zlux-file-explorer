@@ -11,8 +11,8 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { DatasetAttributes } from '../structures/editor-project';
 import { catchError, switchMap, map } from 'rxjs/operators';
 import { UtilsService } from './utils.service';
@@ -21,13 +21,13 @@ import { of, throwError } from 'rxjs';
 @Injectable()
 export class DatasetCrudService {
   constructor(
-    private http: Http,
+    private http: HttpClient,
     private utils: UtilsService
   ){}
 
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
-    return Observable.throw(error.message || error);
+    return throwError(error.message || error);
   }
   
   //addfolder
@@ -74,31 +74,31 @@ export class DatasetCrudService {
 
   deleteNonVsamDatasetOrMember(rightClickedFile: any): Observable<any>{
     let url = ZoweZLUX.uriBroker.datasetContentsUri(rightClickedFile.data.path);
-    return this.http.delete(url)
-    .map(res=>res.json())
-    .catch(this.handleErrorObservable);
+    return this.http.delete(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   deleteVsamDataset(rightClickedFile: any): Observable<any> {
     let url = ZoweZLUX.uriBroker.VSAMdatasetContentsUri(rightClickedFile.data.path);
-    return this.http.delete(url)
-    .map(res => res.json())
-    .catch(this.handleErrorObservable);
+    return this.http.delete(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   queryDatasets(query:string, detail?: boolean, includeAdditionalQualifiers?: boolean): Observable<any>  {
     let url:string;
     url = ZoweZLUX.uriBroker.datasetMetadataUri(encodeURIComponent(query.toUpperCase( ).replace(/\.$/, '')), detail.toString(), undefined, true, undefined, undefined, undefined, undefined, undefined, includeAdditionalQualifiers.toString());
-    return this.http.get(url)
-    .map(res=>res.json())
-    .catch(this.handleErrorObservable);
+    return this.http.get(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   getDataset(path:string) {
     let url:string = ZoweZLUX.uriBroker.datasetContentsUri(path.trim().toUpperCase());
-    return this.http.get(url)
-    .map(res=>res.json())
-    .catch(this.handleErrorObservable);
+    return this.http.get(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   recallDataset(path: string): Observable<DatasetAttributes> {
@@ -117,8 +117,8 @@ export class DatasetCrudService {
         catchError(_err => of('')),
         // get metadata to ensure that the dataset has successfully recalled
         switchMap(() => this.http.get(metadataURI)),
-        map(res => res.json()),
-        map(data => data.datasets[0] as DatasetAttributes),
+        // map(res => res.json()),
+        map((data:any) => data.datasets[0] as DatasetAttributes),
         switchMap(
           // ensure that dataset is recalled, otherwise throw an error
           datasetAttrs =>

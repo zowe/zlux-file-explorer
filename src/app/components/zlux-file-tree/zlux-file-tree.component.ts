@@ -41,21 +41,19 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
-import {
-  MatAutocompleteModule,
-  MatButtonModule,
-  MatButtonToggleModule,
-  MatCheckboxModule,
-  MatDialogModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatSlideToggleModule,
-  MatSnackBarModule,
-  MatTableModule,
-  MatTooltipModule,
-} from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
@@ -70,6 +68,7 @@ import { DownloaderService } from '../../services/downloader.service';
 import { UtilsService } from '../../services/utils.service';
 import { KeyCode } from '../../services/keybinding.service';
 import { KeybindingService } from '../../services/keybinding.service';
+import { ɵAnimationGroupPlayer } from '@angular/animations';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -92,7 +91,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @ViewChild(FileBrowserMVSComponent)
   private mvsComponent: FileBrowserMVSComponent;
 
-  @ViewChild('fileExplorerGlobal')
+  @ViewChild('fileExplorerGlobal', { static: true })
   fileExplorerGlobal: ElementRef<any>;
 
   constructor(/*private persistentDataService: PersistentDataService,*/
@@ -370,7 +369,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     return this.ussComponent.refreshFileMetadatdaUsingPath(path);
    }
 
-  zluxOnMessage(eventContext: any): Promise<any> {
+  zluxOnMessage(eventContext: any): Promise<void> {
     return new Promise((resolve,reject)=> {
 
       if (!eventContext || !eventContext.action){

@@ -11,11 +11,9 @@
 */
 
 import { Injectable   } from '@angular/core';
-import { Http } from '@angular/http';
-import { Observable   } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { UtilsService } from './utils.service'
 
 @Injectable()
@@ -23,29 +21,30 @@ export class UssCrudService {
 
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
-    return Observable.throw(error.message || error);
+    return throwError(error.message || error);
   }
-  constructor(private http: Http, private utils:UtilsService){}
+  constructor(private http: HttpClient, private utils:UtilsService){}
   makeDirectory(path:string, forceOverwrite?: boolean): Observable<any>{
     let url:string = ZoweZLUX.uriBroker.unixFileUri('mkdir', path, undefined, undefined, undefined, forceOverwrite);
-    return this.http.post(url, null)
-      .map(res=>res.json())
-      .catch(this.handleErrorObservable);
+    return this.http.post(url, null).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   getFile(path:string): Observable<any> {
     let filePath:string = this.utils.filePathCheck(path);
     let url:string = ZoweZLUX.uriBroker.unixFileUri('contents', filePath);
-    return this.http.get(url)
-      .map(res=>res.json())
-      .catch(this.handleErrorObservable);
+    return this.http.get(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   getFileContents(path:string): Observable<any> {
     let filePath:string = this.utils.filePathCheck(path);
     let url:string = ZoweZLUX.uriBroker.unixFileUri('contents', filePath);
-    return this.http.get(url)
-      .catch(this.handleErrorObservable);
+    return this.http.get(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   getFileMetadata(path:string): Observable<any> {
@@ -55,47 +54,46 @@ export class UssCrudService {
     //TODO: Fix ZSS bug where "%2F" is not properly processed as a "/" character
     url = url.split("%2F").join("/");
 
-    return this.http.get(url)
-      .map(res=>res.json())
-      .catch(this.handleErrorObservable);
+    return this.http.get(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   copyFile(oldPath:string, newPath:string, forceOverwrite?: boolean): Observable<any>{
       let url :string = ZoweZLUX.uriBroker.unixFileUri('copy', oldPath, undefined, undefined, newPath, forceOverwrite, undefined, true);
-      return this.http.post(url, null)
-      .map(res=>res.json())
-      .catch(this.handleErrorObservable);
+      return this.http.post(url, null).pipe(
+        catchError(this.handleErrorObservable)
+      )
   }
 
   deleteFileOrFolder(path:string): Observable<any>{
     let filePath:string = this.utils.filePathCheck(path);
     let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', filePath);
-    return this.http.delete(url)
-    .map(res=>res.json())
-    .catch(this.handleErrorObservable);
+    return this.http.delete(url).pipe(
+      catchError(this.handleErrorObservable)
+    )
   }
 
   renameFile(oldPath:string, newPath:string, forceOverwrite?: boolean): Observable<any>{
       let url :string = ZoweZLUX.uriBroker.unixFileUri('rename', oldPath, undefined, undefined, newPath, forceOverwrite);
-      return this.http.post(url, null)
-      .map(res=>res.json())
-      .catch(this.handleErrorObservable);
+      return this.http.post(url, null).pipe(
+        catchError(this.handleErrorObservable)
+      )
   }
 
   saveFile(path:string, fileContents:string, targetEncoding?: string, forceOverwrite?: boolean): Observable<any>{
       let url :string = ZoweZLUX.uriBroker.unixFileUri('contents', path, "UTF-8", targetEncoding, undefined, forceOverwrite, undefined, true);
-      return this.http.put(url,fileContents)
-      .map(res=>{
-        res.json()
-      })
-      .catch(this.handleErrorObservable);
+      return this.http.put(url,fileContents).pipe(
+        catchError(this.handleErrorObservable)
+      )
   }
   
   getUserHomeFolder(): Observable<{home: string}>{
     let url :string = ZoweZLUX.uriBroker.userInfoUri();
-    return this.http.get(url)
-    .map(res=>res.json())
-    .catch(this.handleErrorObservable);
+    return this.http.get(url).pipe(
+      map((res:any)=>res),
+      catchError(this.handleErrorObservable)
+    )
   }
 }
 

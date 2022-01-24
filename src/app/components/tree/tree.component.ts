@@ -47,7 +47,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   selectedNode: FileNode;
   lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
   lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
-  @ViewChild('fileExplorerPTree') fileExplorerTree: ElementRef;
+  @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
   constructor() {
     this.lastClickedNodeName = null;
   }

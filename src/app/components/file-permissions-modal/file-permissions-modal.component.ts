@@ -9,12 +9,14 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatSnackBar, MatDialogRef } from '@angular/material';
-import { Observable } from 'rxjs/Observable';
-import { Http } from '@angular/http';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 import { FormControl } from '@angular/forms';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
+import { finalize, catchError, map } from "rxjs/operators";
 
 @Component({
   selector: 'file-permissions-modal',
@@ -63,7 +65,7 @@ export class FilePermissionsModal {
   constructor(
     @Inject(MAT_DIALOG_DATA) data,
     private dialogRef: MatDialogRef<FilePermissionsModal>,
-    private http: Http,
+    private http: HttpClient,
     private snackBar: MatSnackBar,
   ) 
   {
@@ -275,24 +277,21 @@ export class FilePermissionsModal {
 
   savePermissions() {
     let url :string = ZoweZLUX.uriBroker.unixFileUri('chmod', this.path, undefined, undefined, undefined, false, undefined, undefined, undefined, this.octalMode, this.recursive);
-    this.http.post(url, null)
-    .finally(() => this.closeDialog())
-    .map(res=>{
-      if (res.status == 200) {
-        this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
-          'Dismiss', defaultSnackbarOptions);
-        this.node.mode = parseInt(this.octalMode, 10);
-      } else {
-        this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
-          'Dismiss', defaultSnackbarOptions);
-      }
-    })
-    .catch(this.handleErrorObservable).subscribe(
-      resp => {
+    this.http.post(url, null, {observe: 'response'}).pipe(
+      finalize(() => this.closeDialog()),
+    ).subscribe(
+      (res: any) => {
+        if (res.status == 200) {
+          this.snackBar.open(this.path + ' has been successfully changed to ' + this.octalMode + ".",
+            'Dismiss', defaultSnackbarOptions);
+          this.node.mode = parseInt(this.octalMode, 10);
+        } else {
+          this.snackBar.open(res.status + " - A problem was encountered: " + res.statusText, 
+            'Dismiss', defaultSnackbarOptions);
+        }
       },
-      error => { 
-        this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
-          'Dismiss', defaultSnackbarOptions);
+      err => {
+        this.handleErrorObservable(err);
       }
     );
   }
@@ -324,7 +323,9 @@ export class FilePermissionsModal {
 
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
-    return Observable.throw(error.message || error);
+    this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
+    'Dismiss', defaultSnackbarOptions);
+    return throwError(error.message || error);
   }
 }
 

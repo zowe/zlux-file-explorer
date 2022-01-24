@@ -1,8 +1,9 @@
-import { Http, Headers, RequestOptions } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Injectable, Inject } from '@angular/core';
 import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 
 @Injectable()
@@ -18,7 +19,7 @@ export class SearchHistoryService {
   private type:string;
 
   constructor(@Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition
-  ,  private http: Http) {
+  ,  private http: HttpClient) {
     
   }
 
@@ -33,19 +34,19 @@ export class SearchHistoryService {
 
   private getData(): void {
 
-    let headers = new Headers({ 'Content-Type': 'application/json' });
-    let options = new RequestOptions({ headers: headers });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let options = { headers: headers };
 
     const getRequest =  this.http
-      .get(this.uri, options)
-      .map(res => res.json())
-      .catch((err => {
+      .get(this.uri, options).pipe(
+        catchError((err => {
           let type = this.type;
           console.log(err);
           return null;
-      }));
+        }))
+      )
 
-      const sub = getRequest.subscribe((data) => {
+      const sub = getRequest.subscribe((data:any) => {
         if (data && data.contents && data.contents.history) {
           this.searchHistory = Array.from(new Set(this.searchHistory.concat(data.contents.history)));
         };
@@ -57,20 +58,21 @@ export class SearchHistoryService {
 
   private saveData(history: string[]): Observable<any> {
 
-    let headers = new Headers({ 'Content-Type': 'application/json' });
-    let options = new RequestOptions({ headers: headers });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let options = { headers: headers };
 
     let params = {
         "history": history
     };
 
     return this.http
-      .put(this.uri, params, options)
-      .catch((err => {
+      .put(this.uri, params, options).pipe(
+        catchError((err => {
           let type = this.type;
           console.log(`save${type}SearchHistory error`, err);
           return null
-      }));
+        }))
+      )
   }
 
   public saveSearchHistory(path: string):Observable<any> {
