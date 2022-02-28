@@ -2,7 +2,7 @@ name: Build and Test Workflow
 on:
   push:
     branches:
-      - master
+      - v2.x/staging
   pull_request:
     types: [opened, synchronize]
   workflow_dispatch:
@@ -14,7 +14,8 @@ on:
       PERFORM_RELEASE:
         description: 'perform release'
         required: false
-        default: 'false'
+        default: false
+        type: boolean
       PRE_RELEASE_STRING:
         description: 'Pre-release string for a release. For example: rc.1, beta.1, etc. This is required if the release is not performed on branches which "allowFormalRelease" is true.'
         required: false
