@@ -362,10 +362,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   attemptDownload(rightClickedFile: any) {
-    let datasetName = rightClickedFile.data.path;
+    let dataset = rightClickedFile.data.path;
     let filename = rightClickedFile.label;
     let downloadObject = rightClickedFile;
-    let url:string = ZoweZLUX.uriBroker.datasetContentsUri(datasetName);
+    let url:string = ZoweZLUX.uriBroker.datasetContentsUri(dataset);
 
     this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
                     // TODO: Download queue code for progress bar could go here
