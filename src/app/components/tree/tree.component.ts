@@ -14,6 +14,8 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, 
 import { TreeNode } from 'primeng/primeng';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
+import { Subscription, Observable } from 'rxjs';
+
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -40,11 +42,13 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   @Input() treeData: TreeNode;
   @Input() style: any;
   @Input() treeStyle: any;
+  @Input() collapseTreeEvent: Observable<void>;
   @Output() clickEvent = new EventEmitter<FileTreeNode>();
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();
   @Output() panelRightClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
+  private eventsSubscription: Subscription;
   lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
   lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
   @ViewChild('fileExplorerPTree') fileExplorerTree: ElementRef;
@@ -69,6 +73,10 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
     }
   }
 
+  ngOnInit(){
+    this.eventsSubscription = this.collapseTreeEvent.subscribe(() => this.unselectNode());
+  }
+
   nodeRightClickSelect(_event?: any) {
     if (_event){
       this.rightClickEvent.emit(_event);
@@ -87,9 +95,16 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
     this.fileExplorerTree.nativeElement.addEventListener('contextmenu', this.panelRightClickSelect.bind(this));
   }
 
+  unselectNode(){
+    this.selectedNode = null;
+  }
+
   ngOnDestroy() { // PrimeNG as of 6.0 has no native right click support for its tree
+    this.eventsSubscription.unsubscribe();
     this.fileExplorerTree.nativeElement.removeEventListener('contextmenu', this.panelRightClickSelect.bind(this));
   }
+
+
 }
 
 /*

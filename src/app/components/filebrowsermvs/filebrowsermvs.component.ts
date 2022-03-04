@@ -16,6 +16,7 @@ import { take, finalize, debounceTime } from 'rxjs/operators';
 import { ProjectStructure, DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
+import { DownloaderService } from '../../services/downloader.service';
 import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
@@ -49,6 +50,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private updateInterval: number = 3000000;
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
+  private selectedNode: any;
   private showSearch: boolean;
   private rightClickPropertiesPanel: ContextMenuItem[];
   @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
@@ -70,6 +72,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               private mvsSearchHistory:SearchHistoryService,
               private snackBar: MatSnackBar,
               private datasetService: DatasetCrudService,
+              private downloadService:DownloaderService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
               private dialog: MatDialog
@@ -87,6 +90,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
       debounceTime(500),
     ).subscribe((value) => {this.searchInputChanged(value)});
+    this.selectedNode = null;
   }
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -167,6 +171,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); 
+      }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile); 
       }}
     ];
     this.rightClickPropertiesDatasetFolder = [
@@ -356,6 +363,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return [null, null];
   }
 
+  attemptDownload(rightClickedFile: any) {
+    let datasetName = rightClickedFile.data.path;
+    let filename = rightClickedFile.label;
+    let downloadObject = rightClickedFile;
+    let url:string = ZoweZLUX.uriBroker.datasetContentsUri(datasetName);
+
+    this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
+                    // TODO: Download queue code for progress bar could go here
+                });
+  }
+
   showPropertiesDialog(rightClickedFile: any) {
     const filePropConfig = new MatDialogConfig();
     filePropConfig.data = {
@@ -431,6 +449,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void{
+    this.selectedNode = $event.node;
     if($event.node.type == 'folder'){
       $event.node.expanded = !$event.node.expanded;
       if (this.showSearch) { // Update search bar cached data
@@ -466,6 +485,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
     
   onNodeDblClick($event: any): void{
+    this.selectedNode = $event.node;
     if($event.node.data.hasChildren && $event.node.children.length > 0){
       this.path = $event.node.data.path;
       this.getTreeForQueryAsync($event.node.data.path).then((res) => {
@@ -476,6 +496,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeRightClick(event:any) {
+    this.selectedNode = event.node;
     let node = event.node;
     let rightClickProperties;
     if(node.type === 'file'){
@@ -505,6 +526,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       if (!didContextMenuSpawn) { // If context menu failed to spawn...
         let heightAdjustment = $event.clientY - 25; // Bump it up 25px
         didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
+      }
+    }
+  }
+
+  collapseTree(): void {
+    let dataArray = this.data;
+    for (let i: number = 0; i < dataArray.length; i++) {
+      if(this.data[i].expanded == true){
+        this.data[i].expanded = false;
       }
     }
   }
