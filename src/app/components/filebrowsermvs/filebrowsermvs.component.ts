@@ -23,6 +23,8 @@ import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.componen
 import { defaultSnackbarOptions, longSnackbarOptions, quickSnackbarOptions } from '../../shared/snackbar-options';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { TreeComponent } from '../tree/tree.component';
+
 import * as _ from 'lodash';
 
 /* Services */
@@ -54,7 +56,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private showSearch: boolean;
   private rightClickPropertiesPanel: ContextMenuItem[];
   @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
-
+  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
+  
   //TODO:define interface types for mvs-data/data
   private data: any;
   private dataCached: any;
@@ -64,7 +67,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
-  
+ 
 
   constructor(private elementRef:ElementRef,
               private utils:UtilsService,
@@ -537,6 +540,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.data[i].expanded = false;
       }
     }
+    this.treeComponent.unselectNode();
   }
 
   updateTreeView(path: string): void {

@@ -44,9 +44,7 @@
   <div class="fa fa-refresh filebrowseruss-loading-icon" title="Refresh dataset list" (click)="updateTreeView(path);" [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
   <div class="file-tree-utilities">
     <div class="fa fa-minus-square-o filebrowseruss-collapse-icon" title="Collapse Folders in Explorer" (click)="collapseTree();" style="margin-right: 9px; float:right; cursor: pointer;"></div>
-    <img src="../../../assets/delete-icon.png" title="Delete" (click)="showDeleteDialog(selectedNode);" style="margin-right: 9px; float:right; cursor: pointer;">
-    <!-- <img src="../../../assets/create-file.png" title="Create New Folder" (click)="collapseFolders();" style="margin-right: 9px; float:right; cursor: pointer;">
-    <img src="../../../assets/create-folder.png" title="Create New File" (click)="collapseFolders();" style="margin-right: 9px; float:right; cursor: pointer;"> -->
+    <div class="fa fa-trash-o filebrowseruss-delete-icon" title="Delete" (click)="showDeleteDialog(selectedNode);" style="margin-right: 9px; float:right; cursor: pointer;"></div>
   </div>
 
   <!-- Main tree -->
