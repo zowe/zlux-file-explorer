@@ -14,7 +14,6 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, 
 import { TreeNode } from 'primeng/primeng';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
-
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -95,8 +94,6 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   ngOnDestroy() { // PrimeNG as of 6.0 has no native right click support for its tree
     this.fileExplorerTree.nativeElement.removeEventListener('contextmenu', this.panelRightClickSelect.bind(this));
   }
-
-
 }
 
 /*

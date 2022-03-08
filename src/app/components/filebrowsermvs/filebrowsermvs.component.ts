@@ -24,7 +24,6 @@ import { defaultSnackbarOptions, longSnackbarOptions, quickSnackbarOptions } fro
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { TreeComponent } from '../tree/tree.component';
-
 import * as _ from 'lodash';
 
 /* Services */
@@ -67,7 +66,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
- 
 
   constructor(private elementRef:ElementRef,
               private utils:UtilsService,

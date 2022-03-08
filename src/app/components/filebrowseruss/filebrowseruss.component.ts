@@ -30,7 +30,6 @@ import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.compo
 import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
 import { FileTreeNode } from '../../structures/child-event';
 import { TreeComponent } from '../tree/tree.component';
-
 import * as _ from 'lodash';
 
 /* Services */
