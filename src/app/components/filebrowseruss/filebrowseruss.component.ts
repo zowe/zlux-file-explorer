@@ -29,6 +29,7 @@ import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
 import { FileTreeNode } from '../../structures/child-event';
+import { TreeComponent } from '../tree/tree.component';
 import * as _ from 'lodash';
 
 /* Services */
@@ -65,6 +66,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private showSearch: boolean;
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
+  private selectedNode: any;
 
   //TODO:define interface types for uss-data/data
   private data: FileTreeNode[];
@@ -73,6 +75,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
   @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
   @ViewChild('searchInputUSS') searchInputUSS: ElementRef;
+  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -98,6 +101,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
         debounceTime(500),
       ).subscribe((value) => {this.searchInputChanged(value)});
+      this.selectedNode = null;
   }
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -660,7 +664,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   
   onNodeClick($event: any): void {
     this.path = this.path.replace(/\/$/, '');
-
+    this.selectedNode = $event.node;
     if ($event.node.data === 'Folder') {
       if (this.checkIfInDeletionQueueAndMessage($event.node.path, "Cannot open a directory queued for deletion.") == true) {
         return;
@@ -680,6 +684,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let updateTree = false; // A double click drills into a folder, so we make a fresh query instead of update
     this.displayTree($event.node.path, updateTree);
     this.nodeDblClick.emit($event.node);
+    this.selectedNode = $event.node;
   }
 
   onNodeRightClick($event: any) {
@@ -688,7 +693,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     if (node.directory) {
       rightClickProperties = this.rightClickPropertiesFolder;
+      this.selectedNode = node;
     } else {
+      this.selectedNode = node.parent;
       rightClickProperties = this.rightClickPropertiesFile;
     }
      
@@ -738,6 +745,17 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  collapseTree(): void {
+    let dataArray = this.data;
+    this.selectedNode = null;
+    for (let i: number = 0; i < dataArray.length; i++) {
+      if(this.data[i].expanded == true){
+        this.data[i].expanded = false;
+      }
+    }
+    this.treeComponent.unselectNode();
+  }
+
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
@@ -751,6 +769,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       this.dataCached = [];
       return;
     }
+    this.selectedNode = null;
     this.isLoading = true;
     let ussData = this.ussSrv.getFile(path); 
     ussData.subscribe(

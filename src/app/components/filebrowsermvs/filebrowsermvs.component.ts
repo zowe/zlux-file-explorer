@@ -23,6 +23,7 @@ import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.componen
 import { defaultSnackbarOptions, longSnackbarOptions, quickSnackbarOptions } from '../../shared/snackbar-options';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { TreeComponent } from '../tree/tree.component';
 import * as _ from 'lodash';
 
 /* Services */
@@ -50,10 +51,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private updateInterval: number = 3000000;
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
+  private selectedNode: any;
   private showSearch: boolean;
   private rightClickPropertiesPanel: ContextMenuItem[];
   @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
-
+  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
+  
   //TODO:define interface types for mvs-data/data
   private data: any;
   private dataCached: any;
@@ -63,7 +66,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
-  
 
   constructor(private elementRef:ElementRef,
               private utils:UtilsService,
@@ -89,6 +91,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
       debounceTime(500),
     ).subscribe((value) => {this.searchInputChanged(value)});
+    this.selectedNode = null;
   }
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -447,6 +450,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void{
+    this.selectedNode = $event.node;
     if($event.node.type == 'folder'){
       $event.node.expanded = !$event.node.expanded;
       if (this.showSearch) { // Update search bar cached data
@@ -482,6 +486,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
     
   onNodeDblClick($event: any): void{
+    this.selectedNode = $event.node;
     if($event.node.data.hasChildren && $event.node.children.length > 0){
       this.path = $event.node.data.path;
       this.getTreeForQueryAsync($event.node.data.path).then((res) => {
@@ -492,6 +497,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeRightClick(event:any) {
+    this.selectedNode = event.node;
     let node = event.node;
     let rightClickProperties;
     if(node.type === 'file'){
@@ -523,6 +529,16 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
       }
     }
+  }
+
+  collapseTree(): void {
+    let dataArray = this.data;
+    for (let i: number = 0; i < dataArray.length; i++) {
+      if(this.data[i].expanded == true){
+        this.data[i].expanded = false;
+      }
+    }
+    this.treeComponent.unselectNode();
   }
 
   updateTreeView(path: string): void {
