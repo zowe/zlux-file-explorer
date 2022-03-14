@@ -2,7 +2,7 @@
 
 ## 0.13.0
 * Added the option to download the dataset file.
-* Added the create folder, delete and collapse icons in tree explorer
+* Added create folder, delete and collapse icons in tree explorer
 
 ## 0.12.0
 * Added the option to open a file in new browser tab
