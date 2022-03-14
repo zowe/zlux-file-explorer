@@ -78,7 +78,7 @@ export class DownloaderService {
                 resolve();
               })
               .catch(error => {
-                context.log.severe("An error occurred downloading " + fileName + " : ", error)
+                context.log.severe("An error occurred downloading " + fileName)
                 controller.error(error);
                 reject(error);
               });
