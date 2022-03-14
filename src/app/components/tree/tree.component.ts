@@ -87,6 +87,10 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
     this.fileExplorerTree.nativeElement.addEventListener('contextmenu', this.panelRightClickSelect.bind(this));
   }
 
+  unselectNode(){
+    this.selectedNode = null;
+  }
+
   ngOnDestroy() { // PrimeNG as of 6.0 has no native right click support for its tree
     this.fileExplorerTree.nativeElement.removeEventListener('contextmenu', this.panelRightClickSelect.bind(this));
   }
