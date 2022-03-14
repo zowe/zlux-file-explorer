@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 0.13.0
+* Added the option to download the dataset file.
+* Added create folder, delete and collapse icons in tree explorer
+
 ## 0.12.0
 * Added the option to open a file in new browser tab
 * Make Properties title text selectable
