@@ -16,6 +16,7 @@ import { take, finalize, debounceTime } from 'rxjs/operators';
 import { ProjectStructure, DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
+import { DownloaderService } from '../../services/downloader.service';
 import { MatDialog, MatDialogConfig, MatSnackBar, MatDialogRef } from '@angular/material';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
@@ -70,6 +71,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               private mvsSearchHistory:SearchHistoryService,
               private snackBar: MatSnackBar,
               private datasetService: DatasetCrudService,
+              private downloadService:DownloaderService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
               private dialog: MatDialog
@@ -167,6 +169,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); 
+      }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile); 
       }}
     ];
     this.rightClickPropertiesDatasetFolder = [
@@ -354,6 +359,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     }
     return [null, null];
+  }
+
+  attemptDownload(rightClickedFile: any) {
+    let dataset = rightClickedFile.data.path;
+    let filename = rightClickedFile.label;
+    let downloadObject = rightClickedFile;
+    let url:string = ZoweZLUX.uriBroker.datasetContentsUri(dataset);
+
+    this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
+                    // TODO: Download queue code for progress bar could go here
+                });
   }
 
   showPropertiesDialog(rightClickedFile: any) {
