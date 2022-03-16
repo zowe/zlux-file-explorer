@@ -1,5 +1,9 @@
 # ZLUX Angular File Tree
 
+## 1.1.0
+* Added the option to download the dataset file.
+* Added create folder, delete and collapse icons in tree explorer
+
 ## 1.0.0
 * File Tree upgraded to conform to Zowe V2: Angular 6->12, Typescript 2->4 etc.
 
