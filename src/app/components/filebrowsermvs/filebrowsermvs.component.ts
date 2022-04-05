@@ -16,6 +16,7 @@ import { take, finalize, debounceTime } from 'rxjs/operators';
 import { ProjectStructure, DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
 import { TreeNode } from 'primeng/primeng';
+import { DownloaderService } from '../../services/downloader.service';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
@@ -23,6 +24,7 @@ import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.componen
 import { defaultSnackbarOptions, longSnackbarOptions, quickSnackbarOptions } from '../../shared/snackbar-options';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { TreeComponent } from '../tree/tree.component';
 import * as _ from 'lodash';
 
 /* Services */
@@ -50,9 +52,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private updateInterval: number = 3000000;
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
+  private selectedNode: any;
   private showSearch: boolean;
   private rightClickPropertiesPanel: ContextMenuItem[];
   @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
+  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
 
   //TODO:define interface types for mvs-data/data
   private data: any;
@@ -71,6 +75,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               private mvsSearchHistory:SearchHistoryService,
               private snackBar: MatSnackBar,
               private datasetService: DatasetCrudService,
+              private downloadService:DownloaderService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
               private dialog: MatDialog
@@ -88,6 +93,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
       debounceTime(500),
     ).subscribe((value) => {this.searchInputChanged(value)});
+    this.selectedNode = null;
   }
   @Input() inputStyle: any;
   @Input() searchStyle: any;
@@ -176,6 +182,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
+      }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile); 
       }}
     ];
     this.rightClickPropertiesPanel = [
@@ -357,6 +366,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     return [null, null];
   }
 
+  attemptDownload(rightClickedFile: any) {
+    let dataset = rightClickedFile.data.path;
+    let filename = rightClickedFile.label;
+    let downloadObject = rightClickedFile;
+    let url:string = ZoweZLUX.uriBroker.datasetContentsUri(dataset);
+
+    this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
+                    // TODO: Download queue code for progress bar could go here
+                });
+  }
+
   showPropertiesDialog(rightClickedFile: any) {
     const filePropConfig = new MatDialogConfig();
     filePropConfig.data = {
@@ -432,6 +452,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   onNodeClick($event: any): void{
+    this.selectedNode = $event.node;
     if($event.node.type == 'folder'){
       $event.node.expanded = !$event.node.expanded;
       if (this.showSearch) { // Update search bar cached data
@@ -467,6 +488,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
     
   onNodeDblClick($event: any): void{
+    this.selectedNode = $event.node;
     if($event.node.data.hasChildren && $event.node.children.length > 0){
       this.path = $event.node.data.path;
       this.getTreeForQueryAsync($event.node.data.path).then((res) => {
@@ -508,6 +530,16 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
       }
     }
+  }
+
+  collapseTree(): void {
+    let dataArray = this.data;
+    for (let i: number = 0; i < dataArray.length; i++) {
+      if(this.data[i].expanded == true){
+        this.data[i].expanded = false;
+      }
+    }
+    this.treeComponent.unselectNode();
   }
 
   updateTreeView(path: string): void {

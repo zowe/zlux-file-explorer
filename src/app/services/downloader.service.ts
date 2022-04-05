@@ -33,7 +33,7 @@ export class DownloaderService {
       this.abortSignal = this.abortController.signal;
       this.totalSize = downloadObject.size;
 
-      // Define the endcoding type.
+      // Define the endcoding type.(in case of USS file download)
       if(downloadObject.sourceEncoding != undefined && downloadObject.targetEncoding != undefined){
         let queriesObject =
           {
@@ -69,8 +69,23 @@ export class DownloaderService {
       await new Promise<void>((resolve, reject) => {
         new ReadableStream({
           start(controller) {
-            const reader = response.body.getReader();
-            read();
+            let reader = null;
+            if(downloadObject.data.isDataset) {
+              response.json().then(json => {
+                reader = json.records.filter(function(record){return record.length > 0}).map(function(record){return record.trim()}).join("\n");
+                const blob = new Blob([reader], { type: 'text/plain' });
+                createAndDownloadElement(blob, downloadObject.data.path);
+                resolve();
+              })
+              .catch(error => {
+                context.log.severe("An error occurred downloading " + fileName)
+                controller.error(error);
+                reject(error);
+              });
+            } else {
+              reader = response.body.getReader();
+              read();
+            }
             function read() {
               reader.read().then(({done, value}) => {
                 if (done) { // If download completes...
@@ -84,7 +99,7 @@ export class DownloaderService {
                   read();
                 }
               }).catch(error => {
-                context.log.severe("An error occurred downloading " + fileName + " : ", error)
+                context.log.severe("An error occurred downloading " + fileName)
                 controller.error(error);  
                 reject(error);
               })
@@ -114,4 +129,13 @@ export class DownloaderService {
         this.totalSize = 1;
       }
     }
+}
+
+function createAndDownloadElement(blob: Blob, fileName: any) {
+  const elem = window.document.createElement('a');
+  elem.href = window.URL.createObjectURL(blob);
+  elem.download = fileName.replace(/\./g,'_');
+  document.body.appendChild(elem);
+  elem.click();
+  document.body.removeChild(elem);
 }
