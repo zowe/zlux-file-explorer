@@ -86,6 +86,13 @@ export class DatasetCrudService {
     .catch(this.handleErrorObservable);
   }
 
+  submitJCL(rightClickedFile: any): Observable<any> {
+    let url = ZoweZLUX.uriBroker.agentRootUri('jes');
+    return this.http.put(url, { file: rightClickedFile })
+    .map(res => res.json())
+    .catch(this.handleErrorObservable);
+  }
+
   queryDatasets(query:string, detail?: boolean, includeAdditionalQualifiers?: boolean): Observable<any>  {
     let url:string;
     url = ZoweZLUX.uriBroker.datasetMetadataUri(encodeURIComponent(query.toUpperCase( ).replace(/\.$/, '')), detail.toString(), undefined, true, undefined, undefined, undefined, undefined, undefined, includeAdditionalQualifiers.toString());

@@ -175,6 +175,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Download", action:() => { 
         this.attemptDownload(this.rightClickedFile); 
+      }},
+      { text: "Submit JCL", action:() => { 
+        this.attemptSubmit(this.rightClickedFile); 
       }}
     ];
     this.rightClickPropertiesDatasetFolder = [
@@ -373,6 +376,27 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
                     // TODO: Download queue code for progress bar could go here
                 });
+  }
+
+  attemptSubmit(rightClickedFile: any) {
+    let dataset = rightClickedFile.data.path;
+    this.datasetService.submitJCL(dataset).subscribe((response) => {
+      console.log('im here');
+      console.log(response);
+      if (response.jobId) {
+        let ref = this.snackBar.open('JCL Submitted. ID='+response.jobId,'View in Explorer', {duration: 5000, panelClass: 'center' })
+          .onAction().subscribe(()=> {
+            const dispatcher = ZoweZLUX.dispatcher;
+            const argumentFormatter = {data: {op:'deref',source:'event',path:['data']}};
+            let action = dispatcher.makeAction('org.zowe.editor.jcl.view', 'View JCL',
+                                                dispatcher.constants.ActionTargetMode.PluginFindAnyOrCreate,
+                                                dispatcher.constants.ActionType.Launch,'org.zowe.explorer-jes',argumentFormatter);
+            dispatcher.invokeAction(action,{'data':{'owner':'*','prefix':'*','jobId':response.jobId}});
+          });
+      } else {
+        this.snackBar.open('Warning: JCL submitted but Job ID not found.', 'Dismiss', {duration: 10000, panelClass: 'center' });
+      }
+    });
   }
 
   showPropertiesDialog(rightClickedFile: any) {
