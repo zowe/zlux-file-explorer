@@ -381,8 +381,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   attemptSubmit(rightClickedFile: any) {
     let dataset = rightClickedFile.data.path;
     this.datasetService.submitJCL(dataset).subscribe((response) => {
-      console.log('im here');
-      console.log(response);
       if (response.jobId) {
         let ref = this.snackBar.open('JCL Submitted. ID='+response.jobId,'View in Explorer', {duration: 5000, panelClass: 'center' })
           .onAction().subscribe(()=> {
