@@ -63,6 +63,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   public isLoading: boolean;
   private rightClickedFile: any;
   private rightClickPropertiesDatasetFile: ContextMenuItem[];
+  private rightClickPropertiesDatasetJCLFile: ContextMenuItem[];
   private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
@@ -175,6 +176,26 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Download", action:() => { 
         this.attemptDownload(this.rightClickedFile); 
+      }},
+      { text: "Submit JCL", action:() => { 
+        this.attemptSubmit(this.rightClickedFile); 
+      }}
+    ];
+    this.rightClickPropertiesDatasetJCLFile = [
+      { text: "Request Open in New Browser Tab", action:() => {
+        this.openInNewTab.emit(this.rightClickedFile);
+      }},
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile);
+      }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile); 
+      }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile); 
+      }},
+      { text: "Submit JCL", action:() => { 
+        this.attemptSubmit(this.rightClickedFile); 
       }}
     ];
     this.rightClickPropertiesDatasetFolder = [
@@ -375,6 +396,25 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
                 });
   }
 
+  attemptSubmit(rightClickedFile: any) {
+    let dataset = rightClickedFile.data.path;
+    this.datasetService.submitJCL(dataset).subscribe((response) => {
+      if (response.jobId) {
+        let ref = this.snackBar.open('JCL Submitted. ID='+response.jobId,'View in Explorer', {duration: 5000, panelClass: 'center' })
+          .onAction().subscribe(()=> {
+            const dispatcher = ZoweZLUX.dispatcher;
+            const argumentFormatter = {data: {op:'deref',source:'event',path:['data']}};
+            let action = dispatcher.makeAction('org.zowe.editor.jcl.view', 'View JCL',
+                                                dispatcher.constants.ActionTargetMode.PluginFindAnyOrCreate,
+                                                dispatcher.constants.ActionType.Launch,'org.zowe.explorer-jes',argumentFormatter);
+            dispatcher.invokeAction(action,{'data':{'owner':'*','prefix':'*','jobId':response.jobId}});
+          });
+      } else {
+        this.snackBar.open('Warning: JCL submitted but Job ID not found.', 'Dismiss', {duration: 10000, panelClass: 'center' });
+      }
+    });
+  }
+
   showPropertiesDialog(rightClickedFile: any) {
     const filePropConfig = new MatDialogConfig();
     filePropConfig.data = {
@@ -502,6 +542,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     let rightClickProperties;
     if(node.type === 'file'){
       rightClickProperties = this.rightClickPropertiesDatasetFile;
+      if(node.data.fileName.includes('.JCL','.JCL.','.CNTL','.CNTL.'))
+      {
+        rightClickProperties = this.rightClickPropertiesDatasetJCLFile
+      }
     }
     else{
       rightClickProperties = this.rightClickPropertiesDatasetFolder;
