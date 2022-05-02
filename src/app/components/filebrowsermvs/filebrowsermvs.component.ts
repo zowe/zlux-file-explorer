@@ -63,6 +63,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   public isLoading: boolean;
   private rightClickedFile: any;
   private rightClickPropertiesDatasetFile: ContextMenuItem[];
+  private rightClickPropertiesDatasetJCLFile: ContextMenuItem[];
   private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
   private additionalQualifiers: boolean;
@@ -164,6 +165,23 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   initializeRightClickProperties() {
     this.rightClickPropertiesDatasetFile = [
+      { text: "Request Open in New Browser Tab", action:() => {
+        this.openInNewTab.emit(this.rightClickedFile);
+      }},
+      { text: "Properties", action:() => { 
+        this.showPropertiesDialog(this.rightClickedFile);
+      }},
+      { text: "Delete", action:() => { 
+        this.showDeleteDialog(this.rightClickedFile); 
+      }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile); 
+      }},
+      { text: "Submit JCL", action:() => { 
+        this.attemptSubmit(this.rightClickedFile); 
+      }}
+    ];
+    this.rightClickPropertiesDatasetJCLFile = [
       { text: "Request Open in New Browser Tab", action:() => {
         this.openInNewTab.emit(this.rightClickedFile);
       }},
@@ -524,6 +542,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     let rightClickProperties;
     if(node.type === 'file'){
       rightClickProperties = this.rightClickPropertiesDatasetFile;
+      if(node.data.fileName.includes('.JCL','.JCL.','.CNTL','.CNTL.'))
+      {
+        rightClickProperties = this.rightClickPropertiesDatasetJCLFile
+      }
     }
     else{
       rightClickProperties = this.rightClickPropertiesDatasetFolder;
