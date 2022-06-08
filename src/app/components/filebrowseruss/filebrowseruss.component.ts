@@ -312,15 +312,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.copyClick.emit(rightClickedFile);
   }
 
-  checkFileExists(name:string, result):string{
-    let selectedName = name;
-    for (let i: number = 0; i < result.entries.length; i++) {
-      if (!result.entries[i].directory && result.entries[i].name == 'name') {
-        i = -1;
-        selectedName = incrementFileName(name);
-    }
-  }
-
   pasteFile(fileNode: any, destinationPath: any, isCut: boolean) {
     let pathAndName = fileNode.path;
     let name = this.getNameFromPathAndName(pathAndName);
@@ -339,9 +330,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }else{
         this.isLoading = true;
         let destinationMetadata = this.ussSrv.getFile(destinationPath);
-        destinationMetadata.subscribe(
-        result => {
-          for (let i: number = 0; i < result.entries.length; i++) {
+        destinationMetadata.subscribe(result => {
+          for (let i: number = 0; i < result.entries.length.entries.length; i++) {
             if (!result.entries[i].directory && result.entries[i].name == name) {
               if(isCut){
                 this.snackBar.open("Unable to move '" + pathAndName + "' because target '" + destinationPath + '\/' + name + "'already exists at destination.", 
@@ -426,6 +416,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 this.log.severe(error);
             }
           );
+
           setTimeout(() => {
             if (copySubscription.closed == false) {
               this.snackBar.open('Pasting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
@@ -433,9 +424,22 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
             }
           }, 4000);
         },
-      e => {
-            }
-       ); 
+        error => {
+          if (error.status == '403') { //Permission denied
+            this.snackBar.open('Failed to open: Permission denied.', 
+            'Dismiss', defaultSnackbarOptions);
+          } else if (error.status == '0') {
+            this.snackBar.open("Failed to communicate with the App server: " + error.status, 
+                'Dismiss', defaultSnackbarOptions);
+          } else if (error.status == '404') {
+            this.snackBar.open("File/folder not found. " + error.status, 
+                'Dismiss', quickSnackbarOptions);
+          } else {
+            this.snackBar.open("An unknown error occurred: " + error.status, 
+                'Dismiss', defaultSnackbarOptions);
+          }
+          this.log.severe(error);
+        }); 
       }
     },
     error => {
