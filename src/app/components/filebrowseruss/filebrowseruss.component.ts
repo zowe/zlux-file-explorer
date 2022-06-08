@@ -28,6 +28,7 @@ import { FilePermissionsModal } from '../file-permissions-modal/file-permissions
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
 import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.component';
 import { quickSnackbarOptions, defaultSnackbarOptions, longSnackbarOptions } from '../../shared/snackbar-options';
+import { incrementFileName } from '../../shared/checkName'
 import { FileTreeNode } from '../../structures/child-event';
 import { TreeComponent } from '../tree/tree.component';
 import * as _ from 'lodash';
@@ -311,15 +312,19 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.copyClick.emit(rightClickedFile);
   }
 
+  checkFileExists(name:string, result):string{
+    let selectedName = name;
+    for (let i: number = 0; i < result.entries.length; i++) {
+      if (!result.entries[i].directory && result.entries[i].name == 'name') {
+        i = -1;
+        selectedName = incrementFileName(name);
+    }
+  }
+
   pasteFile(fileNode: any, destinationPath: any, isCut: boolean) {
     let pathAndName = fileNode.path;
     let name = this.getNameFromPathAndName(pathAndName);
     this.log.debug(`paste for ${name}, ${destinationPath}, and cut=${isCut}`);
-    if(this.getPathFromPathAndName(pathAndName) == destinationPath){
-      this.snackBar.open("Paste failed: '" + pathAndName + "' Cannot paste file to same destination.",
-        'Dismiss', defaultSnackbarOptions);
-      return;
-    }
     if(pathAndName.indexOf(' ') >= 0){
       this.snackBar.open("Paste failed: '" + pathAndName + "' Operation not yet supported for filenames with spaces.",
         'Dismiss', defaultSnackbarOptions);
@@ -333,86 +338,104 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         return;
       }else{
         this.isLoading = true;
-        let copySubscription = this.ussSrv.copyFile(pathAndName,destinationPath + "/" + name)
-        .subscribe(
-          resp => {
-            if (this.rightClickedFile) {
-              if (this.rightClickedFile.children && this.rightClickedFile.children.length > 0) {
-                let expanded = this.rightClickedFile.expanded;
-                /* We recycle the same method used for opening (clicking on) a node. But instead of expanding it, 
-                we keep the same expanded state, and just use it to add a node */
-                this.addChild(this.rightClickedFile, true);
-                this.rightClickedFile.expanded = expanded;
-              } else if (this.path == destinationPath) {
-                /* In the case that we right click to paste on the active directory instead of a node, we update our tree
-                (active directory) instead of adding onto a specific node */
-                this.displayTree(this.path, true);
+        let destinationMetadata = this.ussSrv.getFile(destinationPath);
+        destinationMetadata.subscribe(
+        result => {
+          for (let i: number = 0; i < result.entries.length; i++) {
+            if (!result.entries[i].directory && result.entries[i].name == name) {
+              if(isCut){
+                this.snackBar.open("Unable to move '" + pathAndName + "' because target '" + destinationPath + '\/' + name + "'already exists at destination.", 
+                        'Dismiss', longSnackbarOptions);
+                return;        
               }
+              i = -1;
+              name = incrementFileName(name);
             }
-            if(isCut){
-              /* Clear the paste option, because even if delete fails after, we have already done the copy */
-              this.isLoading = true;
-              this.fileToCopyOrCut = null;
-              this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
-              this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
-          
-              /* Delete (cut) portion */ 
-              this.ussSrv.deleteFileOrFolder(pathAndName)
-              .subscribe(
-                resp => {
-                  this.isLoading = false;
-                  this.removeChild(fileNode);
-                  this.snackBar.open('Paste successful: ' + name,'Dismiss', quickSnackbarOptions);
-                },
-                error => {
-                  if (error.status == '500') { //Internal Server Error
-                    this.snackBar.open("Copied successfully, but failed to cut '" + pathAndName + "' Server returned with: " + error._body, 
-                      'Dismiss', longSnackbarOptions);
-                  } else if (error.status == '404') { //Not Found
-                    this.snackBar.open("Copied successfully, but '" + pathAndName + "' has already been deleted or does not exist.", 
-                      'Dismiss', defaultSnackbarOptions);
-                    this.removeChild(fileNode);
-                  } else if (error.status == '400' || error.status == '403') { //Bad Request
-                    this.snackBar.open("Copied successfully but failed to cut '" + pathAndName + "' This is probably due to a permission problem.", 
-                      'Dismiss', defaultSnackbarOptions);
-                  } else { //Unknown
-                    this.snackBar.open("Copied successfully, but unknown error cutting '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
-                      'Dismiss', longSnackbarOptions);
-                  }
-                  this.isLoading = false;
-                  this.log.severe(error);
-                }
-              );
-            }else{
-              this.isLoading = false;
-              this.snackBar.open('Paste successful: ' + name,'Dismiss', quickSnackbarOptions);
-            }
-          },
-          error => {
-              if (error.status == '500') { //Internal Server Error
-                this.snackBar.open("Paste failed: HTTP 500 from app-server or agent occurred for '" + pathAndName + "'. Server returned with: " + error._body, 
-                'Dismiss', longSnackbarOptions);
-              } else if (error.status == '404') { //Not Found
-                this.snackBar.open("Paste failed: '" + pathAndName + "' does not exist.", 
-                'Dismiss', defaultSnackbarOptions);
-              } else if (error.status == '400') { //Bad Request
-                this.snackBar.open("Paste failed: HTTP 400 occurred for '" + pathAndName + "'. Check that you have correct permissions for this action.", 
-                'Dismiss', defaultSnackbarOptions);
-              } else { //Unknown
-                this.snackBar.open("Paste failed: '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
-                'Dismiss', longSnackbarOptions);
-              }
-              this.isLoading = false;
-              this.log.severe(error);
           }
-        );
 
-        setTimeout(() => {
-          if (copySubscription.closed == false) {
-            this.snackBar.open('Pasting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
-              'Dismiss', quickSnackbarOptions);
-          }
-        }, 4000);
+          let copySubscription = this.ussSrv.copyFile(pathAndName,destinationPath + "/" + name)
+          .subscribe(
+            resp => {
+              if (this.rightClickedFile) {
+                if (this.rightClickedFile.children && this.rightClickedFile.children.length > 0) {
+                  let expanded = this.rightClickedFile.expanded;
+                  /* We recycle the same method used for opening (clicking on) a node. But instead of expanding it, 
+                  we keep the same expanded state, and just use it to add a node */
+                  this.addChild(this.rightClickedFile, true);
+                  this.rightClickedFile.expanded = expanded;
+                } else if (this.path == destinationPath) {
+                  /* In the case that we right click to paste on the active directory instead of a node, we update our tree
+                  (active directory) instead of adding onto a specific node */
+                  this.displayTree(this.path, true);
+                }
+              }
+              if(isCut){
+                /* Clear the paste option, because even if delete fails after, we have already done the copy */
+                this.isLoading = true;
+                this.fileToCopyOrCut = null;
+                this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
+                this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
+            
+                /* Delete (cut) portion */ 
+                this.ussSrv.deleteFileOrFolder(pathAndName)
+                .subscribe(
+                  resp => {
+                    this.isLoading = false;
+                    this.removeChild(fileNode);
+                    this.snackBar.open('Paste successful: ' + name,'Dismiss', quickSnackbarOptions);
+                  },
+                  error => {
+                    if (error.status == '500') { //Internal Server Error
+                      this.snackBar.open("Copied successfully, but failed to cut '" + pathAndName + "' Server returned with: " + error._body, 
+                        'Dismiss', longSnackbarOptions);
+                    } else if (error.status == '404') { //Not Found
+                      this.snackBar.open("Copied successfully, but '" + pathAndName + "' has already been deleted or does not exist.", 
+                        'Dismiss', defaultSnackbarOptions);
+                      this.removeChild(fileNode);
+                    } else if (error.status == '400' || error.status == '403') { //Bad Request
+                      this.snackBar.open("Copied successfully but failed to cut '" + pathAndName + "' This is probably due to a permission problem.", 
+                        'Dismiss', defaultSnackbarOptions);
+                    } else { //Unknown
+                      this.snackBar.open("Copied successfully, but unknown error cutting '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
+                        'Dismiss', longSnackbarOptions);
+                    }
+                    this.isLoading = false;
+                    this.log.severe(error);
+                  }
+                );
+              }else{
+                this.isLoading = false;
+                this.snackBar.open('Paste successful: ' + name,'Dismiss', quickSnackbarOptions);
+              }
+            },
+            error => {
+                if (error.status == '500') { //Internal Server Error
+                  this.snackBar.open("Paste failed: HTTP 500 from app-server or agent occurred for '" + pathAndName + "'. Server returned with: " + error._body, 
+                  'Dismiss', longSnackbarOptions);
+                } else if (error.status == '404') { //Not Found
+                  this.snackBar.open("Paste failed: '" + pathAndName + "' does not exist.", 
+                  'Dismiss', defaultSnackbarOptions);
+                } else if (error.status == '400') { //Bad Request
+                  this.snackBar.open("Paste failed: HTTP 400 occurred for '" + pathAndName + "'. Check that you have correct permissions for this action.", 
+                  'Dismiss', defaultSnackbarOptions);
+                } else { //Unknown
+                  this.snackBar.open("Paste failed: '" + error.status + "' occurred for '" + pathAndName + "' Server returned with: " + error._body, 
+                  'Dismiss', longSnackbarOptions);
+                }
+                this.isLoading = false;
+                this.log.severe(error);
+            }
+          );
+          setTimeout(() => {
+            if (copySubscription.closed == false) {
+              this.snackBar.open('Pasting ' + pathAndName + '... Larger payloads may take longer. Please be patient.', 
+                'Dismiss', quickSnackbarOptions);
+            }
+          }, 4000);
+        },
+      e => {
+            }
+       ); 
       }
     },
     error => {
