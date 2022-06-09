@@ -10,7 +10,7 @@ on:
       ZLUX_CORE_ARTIFACTORY_PATTERN:
         description: ZLUX Core artifactory download pattern
         required: false
-        default: 'libs-snapshot-local/org/zowe/zlux/zlux-core/2.0.0-V2.X/STAGING/zlux-core-*.tar'
+        default: 'libs-snapshot-local/org/zowe/zlux/zlux-core/*-V2.X-STAGING-ZLUX-CORE/zlux-core-*.tar'
       PERFORM_RELEASE:
         description: 'perform release'
         required: false
@@ -81,7 +81,7 @@ jobs:
         run: |
           if [ -z "${{ github.event.inputs.ZLUX_CORE_ARTIFACTORY_PATTERN }}" ];
           then
-            export ZLUX_CORE_ARTIFACTORY_PATTERN="libs-snapshot-local/org/zowe/zlux/zlux-core/*-STAGING/zlux-core-*.tar"
+            export ZLUX_CORE_ARTIFACTORY_PATTERN="libs-snapshot-local/org/zowe/zlux/zlux-core/*-V2.X-STAGING-ZLUX-CORE/zlux-core-*.tar"
           else
             export ZLUX_CORE_ARTIFACTORY_PATTERN="${{ github.event.inputs.ZLUX_CORE_ARTIFACTORY_PATTERN }}"
           fi
