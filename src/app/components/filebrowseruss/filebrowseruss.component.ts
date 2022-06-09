@@ -331,7 +331,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.isLoading = true;
         let destinationMetadata = this.ussSrv.getFile(destinationPath);
         destinationMetadata.subscribe(result => {
-          //rename the file when doing paste, in case same named file exists in the destination \
+          /*rename the file when doing paste, in case same named file exists in the destination.*/
           for (let i: number = 0; i < result.entries.length.entries.length; i++) {
             if (!result.entries[i].directory && result.entries[i].name == name) {
               if(isCut){
