@@ -11,7 +11,7 @@ Copyright Contributors to the Zowe Project.
 */
 
 
-export function getExtention(name:string):string{
+export function getExtension(name:string):string{
   if (name.split('.').length > 1) {
     let extension = name.split('.')[name.split('.').length - 1];
     let index = name.lastIndexOf('.');
@@ -30,7 +30,7 @@ export function getBaseName(name:string):string{
 }
 
 export function incrementFileName(name: string): string {
-    let extSuffix = this.getExtention(name);
+    let extSuffix = this.getExtension(name);
     let namePrefix = this.getBaseName(name);
 
     // name copy 5(.txt) => name copy 6(.txt)
