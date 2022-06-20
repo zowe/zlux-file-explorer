@@ -63,6 +63,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private dataCached: any;
   public isLoading: boolean;
   private rightClickedFile: any;
+  private rightClickedEvent:any;
   private rightClickPropertiesDatasetFile: ContextMenuItem[];
   private rightClickPropertiesDatasetFolder: ContextMenuItem[];
   private deletionQueue = new Map();
@@ -105,6 +106,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
   ngOnInit() {
     this.intervalId = setInterval(() => {
@@ -229,6 +231,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.data.path);
         rightClickedFile.styleClass = "";
+        this.deleteClick.emit(this.rightClickedEvent.node);
       },
       error => {
         if (error.status == '500') { //Internal Server Error
@@ -275,6 +278,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.updateTreeView(this.path);
         this.deletionQueue.delete(rightClickedFile.data.path);
         rightClickedFile.styleClass = "";
+        this.deleteClick.emit(this.rightClickedEvent.node);
       },
       error => {
         if (error.status == '500') { //Internal Server Error
@@ -517,6 +521,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     this.rightClickedFile = node;
+    this.rightClickedEvent = event;
     this.rightClick.emit(event.node);
     event.originalEvent.preventDefault(); 
   }
