@@ -41,6 +41,7 @@ import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.compon
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { CreateFileModal } from '../create-file-modal/create-file-modal.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -403,6 +404,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
+    CreateFileModal,
     UploadModal,
     TreeComponent],
   imports: [
@@ -439,6 +441,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DatasetPropertiesModal,
     DeleteFileModal,
     CreateFolderModal,
+    CreateFileModal,
     UploadModal
   ],
   providers: [

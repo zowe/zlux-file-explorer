@@ -23,6 +23,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FilePropertiesModal } from '../file-properties-modal/file-properties-modal.component';
 import { DeleteFileModal } from '../delete-file-modal/delete-file-modal.component';
 import { CreateFolderModal } from '../create-folder-modal/create-folder-modal.component';
+import { CreateFileModal } from '../create-file-modal/create-file-modal.component';
 import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
 import { FileOwnershipModal } from '../file-ownership-modal/file-ownership-modal.component';
@@ -111,6 +112,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
   // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
@@ -242,6 +244,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.showOwnerDialog(this.rightClickedFile) }},
       { text: "Tag Directory...", action:() => { 
         this.showTaggingDialog(this.rightClickedFile) }},
+      { text: "Create a File...", action:() => { 
+        this.showCreateFileDialog(this.rightClickedFile);
+      }},
       { text: "Create a Directory...", action:() => { 
         this.showCreateFolderDialog(this.rightClickedFile);
       }},
@@ -619,6 +624,32 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
       this.newFolderClick.emit(this.rightClickedEvent.node);
+    });
+  }
+
+  showCreateFileDialog(rightClickedFile: any) {
+    if (rightClickedFile.path) { // If this came from a node object
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "Cannot create a directory inside a directory queued for deletion.") == true) {
+        return;
+      }  
+    } else { // Or if this is just a path
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile, "Cannot create a directory inside a directory queued for deletion.") == true) {
+        return;
+      }
+    }
+
+    const fileCreateConfig = new MatDialogConfig();
+    fileCreateConfig.data = {
+      event: rightClickedFile,
+      width: '600px'
+    }
+
+    let fileCreateRef:MatDialogRef<CreateFileModal>  = this.dialog.open(CreateFileModal, fileCreateConfig);
+    const createFile = fileCreateRef.componentInstance.onCreate.subscribe(onFileCreateResponse => {
+      /* pathAndName - Path and name obtained from create folder prompt
+      updateExistingTree - Should the existing tree update or fetch a new one */
+      this.createFile(onFileCreateResponse.get("pathAndName"), rightClickedFile, onFileCreateResponse.get("updateExistingTree"));
+      this.newFileClick.emit(this.rightClickedEvent.node);
     });
   }
 
@@ -1109,6 +1140,57 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   updateUss(path: string): void {
     this.displayTree(path, true);
+  }
+
+  createFile(pathAndName: string, node: any, update: boolean): void {
+    this.ussSrv.makeFile(pathAndName).subscribe((res: any )=> {
+      this.log.debug('Created: ' + pathAndName);
+      let path = this.getPathFromPathAndName(pathAndName);
+      let someData = this.ussSrv.getFileMetadata(pathAndName);
+      this.snackBar.open(`Successfully created file: "${pathAndName.substring(pathAndName.lastIndexOf('/') + 1)}"`, 'Dismiss',defaultSnackbarOptions );
+      someData.subscribe(
+              result => {
+                // If the right-clicked 'node' is the correct, valid node
+                if ((node.expanded && node.children) && (node.path == path)) {
+                  let nodeToAdd = {
+                    id: node.children.length,
+                    label: this.getNameFromPathAndName(pathAndName),
+                    mode: result.mode,
+                    owner: result.owner,
+                    group: result.group,
+                    createdAt: result.createdAt,
+                    data: "File",
+                    directory: false,
+                    icon: "fa fa-file",
+                    items: {},
+                    name: this.getNameFromPathAndName(pathAndName),
+                    parent: node,
+                    path: pathAndName,
+                    size: result.size
+                  }
+                  node.children.push(nodeToAdd); //Add node to right clicked node
+                  if (this.showSearch) { // If we update a node in the working directory, we need to find that same node in the cached data
+                    let nodeCached = this.findNodeByPath(this.dataCached, node.path)[0];
+                    if (nodeCached) {
+                      nodeCached.children.push(nodeToAdd);
+                    }
+                  }
+                }
+                // ..otherwise treat folder creation without any context.
+                else {
+                  if (path == this.path) { // If we are creating a folder at the parent level
+                    this.displayTree(path, true);
+                  } else if (update) { // If we want to update the tree
+                    this.addChild(node);
+                  } else { // If we are creating a new folder in a location we're not looking at
+                    this.displayTree(path, false); // ...plop the Explorer into the newly created location.
+                  }
+                }
+              }
+            ); 
+          }, e => {
+        this.snackBar.open(`Status: ${e.status}. Failed to create file: "${pathAndName.substring(pathAndName.lastIndexOf('/') + 1)}"`, 'Dismiss',defaultSnackbarOptions );
+    });   
   }
 
   createFolder(pathAndName: string, node: any, update: boolean): void {
