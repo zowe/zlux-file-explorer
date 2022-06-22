@@ -1151,7 +1151,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       someData.subscribe(
               result => {
                 // If the right-clicked 'node' is the correct, valid node
-                if ((node.expanded && node.children) && (node.path == path)) {
+                if (node.children && node.path == path) {
                   let nodeToAdd = {
                     id: node.children.length,
                     label: this.getNameFromPathAndName(pathAndName),
@@ -1175,6 +1175,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                       nodeCached.children.push(nodeToAdd);
                     }
                   }
+                  node.expanded = true;
                 }
                 // ..otherwise treat folder creation without any context.
                 else {
@@ -1204,7 +1205,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
           someData.subscribe(
             result => {
               // If the right-clicked 'node' is the correct, valid node
-              if ((node.expanded && node.children) && (node.path == path)) {
+              if (node.children && node.path == path) {
                 let nodeToAdd = {
                   id: node.children.length,
                   children: [],
@@ -1229,6 +1230,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                     nodeCached.children.push(nodeToAdd);
                   }
                 }
+                node.expanded = true;
               }
               // ..otherwise treat folder creation without any context.
               else {
