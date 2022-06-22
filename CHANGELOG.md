@@ -2,8 +2,9 @@
 
 ## 1.1.0
 * Added the option to download the dataset file.
-* Added create folder, delete and collapse icons in tree explorer
-* Rename the file when doing copy/paste, when same named file exists in destination
+* Added create folder, delete and collapse icons in tree explorer.
+* Rename the file when doing copy/paste, when same named file exists in destination.
+* Create an empty file by selecting the folder.
 
 ## 1.0.0
 * File Tree upgraded to conform to Zowe V2: Angular 6->12, Typescript 2->4 etc.
