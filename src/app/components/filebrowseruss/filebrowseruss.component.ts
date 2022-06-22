@@ -1188,9 +1188,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                 }
               }
             ); 
-          }, e => {
-        this.snackBar.open(`Status: ${e.status}. Failed to create file: "${pathAndName.substring(pathAndName.lastIndexOf('/') + 1)}"`, 'Dismiss',defaultSnackbarOptions );
-    });   
+          }, error => {
+            this.snackBar.open("Failed to create File: '" + pathAndName + "'", 'Dismiss', defaultSnackbarOptions);
+            this.log.severe(error);
+      });    
   }
 
   createFolder(pathAndName: string, node: any, update: boolean): void {
