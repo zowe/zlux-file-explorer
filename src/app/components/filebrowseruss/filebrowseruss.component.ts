@@ -645,7 +645,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     let fileCreateRef:MatDialogRef<CreateFileModal>  = this.dialog.open(CreateFileModal, fileCreateConfig);
-    const createFile = fileCreateRef.componentInstance.onCreate.subscribe(onFileCreateResponse => {
+    const createFile = fileCreateRef.componentInstance.onFileCreate.subscribe(onFileCreateResponse => {
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFile(onFileCreateResponse.get("pathAndName"), rightClickedFile, onFileCreateResponse.get("updateExistingTree"));
