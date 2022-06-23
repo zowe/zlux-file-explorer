@@ -266,6 +266,12 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.toggleSearch();
         
       }},
+      { text: "Create a File...", action:() => { 
+        let nodeToUse = {
+          path: this.path,
+        }
+        this.showCreateFileDialog(nodeToUse);
+      }},
       { text: "Create a Directory...", action:() => { 
         let nodeToUse = {
           path: this.path,
@@ -1132,7 +1138,14 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         return [data[i], i]; // 0 - node, 1 - index
       }
       if (data[i].children && data[i].children.length > 0) {
-        return this.findNodeByPath(data[i].children, path);
+        let foundValue:any;
+        foundValue = this.findNodeByPath(data[i].children, path);
+        // if match not found in the childern nodes then contine with pending Top level nodes
+        if (foundValue[0] == null && i != data.length - 1){
+          continue;
+        } else{
+          return foundValue;
+        }
       }
     }
     return [null, null];
