@@ -4,6 +4,7 @@
 * Added the option to download the dataset file.
 * Added create folder, delete and collapse icons in tree explorer
 * Rename the file when doing copy/paste, when same named file exists in destination
+* Trigger event from File_tree when Dataset or USS file is deleted
 
 ## 1.0.0
 * File Tree upgraded to conform to Zowe V2: Angular 6->12, Typescript 2->4 etc.

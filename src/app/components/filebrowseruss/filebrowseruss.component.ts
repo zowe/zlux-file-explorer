@@ -581,7 +581,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
     const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       this.deleteFileOrFolder(rightClickedFile);
-      this.deleteClick.emit(this.rightClickedEvent.node);
     });
   }
 
@@ -1185,6 +1184,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.removeChild(rightClickedFile);
         this.deletionQueue.delete(rightClickedFile.path);
         rightClickedFile.styleClass = "";
+        this.deleteClick.emit(this.rightClickedEvent.node);
       },
       error => {
         if (error.status == '500') { //Internal Server Error
