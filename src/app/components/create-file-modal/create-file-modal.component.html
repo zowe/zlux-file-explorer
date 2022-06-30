@@ -20,7 +20,7 @@
   <mat-form-field style="margin-left: 15px;">
     <input id="create-file-input" name="name" [pattern]="filePattern" matInput type="text"
       [(ngModel)]="fileName">
-    <button class="modal-clear-button" mat-button *ngIf="fileName" matSuffix mat-icon-button aria-label="Clear" (click)="fileName=''">
+    <button class="modal-clear-button" mat-button *ngIf="fileName" matSuffix mat-icon-button tabindex="-1" aria-label="Clear" (click)="fileName=''">
       <mat-icon class="create-file-clear-icon">close</mat-icon>
     </button>
   </mat-form-field>
@@ -31,7 +31,7 @@
   <mat-form-field style="margin-left: 45px;">
     <input id="create-path-input" [pattern]="empty" matInput type="text"
       [(ngModel)]="dirPath">
-    <button class="modal-clear-button" mat-button *ngIf="dirPath" matSuffix mat-icon-button aria-label="Clear" (click)="dirPath=''">
+    <button class="modal-clear-button" mat-button *ngIf="dirPath" matSuffix mat-icon-button tabindex="-1" aria-label="Clear" (click)="dirPath=''">
       <mat-icon class="create-file-clear-icon">close</mat-icon>
     </button>
   </mat-form-field>
