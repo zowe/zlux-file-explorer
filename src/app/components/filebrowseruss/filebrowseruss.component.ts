@@ -629,7 +629,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFolder(onCreateResponse.get("pathAndName"), rightClickedFile, onCreateResponse.get("updateExistingTree"));
-      this.newFolderClick.emit(this.rightClickedEvent.node);
+      // emit the event with node info only when node is right clicked and not on file tree panel
+      this.newFolderClick.emit(this.rightClickedEvent.node ? this.rightClickedEvent.node : '');
     });
   }
 
@@ -655,7 +656,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       /* pathAndName - Path and name obtained from create folder prompt
       updateExistingTree - Should the existing tree update or fetch a new one */
       this.createFile(onFileCreateResponse.get("pathAndName"), rightClickedFile, onFileCreateResponse.get("updateExistingTree"));
-      this.newFileClick.emit(this.rightClickedEvent.node);
+      // emit the event with node info only when node is right clicked and not on file tree panel
+      this.newFileClick.emit(this.rightClickedEvent.node ? this.rightClickedEvent.node : '');
     });
   }
 
@@ -788,6 +790,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         didContextMenuSpawn = this.windowActions.spawnContextMenu($event.clientX, heightAdjustment, this.rightClickPropertiesPanel, true);
       }
     }
+    this.rightClickedEvent = $event;
   }
 
   onPathChanged($event: any): void {
@@ -1203,8 +1206,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
               }
             ); 
           }, error => {
-            this.snackBar.open("Failed to create File: '" + pathAndName + "'", 'Dismiss', defaultSnackbarOptions);
-            this.log.severe(error);
+            this.ussSrv.getFileMetadata(pathAndName).subscribe(response => {
+              this.snackBar.open("Failed to create File. '" + pathAndName + "' already exists", 'Dismiss', defaultSnackbarOptions);
+            }, err =>{
+              this.snackBar.open("Failed to create File: '" + pathAndName + "'", 'Dismiss', defaultSnackbarOptions);
+              this.log.severe(error);
+            });
+           
       });    
   }
 
