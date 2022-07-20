@@ -635,11 +635,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   showCreateFileDialog(rightClickedFile: any) {
     if (rightClickedFile.path) { // If this came from a node object
-      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "Cannot create a directory inside a directory queued for deletion.") == true) {
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile.path, "Cannot create a file inside a directory queued for deletion.") == true) {
         return;
       }  
     } else { // Or if this is just a path
-      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile, "Cannot create a directory inside a directory queued for deletion.") == true) {
+      if (this.checkIfInDeletionQueueAndMessage(rightClickedFile, "Cannot create a file inside a directory queued for deletion.") == true) {
         return;
       }
     }
