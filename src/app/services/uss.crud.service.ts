@@ -31,7 +31,7 @@ export class UssCrudService {
     )
   }
 
-  makeFile(path:string, forceOverwrite?: boolean): Observable<any>{
+  makeFile(path:string): Observable<any>{
     let url:string = ZoweZLUX.uriBroker.unixFileUri('touch', path);
     return this.http.post(url, null).pipe(
       catchError(this.handleErrorObservable)
