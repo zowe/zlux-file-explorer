@@ -56,16 +56,7 @@ export class CreateFileModal {
     } else { //If the user kept the path obtained from the node...
       onFileCreateResponse.set("updateExistingTree", true); //then we can add that new folder into the existing node.
     }
-
-    // const requestUrl = ZoweZLUX.uriBroker.unixFileUri('touch', path);
-    // this.http.post(requestUrl, null).subscribe((res: any )=> {
-    //   this.snackBar.open(`Successfully created file: "${this.fileName}"`, 'Dismiss',defaultSnackbarOptions );
-    
-    // }, e => {
-    //     this.snackBar.open(`Status: ${e.status}. Failed to create file: "${this.fileName}"`, 'Dismiss',defaultSnackbarOptions );
-    // });
     this.onFileCreate.emit(onFileCreateResponse); //then we can't update the tree.
-
   }
 
 }
