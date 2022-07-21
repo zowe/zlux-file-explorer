@@ -8,37 +8,36 @@
   
   Copyright Contributors to the Zowe Project.
 -->
-<zlux-tab-trap hiddenIds="createfolderclearicon1,createfolderclearicon2" hiddenPos="2,4"></zlux-tab-trap>
+<zlux-tab-trap hiddenIds="createfileclearicon1,createfileclearicon2" hiddenPos="2,4"></zlux-tab-trap>
 <!-- FA Icon is determined by class name, so we hardcode the style here -->
-<mat-icon style="font-size: 30px; position: absolute;">create_new_folder</mat-icon>
+<mat-icon style="font-size: 30px; position: absolute;">create_new_file</mat-icon>
 <!-- <i class="{{fileIcon}}" style="font-size: 30px;position: absolute;margin-top: 2px;margin-left: 3px;color: #000000;"></i> -->
 <button mat-dialog-close class="close-dialog-btn"><i class="fa fa-close"></i></button>
-<h2 mat-dialog-title class="modal-content-body">Create a Directory</h2>
+<h2 mat-dialog-title class="modal-content-body">Create a File</h2>
 
 <mat-dialog-content style="padding-top: 30px;">
-  Directory name:
+  File name:
   <mat-form-field style="margin-left: 15px;">
-    <input id="create-directory-input" name="name" [pattern]="folderPattern" matInput type="text"
-      [(ngModel)]="folderName">
-    <button class="modal-clear-button" mat-button *ngIf="folderName" matSuffix mat-icon-button tabindex="-1" aria-label="Clear" (click)="folderName=''">
-      <mat-icon class="create-folder-clear-icon">close</mat-icon>
+    <input id="create-file-input" name="name" [pattern]="filePattern" matInput type="text"
+      [(ngModel)]="fileName">
+    <button class="modal-clear-button" mat-button *ngIf="fileName" matSuffix mat-icon-button tabindex="-1" aria-label="Clear" (click)="fileName=''">
+      <mat-icon class="create-file-clear-icon">close</mat-icon>
     </button>
   </mat-form-field>
 </mat-dialog-content>
 
 <mat-dialog-content>
   Path:
-  <mat-form-field style="margin-left: 80px;">
+  <mat-form-field style="margin-left: 45px;">
     <input id="create-path-input" [pattern]="empty" matInput type="text"
-      [(ngModel)]="folderPath">
-    <button class="modal-clear-button" mat-button *ngIf="folderPath" matSuffix mat-icon-button tabindex="-1" aria-label="Clear" (click)="folderPath=''">
-      <mat-icon class="create-folder-clear-icon">close</mat-icon>
+      [(ngModel)]="dirPath">
+    <button class="modal-clear-button" mat-button *ngIf="dirPath" matSuffix mat-icon-button tabindex="-1" aria-label="Clear" (click)="dirPath=''">
+      <mat-icon class="create-file-clear-icon">close</mat-icon>
     </button>
   </mat-form-field>
 </mat-dialog-content>
-
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close class="modal-mat-button create" (click)="createFolder()">Create</button>
+  <button mat-button mat-dialog-close class="modal-mat-button create" (click)="createFile()" [disabled]="!fileName || !dirPath">Create</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
 </mat-dialog-actions>
 
