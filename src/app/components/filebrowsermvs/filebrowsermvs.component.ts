@@ -176,6 +176,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); 
+      }},
+      { text: "Download", action:() => { 
+        this.attemptDownload(this.rightClickedFile); 
       }}
     ];
     this.rightClickPropertiesDatasetFolder = [
@@ -184,9 +187,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
-      }},
-      { text: "Download", action:() => { 
-        this.attemptDownload(this.rightClickedFile); 
       }}
     ];
     this.rightClickPropertiesPanel = [
