@@ -134,7 +134,7 @@ export class DownloaderService {
 function createAndDownloadElement(blob: Blob, fileName: any) {
   const elem = window.document.createElement('a');
   elem.href = window.URL.createObjectURL(blob);
-  elem.download = fileName.replace(/\./g,'_');
+  elem.download = fileName;
   document.body.appendChild(elem);
   elem.click();
   document.body.removeChild(elem);
