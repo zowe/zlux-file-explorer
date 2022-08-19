@@ -223,6 +223,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Copy", action:() => { 
         this.copyFile(this.rightClickedFile);
       }},
+      { text: "Copy Path", action:() => {
+        this.copyPath(this.rightClickedFile);
+      }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile);
       }},
@@ -252,6 +255,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Upload...", action:() => { 
         this.showUploadDialog(this.rightClickedFile);
+      }},
+      { text: "Copy Path", action:() => {
+        this.copyPath(this.rightClickedFile);
       }},
       { text: "Delete", action:() => { 
         this.showDeleteDialog(this.rightClickedFile); }},
@@ -678,7 +684,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }
     });
   }
-  
+
+  copyPath(rightClickedFile: any) {
+    navigator.clipboard.writeText(rightClickedFile.path).then(() => {
+      this.log.debug("Path copied to clipboard");
+    }).catch(() => {
+      console.error("Failed to copy path to clipboard");
+    });
+  }
+
   showTaggingDialog(rightClickedFile: any) {
     const config = new MatDialogConfig();
     config.data = {
