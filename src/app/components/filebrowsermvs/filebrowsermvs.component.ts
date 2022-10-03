@@ -78,6 +78,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               private datasetService: DatasetCrudService,
               private downloadService:DownloaderService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
               private dialog: MatDialog
              ) {
@@ -170,6 +171,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.rightClickPropertiesDatasetFile = [
       { text: "Request Open in New Browser Tab", action:() => {
         this.openInNewTab.emit(this.rightClickedFile);
+      }},
+      { text: "Copy Link", action:() => {
+        this.copyLink(this.rightClickedFile);
       }},
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile);
@@ -379,6 +383,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
                     // TODO: Download queue code for progress bar could go here
                 });
+  }
+
+  copyLink(rightClickedFile: any) {
+    const fileLink = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDataset","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":true}`;
+    navigator.clipboard.writeText(fileLink).then(() => {
+      this.log.debug("Link copied to clipboard");
+    }).catch(() => {
+      console.error("Failed to copy link to clipboard");
+    });
   }
 
   showPropertiesDialog(rightClickedFile: any) {

@@ -223,6 +223,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Copy", action:() => { 
         this.copyFile(this.rightClickedFile);
       }},
+      { text: "Copy Link", action:() => {
+        this.copyLink(this.rightClickedFile);
+      }},
       { text: "Copy Path", action:() => {
         this.copyPath(this.rightClickedFile);
       }},
@@ -682,6 +685,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.displayTree(this.path, false);
         this.fileUploaded.emit(this.path);
       }
+    });
+  }
+
+  copyLink(rightClickedFile: any) {
+    const fileLink = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openFile","name":"${encodeURIComponent(rightClickedFile.path)}","toggleTree":true}`;
+    navigator.clipboard.writeText(fileLink).then(() => {
+      this.log.debug("Link copied to clipboard");
+    }).catch(() => {
+      console.error("Failed to copy Link to clipboard");
     });
   }
 
