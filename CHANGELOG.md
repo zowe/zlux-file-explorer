@@ -7,6 +7,7 @@
 * Create an empty file by selecting the folder.
 * Bugfix: Fixing the bug to download the dataset file.
 * Added the option to copy path of USS file or dereoctory.
+* Added the option to copy the link to a file or dataset.
 
 ## 1.0.0
 * File Tree upgraded to conform to Zowe V2: Angular 6->12, Typescript 2->4 etc.
