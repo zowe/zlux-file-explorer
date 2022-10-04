@@ -723,16 +723,29 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     });
 
     saveRef.afterClosed().subscribe(attributes => {
-      if (attributes) {
+      if ( attributes ) {
+        let directoryBlocks = attributes.directoryBlocks;
+        let dsNameType = attributes.datasetType;
+        if( attributes.organization == 'PS' ) {
+          directoryBlocks = 0;
+          dsNameType = '';
+        }
         const datasetAttributes = {
           ndisp: 'CATALOG',
           status: 'NEW',
+          space: attributes.allocationUnit,
           dsorg: attributes.organization,
           blksz: attributes.blockSize,
           lrecl: attributes.recordLength,
           recfm: attributes.recordFormat,
-          close: 'true'
+          close: 'true',
+          dir: directoryBlocks,
+          prime: attributes.primarySpace,
+          secnd: attributes.secondarySpace,
+          avgr: attributes.averageRecordUnit,
+          dsnt: attributes.dsNameType
         }
+
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
           this.snackBar.open(`Dataset created successfully.`, 'Dismiss', defaultSnackbarOptions);
           this.isLoading = false;
