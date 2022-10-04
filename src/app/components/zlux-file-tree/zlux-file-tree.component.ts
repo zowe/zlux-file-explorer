@@ -54,6 +54,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatasetPropertiesModal } from '../dataset-properties-modal/dataset-properties-modal.component';
 import { FilePermissionsModal } from '../file-permissions-modal/file-permissions-modal.component';
@@ -62,6 +63,7 @@ import { FileTaggingModal } from '../file-tagging-modal/file-tagging-modal.compo
 import { InputTextModule } from 'primeng/inputtext';
 import { Subscription } from 'rxjs';
 import { UploadModal } from '../upload-files-modal/upload-files-modal.component';
+import { CreateDatasetModal } from '../create-dataset-modal/create-dataset-modal.component'
 
 /* Services */
 import { UploaderService } from '../../services/uploader.service';
@@ -406,7 +408,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     CreateFolderModal,
     CreateFileModal,
     UploadModal,
-    TreeComponent],
+    TreeComponent,
+    CreateDatasetModal],
   imports: [
     CommonModule, 
     FormsModule, 
@@ -425,6 +428,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     MatButtonModule,
     MatButtonToggleModule,
     MatTooltipModule,
+    MatSelectModule,
     MatAutocompleteModule,
     ZluxTabbingModule,
     MatSlideToggleModule,
@@ -442,7 +446,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     DeleteFileModal,
     CreateFolderModal,
     CreateFileModal,
-    UploadModal
+    UploadModal,
+    CreateDatasetModal
   ],
   providers: [
     KeybindingService,
