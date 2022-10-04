@@ -74,11 +74,6 @@ export class CreateDatasetModal {
   private properties = {
     preset: '',
     name: '',
-    managementClass: '',
-    storageClass: '',
-    volumeSerial: '',
-    deviceType: '',
-    dataClass: '',
     allocationUnit: '',
     averageRecordUnit: '',
     primarySpace: '',
@@ -88,7 +83,11 @@ export class CreateDatasetModal {
     recordLength: '',
     blockSize: '',
     datasetType: '',
-    organization: ''
+    organization: '',
+    managementClass: '',
+    storageClass: '',
+    volumeSerial: '',
+    dataClass: ''
   };
   private numericPattern: string;
   private numericPatternExZero: string;

@@ -114,12 +114,6 @@
     <mat-error>Invalid Volume Serial</mat-error>
   </mat-form-field>
   <p></p>
-  <label>Device Type:</label>
-  <mat-form-field>
-    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.deviceType" #deviceTypeInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Device Type</mat-error>
-  </mat-form-field>
-  <p></p>
   <label>Data Class:</label>
   <mat-form-field>
     <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.dataClass" #dataClassInput="ngModel" [errorStateMatcher]="matcher">
@@ -133,7 +127,7 @@
     class="right" 
     color="primary" 
     [mat-dialog-close]="properties"
-    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || managementClassInput.invalid || storageClassInput.invalid || volserInput.invalid || deviceTypeInput.invalid || dataClassInput.invalid">
+    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || managementClassInput.invalid || storageClassInput.invalid || volserInput.invalid || dataClassInput.invalid">
     Save
   </button>
 </mat-dialog-actions>
