@@ -186,6 +186,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }}
     ];
     this.rightClickPropertiesDatasetFolder = [
+      { text: "Copy Link", action:() => {
+        this.copyLink(this.rightClickedFile);
+      }},
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile);
       }},
@@ -386,8 +389,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   copyLink(rightClickedFile: any) {
-    const dsLink = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDataset","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":true}`;
-    navigator.clipboard.writeText(dsLink).then(() => {
+    let link = '';
+    if(rightClickedFile.type == 'file'){
+       link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDataset","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":true}`;
+    } else {
+      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDSList","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":false}`;
+    }
+    navigator.clipboard.writeText(link).then(() => {
       this.log.debug("Link copied to clipboard");
     }).catch(() => {
       console.error("Failed to copy link to clipboard");
