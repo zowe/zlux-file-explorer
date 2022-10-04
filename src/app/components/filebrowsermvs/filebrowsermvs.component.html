@@ -40,6 +40,7 @@
     </div>
   </div>
 
+  <div class="fa fa-plus filebrowsermvs-plus-icon" title="Create new dataset" (click)="createDatasetDialog()" style="cursor: pointer;"></div>
   <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
   <div class="fa fa-refresh filebrowseruss-loading-icon" title="Refresh dataset list" (click)="updateTreeView(path);" [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
   <div class="file-tree-utilities">
