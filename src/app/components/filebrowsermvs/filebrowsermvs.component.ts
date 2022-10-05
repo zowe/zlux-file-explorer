@@ -104,6 +104,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Input() showUpArrow: boolean;
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
@@ -600,10 +601,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.pathChanged.emit($event);
   }
 
+  onDataChanged($event: any): void {
+    this.dataChanged.emit($event);
+  }
+
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.isLoading = true;
       this.datasetService.queryDatasets(path, true, this.additionalQualifiers).pipe(take(1)).subscribe((res) => {
+        this.onDataChanged(res);
         let parents: TreeNode[] = [];
         let parentMap = {};
         this.lastPath = path;

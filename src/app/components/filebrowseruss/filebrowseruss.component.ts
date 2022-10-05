@@ -107,6 +107,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeRightClick: EventEmitter<any> = new EventEmitter<any>();
@@ -830,6 +831,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.pathChanged.emit($event);
   }
 
+  onDataChanged($event: any): void {
+    this.dataChanged.emit($event);
+  }
+
   sortFn(a: any, b: any) {
     if (a.directory !== b.directory) {
       if (a.directory === true) {
@@ -876,6 +881,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     ussData.subscribe(
     files => {
       files.entries.sort(this.sortFn);
+      this.onDataChanged(files.entries);
       const tempChildren: FileTreeNode[] = [];
       for (let i: number = 0; i < files.entries.length; i++) {
         if (files.entries[i].directory) {
