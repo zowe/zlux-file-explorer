@@ -75,9 +75,10 @@ npm rebuild node-sass
 
 ## How to build a File Tree release
 
-1. Set the version number you want https://github.com/zowe/zlux-file-explorer/blob/staging/package.json#L3
-2. Set the build number you want (RC1, 2, 3 etc see https://github.com/zowe/zlux-file-explorer/tags)
-3. Enter the build number you want into the jenkins job (see a previous run https://wash.zowe.org:8443/job/zlux-angular-file-tree/job/staging/22/parameters/)
+1. Set the version number you want https://github.com/zowe/zlux-file-explorer/blob/staging/package.json#L3 . 
+2. Reinstall the app to update the package-lock.json too.
+3. Click on GitHub "Actions" tab at the top. Select "Build and Test Workflow".
+4. Click on "Run workflow" dropdown. Select desired branch and release text string i.e. "RC1" to build a FT npm release
 
 This program and the accompanying materials are
 made available under the terms of the Eclipse Public License v2.0 which accompanies
