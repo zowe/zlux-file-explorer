@@ -150,6 +150,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() datasetSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussSelect: EventEmitter<any> = new EventEmitter<any>();
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
+  @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
 
@@ -302,6 +303,10 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
 
   onPathChanged($event: any) {
     this.pathChanged.emit($event);
+  }
+
+  onDataChanged($event: any): void {
+    this.dataChanged.emit($event);
   }
 
   onRightClick($event: any) {
