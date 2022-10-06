@@ -969,7 +969,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     );
     this.refreshHistory(this.path);
   }
-
   private refreshHistory(path:string) {
     const sub = this.ussSearchHistory
                   .saveSearchHistory(path)
@@ -978,6 +977,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
                   });
   }
 
+  clearSearchHistory(): void {
+    this.ussSearchHistory.clearSearchHistory();
+  }
 
   //Adds children to the existing node to update this.data array, 
   //fetch - fetches new data, expand - expands or not folder node after fetching new data

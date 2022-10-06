@@ -690,6 +690,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
                   });
   }
 
+  clearSearchHistory(): void {
+    this.mvsSearchHistory.clearSearchHistory();
+  }
+
 /**
 * [levelUp: function to ascend up a level in the file/folder tree]
 * @param index [tree index where the 'folder' parent is accessed]

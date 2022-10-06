@@ -43,8 +43,9 @@
   <div class="fa fa-spinner fa-spin filebrowseruss-loading-icon" [hidden]="!isLoading"></div>
   <div class="fa fa-refresh filebrowseruss-loading-icon" title="Refresh dataset list" (click)="updateTreeView(path);" [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
   <div class="file-tree-utilities">
-    <div class="fa fa-minus-square-o filebrowseruss-collapse-icon" title="Collapse Folders in Explorer" (click)="collapseTree();" style="margin-right: 9px; float:right; cursor: pointer;"></div>
-    <div class="fa fa-trash-o filebrowseruss-delete-icon" title="Delete" (click)="showDeleteDialog(selectedNode);" style="margin-right: 9px; float:right; cursor: pointer;"></div>
+    <div class="fa fa-history filebrowser-icon special" title="Clear Search History" (click)="clearSearchHistory();"></div>
+    <div class="fa fa-minus-square-o filebrowser-icon" title="Collapse Folders in Explorer" (click)="collapseTree();"></div>
+    <div class="fa fa-trash-o filebrowser-icon" title="Delete" (click)="showDeleteDialog(selectedNode);"></div>
   </div>
   <!-- Main tree -->
   <div [hidden]="hideExplorer" style="height: 100%;">

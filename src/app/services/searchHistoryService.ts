@@ -95,4 +95,9 @@ export class SearchHistoryService {
      return this.searchHistory;
   }
 
+  public clearSearchHistory(): Observable<any> {
+    this.searchHistory = [];
+    return of(this.searchHistory);
+  }
+
 }
