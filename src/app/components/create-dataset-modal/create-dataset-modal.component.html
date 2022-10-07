@@ -54,6 +54,12 @@
     <mat-error>Invalid Secondary Space</mat-error>
   </mat-form-field>
   <p></p>
+  <label class="required">Block Length:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.blockLength" #blockLengthInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Record Length</mat-error>
+  </mat-form-field>
+  <p></p>
   <label class="required">Directory Blocks:</label>
   <mat-form-field>
     <input matInput [pattern]="numericPattern" [(ngModel)]="properties.directoryBlocks" #dirBlockInput="ngModel" [errorStateMatcher]="matcher">
@@ -127,7 +133,7 @@
     class="right" 
     color="primary" 
     [mat-dialog-close]="properties"
-    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || managementClassInput.invalid || storageClassInput.invalid || volserInput.invalid || dataClassInput.invalid">
+    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || !properties.blockLength || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || blockLengthInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || managementClassInput.invalid || storageClassInput.invalid || volserInput.invalid || dataClassInput.invalid">
     Save
   </button>
 </mat-dialog-actions>

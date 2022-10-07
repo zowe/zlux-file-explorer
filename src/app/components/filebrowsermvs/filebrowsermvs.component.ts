@@ -724,8 +724,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     saveRef.afterClosed().subscribe(attributes => {
       if ( attributes ) {
-        let directoryBlocks = attributes.directoryBlocks;
         let dsNameType = attributes.datasetType;
+        let directoryBlocks = attributes.directoryBlocks;
         if( attributes.organization == 'PS' ) {
           directoryBlocks = 0;
           dsNameType = '';
@@ -738,12 +738,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           blksz: attributes.blockSize,
           lrecl: attributes.recordLength,
           recfm: attributes.recordFormat,
+          blkln: attributes.blockLength,
           close: 'true',
           dir: directoryBlocks,
           prime: attributes.primarySpace,
           secnd: attributes.secondarySpace,
           avgr: attributes.averageRecordUnit,
-          dsnt: attributes.dsNameType
+          dsnt: dsNameType
         }
 
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
@@ -752,7 +753,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           const path = attributes.name.substring(0,6);
           this.updateTreeView(path);
         }, error => {
-          this.snackBar.open(`Failed to create the dataset: ${error._body}`, 'Dismiss', defaultSnackbarOptions);
+          this.snackBar.open(`Failed to create the dataset: ${error}`, 'Dismiss', defaultSnackbarOptions);
           }
         );
       }
