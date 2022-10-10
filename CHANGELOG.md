@@ -1,5 +1,8 @@
 # ZLUX Angular File Tree
 
+## 1.2.0
+* Added the option to receive USS/MVS node data
+
 ## 1.1.0
 * Added the option to download the dataset file.
 * Added create folder, delete and collapse icons in tree explorer.
