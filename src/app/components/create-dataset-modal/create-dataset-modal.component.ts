@@ -84,6 +84,7 @@ export class CreateDatasetModal {
     blockSize: '',
     datasetType: '',
     organization: '',
+    blockLength: '',
     managementClass: '',
     storageClass: '',
     volumeSerial: '',
@@ -110,7 +111,7 @@ export class CreateDatasetModal {
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
-    this.recordFormatOptions = ['A', 'B', 'F', 'FB', 'V', 'VB', 'U', 'VBA'];
+    this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U'];
     this.datasetTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];

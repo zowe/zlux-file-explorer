@@ -17,7 +17,7 @@
 
 .filebrowsermvs-search {
   width: fit-content;
-  min-width: 250px;
+  max-width: 250px;
   margin-left: 5px;
   display: inline-block;
   height: 40px;
@@ -65,6 +65,11 @@
 .file-tree-utilities {
   overflow: hidden;
   border: 1px solid #464646;
+}
+
+.filebrowsermvs-loading-icon {
+  margin-left: 8px !important;
+  font-size: large !important;
 }
 
 .filebrowsermvs-plus-icon {
