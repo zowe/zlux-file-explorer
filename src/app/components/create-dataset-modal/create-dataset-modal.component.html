@@ -54,8 +54,15 @@
     </mat-select>
   </mat-form-field>
   <p></p>
-Advanced Attributes <span><i class="fa fa-caret-up" title="Collapse view" aria-hidden="true"></i></span>
-  <div [hidden]="true">
+  <p></p>
+  <h6 style="text-align: center;"> ADVANCE ATTRIBUTES
+    <span>
+      <i class="fa fa-caret-down" title="Expand view" *ngIf="!showAdvanceAttributes" (click)="showAdvanceAttributes=!showAdvanceAttributes" style="cursor: pointer; font-size: large;"></i>
+      <i class="fa fa-caret-up" title="Collapse view" *ngIf="showAdvanceAttributes" (click)="showAdvanceAttributes=!showAdvanceAttributes" style="cursor: pointer; font-size: large;"></i>
+    </span>
+  </h6>
+  <p></p>
+  <div [hidden]="!showAdvanceAttributes">
   <label>Preset:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.preset" #presetInput (selectionChange)="onPresetChange(presetInput.value)">
