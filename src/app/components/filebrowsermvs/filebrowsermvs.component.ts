@@ -730,7 +730,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     saveRef.afterClosed().subscribe(attributes => {
       if ( attributes ) {
-        let dsNameType = attributes.datasetType;
+        let dsNameType = attributes.datasetNameType;
         let directoryBlocks = attributes.directoryBlocks;
         if( attributes.organization == 'PS' ) {
           directoryBlocks = 0;

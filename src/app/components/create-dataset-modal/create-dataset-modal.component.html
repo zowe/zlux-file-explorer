@@ -12,6 +12,14 @@
 <h2 mat-dialog-title>CREATE DATASET</h2>
 <p class="mandatory">Mandatory fields are marked with an asterisk</p>
 <mat-dialog-content>
+  <label>Dataset Type:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetType" #datasetTypeInput (selectionChange)="onDatasetTypeChange(datasetTypeInput.value)">
+      <mat-option *ngFor="let datasetType of datasetTypeOptions" [value]="datasetType">
+      {{datasetType}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
   <label class="required">Dataset Name:</label>
   <mat-form-field>
     <input matInput type="text" maxlength="44" [pattern]="datasetNamePattern" [(ngModel)]="properties.name" #nameInput="ngModel" [errorStateMatcher]="matcher">
@@ -38,19 +46,19 @@
     <mat-error>Invalid Block Size</mat-error>
   </mat-form-field>
   <p></p>
-  <label class="required">Dataset Type:</label>
-  <mat-form-field>
-    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetType">
-      <mat-option *ngFor="let datasetType of datasetTypeOptions" [value]="datasetType">
-      {{datasetType}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <p></p>
   <label class="required">Dataset Organization:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.organization">
       <mat-option *ngFor="let organization of organizationOptions" [value]="organization">
       {{organization}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Dataset Name Type:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetNameType">
+      <mat-option *ngFor="let datasetNameType of datasetNameTypeOptions" [value]="datasetNameType">
+      {{datasetNameType}}</mat-option>
     </mat-select>
   </mat-form-field>
   <p></p>

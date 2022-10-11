@@ -7,18 +7,19 @@
   
   Copyright Contributors to the Zowe Project.
 */
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 
 interface DatasetCreationParams {
-  organization :string,
-  allocationUnit :string,
-  primarySpace :string,
-  secondarySpace :string,
-  directoryBlocks :string,
-  recordFormat :string,
-  blockSize :string,
-  recordLength :string,
+  organization? :string,
+  allocationUnit? :string,
+  primarySpace? :string,
+  secondarySpace? :string,
+  directoryBlocks? :string,
+  recordFormat? :string,
+  blockSize? :string,
+  recordLength? :string,
+  datasetNameType? :string
 }
 
 const PRESETS = new Map<string, DatasetCreationParams> ([
@@ -64,6 +65,24 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
   }],
 ]);
 
+const DATASETTYPE = new Map<string, DatasetCreationParams> ([
+  ['PS', {
+    organization: 'PS',
+    datasetNameType: '',
+    directoryBlocks: '0',
+  }],
+  ['PDS', {
+    organization: 'PO',
+    datasetNameType: 'PDS',
+    directoryBlocks: '20',
+  }],
+  ['PDSE', {
+    organization: 'PO',
+    datasetNameType: 'LIBRARY',
+    directoryBlocks: '20',
+  }]
+]);
+
 @Component({
   selector: 'create-dataset-modal',
   templateUrl: './create-dataset-modal.component.html',
@@ -74,6 +93,7 @@ export class CreateDatasetModal {
   private properties = {
     preset: '',
     name: '',
+    datasetType: '',
     allocationUnit: '',
     averageRecordUnit: '',
     primarySpace: '',
@@ -82,7 +102,7 @@ export class CreateDatasetModal {
     recordFormat: '',
     recordLength: '',
     blockSize: '',
-    datasetType: '',
+    datasetNameType: '',
     organization: ''
   };
   private numericPattern: string;
@@ -90,15 +110,16 @@ export class CreateDatasetModal {
   private datasetNamePattern: string;
   private alphaNumericPattern: string;
   private presetOptions: string[];
-  private allocationUnitOptions: string[];
   private datasetTypeOptions: string[];
+  private allocationUnitOptions: string[];
+  private datasetNameTypeOptions: string[];
   private recordFormatOptions: string[];
   private organizationOptions: string[];
   private recordUnitOptions: string[];
   private matcher = new CustomErrorStateMatcher();
   private showAdvanceAttributes: boolean = false;
 
-  constructor() { }
+  constructor(private el: ElementRef,) { }
 
   ngOnInit() {
     this.numericPattern = "^[0-9]*$";
@@ -106,22 +127,53 @@ export class CreateDatasetModal {
     this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,21}$";
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
+    this.datasetTypeOptions = ['PS', 'PDS', 'PDSE'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
     this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U'];
-    this.datasetTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
+    this.datasetNameTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
-    this.properties.preset = 'JCL';
-    this.properties.averageRecordUnit = 'U';
-    this.properties.datasetType = 'PDS';
-    this.setProperties(this.properties.preset);
+    this.properties.datasetType = 'PS';
+    this.properties.preset = '';
+    this.properties.averageRecordUnit = '';
+    this.properties.datasetNameType = 'PDS';
+    this.setDatasetTypeProperties(this.properties.datasetType);
+  }
+
+  expandAdvAttributes() {
+    console.log('-----Trying to scroll---------------------------------------------');
+    this.showAdvanceAttributes = !this.showAdvanceAttributes;
+    const lastFieldControl: HTMLElement = this.el.nativeElement.querySelector(
+      "form .directory-block"
+    );
+    window.scroll({
+      top: this.getTopOffset(lastFieldControl),
+      left: 0,
+      behavior: "smooth"
+    });
+  }
+
+  private getTopOffset(controlEl: HTMLElement): number {
+    console.log('---------------------------controlEl: ', controlEl);
+    const labelOffset = 50;
+    return controlEl.getBoundingClientRect().top + window.scrollY - labelOffset;
+  }
+
+  onDatasetTypeChange(value:string): void {
+    this.setDatasetTypeProperties(value);
   }
 
   onPresetChange(value: string): void {
-    this.setProperties(value);
+    this.setPresetProperties(value);
   }
 
-  setProperties(preset: string): void  {
+  setDatasetTypeProperties(datasetType: string): void {
+    this.properties.organization = DATASETTYPE.get(datasetType)?.organization;
+    this.properties.datasetNameType = DATASETTYPE.get(datasetType)?.datasetNameType;
+    this.properties.directoryBlocks = DATASETTYPE.get(datasetType)?.directoryBlocks;
+  }
+
+  setPresetProperties(preset: string): void  {
     this.properties.allocationUnit = PRESETS.get(preset).allocationUnit;
     this.properties.primarySpace = PRESETS.get(preset).primarySpace;
     this.properties.secondarySpace = PRESETS.get(preset).secondarySpace;
