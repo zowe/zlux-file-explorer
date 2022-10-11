@@ -730,12 +730,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
     saveRef.afterClosed().subscribe(attributes => {
       if ( attributes ) {
-        let dsNameType = attributes.datasetNameType;
-        let directoryBlocks = attributes.directoryBlocks;
-        if( attributes.organization == 'PS' ) {
-          directoryBlocks = 0;
-          dsNameType = '';
-        }
         const datasetAttributes = {
           ndisp: 'CATALOG',
           status: 'NEW',
@@ -745,11 +739,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           lrecl: attributes.recordLength,
           recfm: attributes.recordFormat,
           close: 'true',
-          dir: directoryBlocks,
+          dir: attributes.directoryBlocks,
           prime: attributes.primarySpace,
           secnd: attributes.secondarySpace,
           avgr: attributes.averageRecordUnit,
-          dsnt: dsNameType
+          dsnt: attributes.datasetNameType
         }
 
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {

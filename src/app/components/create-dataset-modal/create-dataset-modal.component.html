@@ -57,6 +57,7 @@
   <label class="required">Dataset Name Type:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetNameType">
+      <mat-option>None</mat-option>
       <mat-option *ngFor="let datasetNameType of datasetNameTypeOptions" [value]="datasetNameType">
       {{datasetNameType}}</mat-option>
     </mat-select>
@@ -74,6 +75,7 @@
   <label>Preset:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.preset" #presetInput (selectionChange)="onPresetChange(presetInput.value)">
+      <mat-option>None</mat-option>
       <mat-option *ngFor="let preset of presetOptions" [value]="preset">
       {{preset}}</mat-option>
     </mat-select>
@@ -82,6 +84,7 @@
   <label>Allocation Unit:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.allocationUnit">
+      <mat-option>None</mat-option>
       <mat-option *ngFor="let allocationUnit of allocationUnitOptions" [value]="allocationUnit">
       {{allocationUnit}}</mat-option>
     </mat-select>
@@ -90,6 +93,7 @@
   <label>Average Record Unit:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.averageRecordUnit">
+      <mat-option>None</mat-option>
       <mat-option *ngFor="let averageRecordUnit of recordUnitOptions" [value]="averageRecordUnit">
       {{averageRecordUnit}}</mat-option>
     </mat-select>

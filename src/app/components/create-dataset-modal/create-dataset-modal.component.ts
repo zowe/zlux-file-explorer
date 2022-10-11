@@ -68,18 +68,15 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
 const DATASETTYPE = new Map<string, DatasetCreationParams> ([
   ['PS', {
     organization: 'PS',
-    datasetNameType: '',
-    directoryBlocks: '0',
+    datasetNameType: ''
   }],
   ['PDS', {
     organization: 'PO',
-    datasetNameType: 'PDS',
-    directoryBlocks: '20',
+    datasetNameType: 'PDS'
   }],
   ['PDSE', {
     organization: 'PO',
-    datasetNameType: 'LIBRARY',
-    directoryBlocks: '20',
+    datasetNameType: 'LIBRARY'
   }]
 ]);
 
@@ -151,7 +148,6 @@ export class CreateDatasetModal {
   setDatasetTypeProperties(datasetType: string): void {
     this.properties.organization = DATASETTYPE.get(datasetType)?.organization;
     this.properties.datasetNameType = DATASETTYPE.get(datasetType)?.datasetNameType;
-    this.properties.directoryBlocks = DATASETTYPE.get(datasetType)?.directoryBlocks;
   }
 
   setPresetProperties(preset: string): void  {
