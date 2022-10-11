@@ -140,25 +140,6 @@ export class CreateDatasetModal {
     this.setDatasetTypeProperties(this.properties.datasetType);
   }
 
-  expandAdvAttributes() {
-    console.log('-----Trying to scroll---------------------------------------------');
-    this.showAdvanceAttributes = !this.showAdvanceAttributes;
-    const lastFieldControl: HTMLElement = this.el.nativeElement.querySelector(
-      "form .directory-block"
-    );
-    window.scroll({
-      top: this.getTopOffset(lastFieldControl),
-      left: 0,
-      behavior: "smooth"
-    });
-  }
-
-  private getTopOffset(controlEl: HTMLElement): number {
-    console.log('---------------------------controlEl: ', controlEl);
-    const labelOffset = 50;
-    return controlEl.getBoundingClientRect().top + window.scrollY - labelOffset;
-  }
-
   onDatasetTypeChange(value:string): void {
     this.setDatasetTypeProperties(value);
   }

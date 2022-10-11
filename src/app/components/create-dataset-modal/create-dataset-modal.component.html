@@ -79,7 +79,7 @@
     </mat-select>
   </mat-form-field>
   <p></p>
-  <label class="required">Allocation Unit:</label>
+  <label>Allocation Unit:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.allocationUnit">
       <mat-option *ngFor="let allocationUnit of allocationUnitOptions" [value]="allocationUnit">
@@ -87,7 +87,7 @@
     </mat-select>
   </mat-form-field>
   <p></p>
-  <label class="required">Average Record Unit:</label>
+  <label>Average Record Unit:</label>
   <mat-form-field>
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.averageRecordUnit">
       <mat-option *ngFor="let averageRecordUnit of recordUnitOptions" [value]="averageRecordUnit">
@@ -95,7 +95,7 @@
     </mat-select>
   </mat-form-field>
   <p></p>
-  <label class="required">Primary Space:</label>
+  <label>Primary Space:</label>
   <mat-form-field>
     <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher">
     <mat-error>Invalid Primary Space</mat-error>
@@ -107,7 +107,7 @@
     <mat-error>Invalid Secondary Space</mat-error>
   </mat-form-field>
   <p></p>
-  <label class="required">Directory Blocks:</label>
+  <label>Directory Blocks:</label>
   <mat-form-field>
     <input matInput [pattern]="numericPattern" [(ngModel)]="properties.directoryBlocks" #dirBlockInput="ngModel" [errorStateMatcher]="matcher">
     <mat-error>Invalid Directory Blocks</mat-error>
@@ -121,7 +121,7 @@
     class="right" 
     color="primary" 
     [mat-dialog-close]="properties"
-    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid">
+    [disabled]="!properties.name || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid">
     Save
   </button>
 </mat-dialog-actions>
