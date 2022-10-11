@@ -84,11 +84,7 @@ export class CreateDatasetModal {
     blockSize: '',
     datasetType: '',
     organization: '',
-    blockLength: '',
-    managementClass: '',
-    storageClass: '',
-    volumeSerial: '',
-    dataClass: ''
+    blockLength: ''
   };
   private numericPattern: string;
   private numericPatternExZero: string;

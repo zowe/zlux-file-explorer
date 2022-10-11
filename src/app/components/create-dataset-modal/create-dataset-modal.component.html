@@ -101,30 +101,6 @@
       {{organization}}</mat-option>
     </mat-select>
   </mat-form-field>
-  <p></p>
-  <label>Management Class:</label>
-  <mat-form-field>
-    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.managementClass" #managementClassInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Management Class</mat-error>
-  </mat-form-field>
-  <p></p>
-  <label>Storage Class:</label>
-  <mat-form-field>
-    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.storageClass" #storageClassInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Storage Class</mat-error>
-  </mat-form-field>
-  <p></p>
-  <label>Volume Serial:</label>
-  <mat-form-field>
-    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.volumeSerial" #volserInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Volume Serial</mat-error>
-  </mat-form-field>
-  <p></p>
-  <label>Data Class:</label>
-  <mat-form-field>
-    <input matInput type="text" [pattern]="alphaNumericPattern" [(ngModel)]="properties.dataClass" #dataClassInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Data Class</mat-error>
-  </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button 
@@ -133,7 +109,7 @@
     class="right" 
     color="primary" 
     [mat-dialog-close]="properties"
-    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || !properties.blockLength || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || blockLengthInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || managementClassInput.invalid || storageClassInput.invalid || volserInput.invalid || dataClassInput.invalid">
+    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || !properties.blockLength || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || blockLengthInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid">
     Save
   </button>
 </mat-dialog-actions>
