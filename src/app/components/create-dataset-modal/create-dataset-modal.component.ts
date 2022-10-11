@@ -96,6 +96,7 @@ export class CreateDatasetModal {
   private organizationOptions: string[];
   private recordUnitOptions: string[];
   private matcher = new CustomErrorStateMatcher();
+  private showAdvanceAttributes: boolean = false;
 
   constructor() { }
 
