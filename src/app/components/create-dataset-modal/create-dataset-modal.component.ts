@@ -83,8 +83,7 @@ export class CreateDatasetModal {
     recordLength: '',
     blockSize: '',
     datasetType: '',
-    organization: '',
-    blockLength: ''
+    organization: ''
   };
   private numericPattern: string;
   private numericPatternExZero: string;

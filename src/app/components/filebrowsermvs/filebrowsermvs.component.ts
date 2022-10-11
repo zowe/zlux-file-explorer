@@ -744,7 +744,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           blksz: attributes.blockSize,
           lrecl: attributes.recordLength,
           recfm: attributes.recordFormat,
-          blkln: attributes.blockLength,
           close: 'true',
           dir: directoryBlocks,
           prime: attributes.primarySpace,

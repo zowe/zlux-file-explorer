@@ -12,58 +12,10 @@
 <h2 mat-dialog-title>CREATE DATASET</h2>
 <p class="mandatory">Mandatory fields are marked with an asterisk</p>
 <mat-dialog-content>
-  <label>Preset:</label>
-  <mat-form-field>
-    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.preset" #presetInput (selectionChange)="onPresetChange(presetInput.value)">
-      <mat-option *ngFor="let preset of presetOptions" [value]="preset">
-      {{preset}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <p></p>
   <label class="required">Dataset Name:</label>
   <mat-form-field>
     <input matInput type="text" maxlength="44" [pattern]="datasetNamePattern" [(ngModel)]="properties.name" #nameInput="ngModel" [errorStateMatcher]="matcher">
     <mat-error>Invalid Name</mat-error>
-  </mat-form-field>
-  <p></p>
-  <label class="required">Allocation Unit:</label>
-  <mat-form-field>
-    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.allocationUnit">
-      <mat-option *ngFor="let allocationUnit of allocationUnitOptions" [value]="allocationUnit">
-      {{allocationUnit}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <p></p>
-  <label class="required">Average Record Unit:</label>
-  <mat-form-field>
-    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.averageRecordUnit">
-      <mat-option *ngFor="let averageRecordUnit of recordUnitOptions" [value]="averageRecordUnit">
-      {{averageRecordUnit}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <p></p>
-  <label class="required">Primary Space:</label>
-  <mat-form-field>
-    <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Primary Space</mat-error>
-  </mat-form-field>
-  <p></p>
-  <label>Secondary Space:</label>
-  <mat-form-field>
-    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.secondarySpace" #secSpaceInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Secondary Space</mat-error>
-  </mat-form-field>
-  <p></p>
-  <label class="required">Block Length:</label>
-  <mat-form-field>
-    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.blockLength" #blockLengthInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Record Length</mat-error>
-  </mat-form-field>
-  <p></p>
-  <label class="required">Directory Blocks:</label>
-  <mat-form-field>
-    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.directoryBlocks" #dirBlockInput="ngModel" [errorStateMatcher]="matcher">
-    <mat-error>Invalid Directory Blocks</mat-error>
   </mat-form-field>
   <p></p>
   <label class="required">Record Format:</label>
@@ -101,6 +53,51 @@
       {{organization}}</mat-option>
     </mat-select>
   </mat-form-field>
+  <p></p>
+  Advanced Attributes <span></span>
+  <div [hidden]="true">
+  <label>Preset:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.preset" #presetInput (selectionChange)="onPresetChange(presetInput.value)">
+      <mat-option *ngFor="let preset of presetOptions" [value]="preset">
+      {{preset}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Allocation Unit:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.allocationUnit">
+      <mat-option *ngFor="let allocationUnit of allocationUnitOptions" [value]="allocationUnit">
+      {{allocationUnit}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Average Record Unit:</label>
+  <mat-form-field>
+    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.averageRecordUnit">
+      <mat-option *ngFor="let averageRecordUnit of recordUnitOptions" [value]="averageRecordUnit">
+      {{averageRecordUnit}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Primary Space:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Primary Space</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label>Secondary Space:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.secondarySpace" #secSpaceInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Secondary Space</mat-error>
+  </mat-form-field>
+  <p></p>
+  <label class="required">Directory Blocks:</label>
+  <mat-form-field>
+    <input matInput [pattern]="numericPattern" [(ngModel)]="properties.directoryBlocks" #dirBlockInput="ngModel" [errorStateMatcher]="matcher">
+    <mat-error>Invalid Directory Blocks</mat-error>
+  </mat-form-field>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button 
@@ -109,7 +106,7 @@
     class="right" 
     color="primary" 
     [mat-dialog-close]="properties"
-    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || !properties.blockLength || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || blockLengthInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid">
+    [disabled]="!properties.name || !properties.primarySpace || !properties.directoryBlocks || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid">
     Save
   </button>
 </mat-dialog-actions>
