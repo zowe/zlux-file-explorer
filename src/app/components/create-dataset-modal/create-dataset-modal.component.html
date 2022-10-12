@@ -54,13 +54,9 @@
     </mat-select>
   </mat-form-field>
   <p></p>
-  <label class="required">Dataset Name Type:</label>
+  <label>Dataset Name Type:</label>
   <mat-form-field>
-    <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.datasetNameType">
-      <mat-option>None</mat-option>
-      <mat-option *ngFor="let datasetNameType of datasetNameTypeOptions" [value]="datasetNameType">
-      {{datasetNameType}}</mat-option>
-    </mat-select>
+    <input matInput [(ngModel)]="properties.datasetNameType" placeholder="Blank for PS Dataset" readonly>
   </mat-form-field>
   <p></p>
   <p></p>

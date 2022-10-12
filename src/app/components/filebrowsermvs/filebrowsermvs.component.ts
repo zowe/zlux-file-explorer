@@ -733,18 +733,49 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         const datasetAttributes = {
           ndisp: 'CATALOG',
           status: 'NEW',
-          space: attributes.allocationUnit,
           dsorg: attributes.organization,
           blksz: attributes.blockSize,
           lrecl: attributes.recordLength,
           recfm: attributes.recordFormat,
-          close: 'true',
-          dir: attributes.directoryBlocks,
-          prime: attributes.primarySpace,
-          secnd: attributes.secondarySpace,
-          avgr: attributes.averageRecordUnit,
-          dsnt: attributes.datasetNameType
+          dsnt: attributes.datasetNameType,
+          close: 'true'
         }
+
+        if(attributes.allocationUnit) {
+          datasetAttributes['space'] = attributes.allocationUnit;
+        }
+        if(attributes.averageRecordUnit) {
+          datasetAttributes['avgr'] = attributes.averageRecordUnit;
+        }
+        if(attributes.primarySpace) {
+          datasetAttributes['prime'] = attributes.primarySpace;
+        }
+        if(attributes.secondarySpace) {
+          datasetAttributes['secnd'] = attributes.secondarySpace;
+        }
+        if(attributes.directoryBlocks) {
+          if(attributes.datasetType !== 'PS' && attributes.directoryBlocks == '0') {
+            attributes.directoryBlocks = 10;
+          }
+          datasetAttributes['dir'] = attributes.directoryBlocks;
+        }
+
+
+        // const datasetAttributes2 = {
+        //   ndisp: 'CATALOG',
+        //   status: 'NEW',
+        //   space: attributes.allocationUnit,
+        //   dsorg: attributes.organization,
+        //   blksz: attributes.blockSize,
+        //   lrecl: attributes.recordLength,
+        //   recfm: attributes.recordFormat,
+        //   close: 'true',
+        //   dir: attributes.directoryBlocks,
+        //   prime: attributes.primarySpace,
+        //   secnd: attributes.secondarySpace,
+        //   avgr: attributes.averageRecordUnit,
+        //   dsnt: attributes.datasetNameType
+        // }
 
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
           this.snackBar.open(`Dataset created successfully.`, 'Dismiss', defaultSnackbarOptions);

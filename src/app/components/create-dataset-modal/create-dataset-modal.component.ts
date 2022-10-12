@@ -127,13 +127,15 @@ export class CreateDatasetModal {
     this.datasetTypeOptions = ['PS', 'PDS', 'PDSE'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
     this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U'];
-    this.datasetNameTypeOptions = ['PDS','LIBRARY', 'HFS', 'LARGE', 'BASIC', 'EXTREQ', 'EXTPREF', 'DEFAULT'];
+    this.datasetNameTypeOptions = ['PDS','LIBRARY'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
     this.properties.datasetType = 'PS';
+    this.properties.recordLength = '256';
+    this.properties.recordFormat = 'FB';
+    this.properties.blockSize = '5120'
     this.properties.preset = '';
     this.properties.averageRecordUnit = '';
-    this.properties.datasetNameType = 'PDS';
     this.setDatasetTypeProperties(this.properties.datasetType);
   }
 
