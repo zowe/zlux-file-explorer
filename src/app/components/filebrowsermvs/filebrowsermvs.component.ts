@@ -734,8 +734,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           ndisp: 'CATALOG',
           status: 'NEW',
           dsorg: attributes.organization,
-          blksz: attributes.blockSize,
-          lrecl: attributes.recordLength,
+          blksz: parseInt(attributes.blockSize),
+          lrecl: parseInt(attributes.recordLength),
           recfm: attributes.recordFormat,
           dsnt: attributes.datasetNameType,
           close: 'true'
@@ -748,34 +748,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           datasetAttributes['avgr'] = attributes.averageRecordUnit;
         }
         if(attributes.primarySpace) {
-          datasetAttributes['prime'] = attributes.primarySpace;
+          datasetAttributes['prime'] = parseInt(attributes.primarySpace);
         }
         if(attributes.secondarySpace) {
-          datasetAttributes['secnd'] = attributes.secondarySpace;
+          datasetAttributes['secnd'] = parseInt(attributes.secondarySpace);
         }
         if(attributes.directoryBlocks) {
           if(attributes.datasetType !== 'PS' && attributes.directoryBlocks == '0') {
             attributes.directoryBlocks = 10;
           }
-          datasetAttributes['dir'] = attributes.directoryBlocks;
+          datasetAttributes['dir'] = parseInt(attributes.directoryBlocks);
         }
-
-
-        // const datasetAttributes2 = {
-        //   ndisp: 'CATALOG',
-        //   status: 'NEW',
-        //   space: attributes.allocationUnit,
-        //   dsorg: attributes.organization,
-        //   blksz: attributes.blockSize,
-        //   lrecl: attributes.recordLength,
-        //   recfm: attributes.recordFormat,
-        //   close: 'true',
-        //   dir: attributes.directoryBlocks,
-        //   prime: attributes.primarySpace,
-        //   secnd: attributes.secondarySpace,
-        //   avgr: attributes.averageRecordUnit,
-        //   dsnt: attributes.datasetNameType
-        // }
 
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
           this.snackBar.open(`Dataset created successfully.`, 'Dismiss', defaultSnackbarOptions);

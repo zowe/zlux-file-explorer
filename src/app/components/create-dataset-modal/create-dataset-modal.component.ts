@@ -7,7 +7,7 @@
   
   Copyright Contributors to the Zowe Project.
 */
-import { Component, ElementRef } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 
 interface DatasetCreationParams {
@@ -30,7 +30,6 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'FB',
     recordLength: '80',
-    blockSize: '0',
     organization: 'PO'
   }],
   ['COBOL', {
@@ -40,7 +39,6 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'FB',
     recordLength: '133',
-    blockSize: '0',
     organization: 'PO'
   }],
   ['PLX', {
@@ -50,7 +48,6 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'VBA',
     recordLength: '132',
-    blockSize: '0',
     organization: 'PO'
   }],
   ['XML', {
@@ -60,7 +57,6 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'VBA',
     recordLength: '16383',
-    blockSize: '0',
     organization: 'PO'
   }],
 ]);
@@ -116,6 +112,8 @@ export class CreateDatasetModal {
   private matcher = new CustomErrorStateMatcher();
   private showAdvanceAttributes: boolean = false;
 
+  @ViewChild('dirblocks') dirBlockInput: ElementRef;
+
   constructor(private el: ElementRef,) { }
 
   ngOnInit() {
@@ -139,6 +137,16 @@ export class CreateDatasetModal {
     this.setDatasetTypeProperties(this.properties.datasetType);
   }
 
+  onExpland() {
+    this.showAdvanceAttributes = !this.showAdvanceAttributes;
+    setTimeout(()=>{
+      this.dirBlockInput.nativeElement.focus();
+    })
+    setTimeout(()=>{
+      this.dirBlockInput.nativeElement.blur();
+    },10)
+  }
+
   onDatasetTypeChange(value:string): void {
     this.setDatasetTypeProperties(value);
   }
@@ -159,7 +167,6 @@ export class CreateDatasetModal {
     this.properties.directoryBlocks = PRESETS.get(preset).directoryBlocks;
     this.properties.recordFormat = PRESETS.get(preset).recordFormat;
     this.properties.recordLength = PRESETS.get(preset).recordLength;
-    this.properties.blockSize = PRESETS.get(preset).blockSize;
     this.properties.organization = PRESETS.get(preset).organization;
   }
 }
