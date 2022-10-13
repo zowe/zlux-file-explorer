@@ -149,8 +149,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         return of('/');
       }),
     ).subscribe(home => {
-      this.path = home;
       if(!this.ussPathExists) {
+        this.path = home;
         this.updateUss(home);
         this.ussPathExists = true;
       }
