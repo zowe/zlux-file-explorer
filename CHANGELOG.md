@@ -2,6 +2,8 @@
 
 ## 1.2.0
 * Added the option to receive USS/MVS node data
+* Added the option to copy path of USS file or dereoctory
+* Bugfix: Set USS path to correct directory, when opening the directory or file in new browser tab respectively
 
 ## 1.1.0
 * Added the option to download the dataset file.
@@ -9,8 +11,6 @@
 * Rename the file when doing copy/paste, when same named file exists in destination.
 * Create an empty file by selecting the folder.
 * Bugfix: Fixing the bug to download the dataset file.
-* Added the option to copy path of USS file or dereoctory.
-* Added the option to copy the link to a file, folder, dataset or dataset member.
 
 ## 1.0.0
 * File Tree upgraded to conform to Zowe V2: Angular 6->12, Typescript 2->4 etc.
