@@ -69,6 +69,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
   private selectedNode: any;
+  private ussPathExists = false;
 
   //TODO:define interface types for uss-data/data
   private data: FileTreeNode[];
@@ -149,7 +150,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }),
     ).subscribe(home => {
       this.path = home;
-      this.updateUss(home);
+      if(!this.ussPathExists) {
+        this.updateUss(home);
+        this.ussPathExists = true;
+      }
     });
     this.initializeRightClickProperties();
     // TODO: Uncomment & fix auto-update of node data based on an interval. Maybe future setting?
@@ -1175,6 +1179,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   updateUss(path: string): void {
     this.displayTree(path, true);
+    this.ussPathExists = true;
   }
 
   createFile(pathAndName: string, node: any, update: boolean): void {
