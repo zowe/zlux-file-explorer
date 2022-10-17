@@ -46,7 +46,7 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     primarySpace: '300',
     secondarySpace: '150',
     directoryBlocks: '20',
-    recordFormat: 'VBA',
+    recordFormat: 'VB',
     recordLength: '132',
     organization: 'PO'
   }],
@@ -55,7 +55,7 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     primarySpace: '200',
     secondarySpace: '100',
     directoryBlocks: '20',
-    recordFormat: 'VBA',
+    recordFormat: 'VB',
     recordLength: '16383',
     organization: 'PO'
   }],
@@ -102,6 +102,7 @@ export class CreateDatasetModal {
   private numericPatternExZero: string;
   private datasetNamePattern: string;
   private alphaNumericPattern: string;
+  // private blocksizePattern: string;
   private presetOptions: string[];
   private datasetTypeOptions: string[];
   private allocationUnitOptions: string[];
@@ -110,9 +111,6 @@ export class CreateDatasetModal {
   private organizationOptions: string[];
   private recordUnitOptions: string[];
   private matcher = new CustomErrorStateMatcher();
-  private showAdvanceAttributes: boolean = false;
-
-  @ViewChild('dirblocks') dirBlockInput: ElementRef;
 
   constructor(private el: ElementRef,) { }
 
@@ -121,6 +119,7 @@ export class CreateDatasetModal {
     this.numericPatternExZero = "^[1-9][0-9]*$";
     this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,21}$";
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
+    // this.blocksizePattern = "^.{1, 100}$";
     this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
     this.datasetTypeOptions = ['PS', 'PDS', 'PDSE'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
@@ -129,22 +128,13 @@ export class CreateDatasetModal {
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
     this.properties.datasetType = 'PS';
-    this.properties.recordLength = '256';
-    this.properties.recordFormat = 'FB';
-    this.properties.blockSize = '5120'
-    this.properties.preset = '';
+    // this.properties.recordLength = '256';
+    // this.properties.recordFormat = 'FB';
+    // this.properties.blockSize = '5120'
+    this.properties.preset = 'JCL';
     this.properties.averageRecordUnit = '';
     this.setDatasetTypeProperties(this.properties.datasetType);
-  }
-
-  onExpland() {
-    this.showAdvanceAttributes = !this.showAdvanceAttributes;
-    setTimeout(()=>{
-      this.dirBlockInput.nativeElement.focus();
-    })
-    setTimeout(()=>{
-      this.dirBlockInput.nativeElement.blur();
-    },10)
+    this.setPresetProperties(this.properties.preset);
   }
 
   onDatasetTypeChange(value:string): void {

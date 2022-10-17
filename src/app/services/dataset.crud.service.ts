@@ -132,8 +132,8 @@ export class DatasetCrudService {
     const contentsURI = ZoweZLUX.uriBroker.datasetContentsUri(name);
     return this.http.put(contentsURI, datasetAttributes)
       .pipe(
-        catchError(this.handleErrorObservable),
-        map((res:any) => res.json())
+        catchError(error => throwError(error)),
+        map((res:any) => res)
       );
   }
 }

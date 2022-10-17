@@ -766,7 +766,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
           const path = attributes.name.substring(0,6);
           this.updateTreeView(path);
         }, error => {
-          this.snackBar.open(`Failed to create the dataset: ${error}`, 'Dismiss', defaultSnackbarOptions);
+          this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', defaultSnackbarOptions);
           }
         );
       }
