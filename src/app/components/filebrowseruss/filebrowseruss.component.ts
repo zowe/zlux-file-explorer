@@ -701,6 +701,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
     navigator.clipboard.writeText(link).then(() => {
       this.log.debug("Link copied to clipboard");
+      this.snackBar.open("Copied link successfully", 'Dismiss', quickSnackbarOptions);
     }).catch(() => {
       console.error("Failed to copy Link to clipboard");
     });
