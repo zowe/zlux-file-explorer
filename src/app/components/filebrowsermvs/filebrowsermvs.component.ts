@@ -78,6 +78,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
               private datasetService: DatasetCrudService,
               private downloadService:DownloaderService,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+              @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
               @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
               private dialog: MatDialog
              ) {
@@ -172,6 +173,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Request Open in New Browser Tab", action:() => {
         this.openInNewTab.emit(this.rightClickedFile);
       }},
+      { text: "Copy Link", action:() => {
+        this.copyLink(this.rightClickedFile);
+      }},
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile);
       }},
@@ -183,6 +187,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
       }}
     ];
     this.rightClickPropertiesDatasetFolder = [
+      { text: "Copy Link", action:() => {
+        this.copyLink(this.rightClickedFile);
+      }},
       { text: "Properties", action:() => { 
         this.showPropertiesDialog(this.rightClickedFile);
       }},
@@ -380,6 +387,21 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.downloadService.fetchFileHandler(url,filename, downloadObject).then((res) => {
                     // TODO: Download queue code for progress bar could go here
                 });
+  }
+
+  copyLink(rightClickedFile: any) {
+    let link = '';
+    if(rightClickedFile.type == 'file'){
+       link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDataset","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":true}`;
+    } else {
+      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDSList","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":false}`;
+    }
+    navigator.clipboard.writeText(link).then(() => {
+      this.log.debug("Link copied to clipboard");
+      this.snackBar.open("Copied link successfully", 'Dismiss', quickSnackbarOptions);
+    }).catch(() => {
+      console.error("Failed to copy link to clipboard");
+    });
   }
 
   showPropertiesDialog(rightClickedFile: any) {
@@ -584,6 +606,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.dataChanged.emit($event);
   }
 
+  setPath(path: any) {
+    this.path = path;
+  }
+  
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.isLoading = true;
