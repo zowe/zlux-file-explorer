@@ -606,6 +606,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.dataChanged.emit($event);
   }
 
+  setPath(path: any) {
+    this.path = path;
+  }
+  
   getTreeForQueryAsync(path: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.isLoading = true;
