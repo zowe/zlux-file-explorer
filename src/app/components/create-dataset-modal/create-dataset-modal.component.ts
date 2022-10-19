@@ -120,6 +120,9 @@ export class CreateDatasetModal {
   private isRecordFormatValid: boolean = true;
   private recordFormatErrorMessage: string;
   private blockSizeTouched: boolean = false;
+  private isAllocUnitValid: boolean = true;
+  private allocUnitErrorMessage: string = "If allocation unit is 'BLKS' then record format must be blocked type: FB, VB, VBA";
+  private isRecFormatTouched: boolean = false;
 
   @ViewChild('dirblocks') dirblocks: ElementRef;
   @ViewChild('primeSpace') primeSpace: ElementRef;
@@ -282,6 +285,18 @@ export class CreateDatasetModal {
     }
   }
 
+  checkForValidAllocUnitCombination(): void {
+    if (this.properties.allocationUnit == 'BLKS') {
+      if (this.properties.recordFormat !== 'FB' && this.properties.recordFormat !== 'VB' && this.properties.recordFormat !== 'VBA' ) {
+        this.isAllocUnitValid = false;
+      } else {
+        this.isAllocUnitValid = true;
+      }
+    } else {
+      this.isAllocUnitValid = true;
+    }
+  }
+
   onPrimeSpaceChange(primarySpace): void {
     if(parseInt(primarySpace) > 16777215) {
       this.isPrimeSpaceValid = false;
@@ -320,8 +335,16 @@ export class CreateDatasetModal {
   }
 
   onRecordFormatChange(value): void {
+    this.isRecFormatTouched = true;
     if(this.blockSizeTouched || this.properties.recordFormat =='U') {
       this.checkForValidRecordFormatCombination();
+    }
+    this.checkForValidAllocUnitCombination();
+  }
+
+  onAllocUnitChange(value): void {
+    if(this.isRecFormatTouched) {
+      this.checkForValidAllocUnitCombination();
     }
   }
 }
