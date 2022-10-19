@@ -736,40 +736,26 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         const datasetAttributes = {
           ndisp: 'CATALOG',
           status: 'NEW',
+          space: attributes.allocationUnit,
           dsorg: attributes.organization,
           blksz: parseInt(attributes.blockSize),
           lrecl: parseInt(attributes.recordLength),
           recfm: attributes.recordFormat,
+          dir: parseInt(attributes.directoryBlocks),
+          prime: parseInt(attributes.primarySpace),
+          secnd: parseInt(attributes.secondarySpace),
           dsnt: attributes.datasetNameType,
+          avgr: attributes.averageRecordUnit,
           close: 'true'
         }
 
-        if(attributes.allocationUnit) {
-          datasetAttributes['space'] = attributes.allocationUnit;
-        }
-        if(attributes.averageRecordUnit) {
-          datasetAttributes['avgr'] = attributes.averageRecordUnit;
-        }
-        if(attributes.primarySpace) {
-          datasetAttributes['prime'] = parseInt(attributes.primarySpace);
-        }
-        if(attributes.secondarySpace) {
-          datasetAttributes['secnd'] = parseInt(attributes.secondarySpace);
-        }
-        if(attributes.directoryBlocks) {
-          if(attributes.datasetType !== 'PS' && attributes.directoryBlocks == '0') {
-            attributes.directoryBlocks = 10;
-          }
-          datasetAttributes['dir'] = parseInt(attributes.directoryBlocks);
-        }
-
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
-          this.snackBar.open(`Dataset created successfully.`, 'Dismiss', defaultSnackbarOptions);
+          this.snackBar.open(`Dataset created successfully.`, 'Dismiss', longSnackbarOptions);
           this.isLoading = false;
           const path = attributes.name.substring(0,6);
           this.updateTreeView(path);
         }, error => {
-          this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', defaultSnackbarOptions);
+          this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', longSnackbarOptions);
           }
         );
       }
