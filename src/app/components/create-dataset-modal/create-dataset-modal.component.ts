@@ -46,7 +46,7 @@ const TEMPLATE = new Map<string, templateParams> ([
     primarySpace: '300',
     secondarySpace: '150',
     directoryBlocks: '20',
-    recordFormat: 'VB',
+    recordFormat: 'VBA',
     recordLength: '132',
   }],
   ['XML', {
@@ -54,16 +54,13 @@ const TEMPLATE = new Map<string, templateParams> ([
     primarySpace: '200',
     secondarySpace: '100',
     directoryBlocks: '20',
-    recordFormat: 'VB',
+    recordFormat: 'VBA',
     recordLength: '16383',
   }],
 ]);
 
 const DATASETNAMETYPE = new Map<string, dsntParams> ([
   ['PDS', {
-    organization: 'PO',
-  }],
-  ['PDSE', {
     organization: 'PO',
   }],
   ['LIBRARY', {
@@ -109,6 +106,9 @@ export class CreateDatasetModal {
   private organizationOptions: string[];
   private recordUnitOptions: string[];
   private matcher = new CustomErrorStateMatcher();
+  private isError: boolean = false;
+  private errorText: string;
+  private dirBlockTouched: boolean = false;
 
   @ViewChild('dirblocks') dirblocks: ElementRef;
   @ViewChild('primeSpace') primeSpace: ElementRef;
@@ -128,14 +128,14 @@ export class CreateDatasetModal {
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.templateOptions = ['JCL','COBOL','PLX', 'XML'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
-    this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U'];
+    this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'VBA', 'U'];
     this.datasetNameTypeOptions = ['PDS','LIBRARY', 'BASIC', 'LARGE'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
     this.properties.datasetNameType = 'PDS';
+    this.properties.organization = 'PO'
     this.properties.template = '';
     this.properties.averageRecordUnit = '';
-    this.setDatasetNameTypeProperties(this.properties.datasetNameType);
   }
 
   onTemplateChange(value: string): void {
@@ -143,7 +143,7 @@ export class CreateDatasetModal {
   }
 
   setDatasetNameTypeProperties(datasetNameType: string): void {
-    this.dsorg.nativeElement.setAttribute('style', 'margin-bottom: -7px; border-bottom: 2px solid #000099');
+    this.dsorg.nativeElement.setAttribute('style', 'padding-bottom: 4px; margin-bottom: -7px; border-bottom: 2px solid #000099');
     setTimeout(() => {
       this.dsorg.nativeElement.setAttribute('style', 'margin-bottom: 0px; border-bottom: 0px');
     }, 3000)
@@ -153,8 +153,8 @@ export class CreateDatasetModal {
     } else {
       this.properties.organization = DATASETNAMETYPE.get(datasetNameType)?.organization;
     }
-    if(datasetNameType == 'LIBRARY') {
-      this.properties.datasetNameType = 'PDSE';
+    if(this.dirBlockTouched) {
+      this.checkForValidCombination();
     }
   }
 
@@ -175,6 +175,8 @@ export class CreateDatasetModal {
       this.recordFormat._elementRef.nativeElement.setAttribute('style', 'padding-bottom: 0px; margin-bottom: 0px; border-bottom: 0px');
     }, 3000)
 
+    this.dirBlockTouched = true;
+
     if(!template) {
       this.properties.allocationUnit = '';
       this.properties.primarySpace = '';
@@ -187,9 +189,36 @@ export class CreateDatasetModal {
     this.properties.allocationUnit = TEMPLATE.get(template).allocationUnit;
     this.properties.primarySpace = TEMPLATE.get(template).primarySpace;
     this.properties.secondarySpace = TEMPLATE.get(template).secondarySpace;
-    this.properties.directoryBlocks = TEMPLATE.get(template).directoryBlocks;
+    if(this.properties.organization == 'PS') {
+      this.properties.directoryBlocks = '0';
+    } else {
+      this.properties.directoryBlocks = TEMPLATE.get(template).directoryBlocks;
+    }
+    this.isError=false;
     this.properties.recordFormat = TEMPLATE.get(template).recordFormat;
     this.properties.recordLength = TEMPLATE.get(template).recordLength;
+  }
+
+  onDirBlockChange(value): void {
+    this.dirBlockTouched = true;
+    this.checkForValidCombination();
+  }
+
+  checkForValidCombination():void {
+    if(this.properties.organization == 'PS' && this.properties.directoryBlocks > '0') {
+      this.isError = true;
+      this.errorText = 'Invalid Combination: Directory blocks must be 0 for the sequential dataset';
+    }
+    if(this.properties.organization == 'PS' && this.properties.directoryBlocks === '0') {
+      this.isError = false;
+    }
+    if(this.properties.organization == 'PO' && this.properties.directoryBlocks < '1') {
+      this.isError = true;
+      this.errorText = 'Invalid Combination: Directory blocks must be greater than 0 for the partitioned dataset';
+    }
+    if(this.properties.organization == 'PO' && this.properties.directoryBlocks > '0') {
+      this.isError = false;
+    }
   }
 }
 

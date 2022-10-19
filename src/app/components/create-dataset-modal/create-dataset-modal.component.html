@@ -12,15 +12,15 @@
 <h2 mat-dialog-title>CREATE DATASET</h2>
 <p class="mandatory">Mandatory fields are marked with an asterisk</p>
 <mat-dialog-content>
-  <label class="required" style="margin-left: -6px">Data Set Name:</label>
-      <mat-form-field>
-        <input matInput type="text" maxlength="44" placeholder="High-level qualifier must start with a TSO ID" [pattern]="datasetNamePattern" [(ngModel)]="properties.name" #nameInput="ngModel" [errorStateMatcher]="matcher">
+  <label class="required" style="margin-left: 6px">Data Set Name:</label>
+      <mat-form-field floatLabel="never" [style.width.px]=300>
+        <input matInput type="text" maxlength="44" placeholder="High-level qualifier must start with a TSO ID" [pattern]="datasetNamePattern" [(ngModel)]="properties.name" #nameInput="ngModel" [errorStateMatcher]="matcher" oninput="this.value = this.value.toUpperCase()">
         <mat-error>Invalid Name</mat-error>
       </mat-form-field>
   <div class="row">
-    <div class="column">
+    <div class="column1">
       <label class="required">Data Set Name Type:</label>
-      <mat-form-field>
+      <mat-form-field floatLabel="never">
         <mat-select class="select-encoding" tabindex="0" placeholder="Blank for PS Dataset" [(ngModel)]="properties.datasetNameType" #datasetNameType (selectionChange)="setDatasetNameTypeProperties(datasetNameType.value)">
           <mat-option>Blank</mat-option>
           <mat-option *ngFor="let datasetNameType of datasetNameTypeOptions" [value]="datasetNameType">
@@ -28,7 +28,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="column">
+    <div class="column2">
       <label>Data Set Organization:</label>
       <mat-form-field>
         <input matInput [(ngModel)]="properties.organization" readonly #dsorg>
@@ -36,8 +36,8 @@
     </div>
   </div>
   <p></p>
-  <label style="margin-left: -3px;">Template:</label>
-  <mat-form-field>
+  <label style="margin-left: 310px; width: 148px; font-size: larger; font-weight: bold;">TEMPLATE:</label>
+  <mat-form-field style="width: 150px; font-weight: bold; margin-top: 3px;" floatLabel="never">
     <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.template" #templateInput (selectionChange)="onTemplateChange(templateInput.value)">
       <mat-option>None</mat-option>
       <mat-option *ngFor="let template of templateOptions" [value]="template">
@@ -45,9 +45,9 @@
     </mat-select>
   </mat-form-field>
   <div class="row">
-    <div class="column">
+    <div class="column1">
       <label class="required">Allocation Unit:</label>
-      <mat-form-field>
+      <mat-form-field floatLabel="never">
         <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.allocationUnit" #allocUnit>
           <mat-option *ngFor="let allocationUnit of allocationUnitOptions" [value]="allocationUnit">
           {{allocationUnit}}</mat-option>
@@ -60,18 +60,18 @@
       </mat-form-field>
       <label class="required">Record Length:</label>
       <mat-form-field>
-        <input matInput [pattern]="numericPattern" [(ngModel)]="properties.recordLength" #recLengthInput="ngModel" [errorStateMatcher]="matcher" #recordLength>
+        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.recordLength" #recLengthInput="ngModel" [errorStateMatcher]="matcher" #recordLength>
         <mat-error>Invalid Record Length</mat-error>
       </mat-form-field>
       <label class="required">Directory Blocks:</label>
-      <mat-form-field>
-        <input matInput [pattern]="numericPattern" [(ngModel)]="properties.directoryBlocks" #dirBlockInput="ngModel" [errorStateMatcher]="matcher"  #dirblocks>
+      <mat-form-field floatLabel="never">
+        <input matInput [pattern]="numericPattern" placeholder="0 for PS Data Set" [(ngModel)]="properties.directoryBlocks" #dirBlockInput="ngModel" [errorStateMatcher]="matcher" (ngModelChange)="onDirBlockChange(dirBlockInput.value)"  #dirblocks>
         <mat-error>Invalid Directory Blocks</mat-error>
       </mat-form-field>
     </div>
-    <div class="column">
+    <div class="column2">
       <label class="required">Average Record Unit:</label>
-      <mat-form-field>
+      <mat-form-field floatLabel="never">
         <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.averageRecordUnit">
           <mat-option *ngFor="let averageRecordUnit of recordUnitOptions" [value]="averageRecordUnit">
           {{averageRecordUnit}}</mat-option>
@@ -83,7 +83,7 @@
         <mat-error>Invalid Secondary Space</mat-error>
       </mat-form-field>
       <label class="required">Record Format:</label>
-      <mat-form-field>
+      <mat-form-field floatLabel="never">
         <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.recordFormat" #recordFormat>
           <mat-option *ngFor="let recordFormat of recordFormatOptions" [value]="recordFormat">
           {{recordFormat}}</mat-option>
@@ -97,6 +97,7 @@
     </div>
   </div>
 </mat-dialog-content>
+<div [hidden]="!isError" class="errorClass">{{errorText}}</div>
 <mat-dialog-actions>
   <button 
     mat-button
@@ -104,7 +105,7 @@
     class="right" 
     color="primary" 
     [mat-dialog-close]="properties"
-    [disabled]="!properties.name || !properties.allocationUnit || !properties.averageRecordUnit || !properties.primarySpace || !properties.secondarySpace || !properties.directoryBlocks || !properties.recordFormat || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid">
+    [disabled]="!properties.name || !properties.allocationUnit || !properties.averageRecordUnit || !properties.primarySpace || !properties.secondarySpace || !properties.directoryBlocks || !properties.recordFormat || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || isError">
     Save
   </button>
 </mat-dialog-actions>

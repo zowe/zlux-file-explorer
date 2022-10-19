@@ -729,7 +729,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     });
 
     saveRef.afterClosed().subscribe(attributes => {
-      if ( attributes ) {
+      if (attributes.datasetNameType == 'LIBRARY') {
+        attributes.datasetNameType = 'PDSE';
+      }
+      if (attributes) {
         const datasetAttributes = {
           ndisp: 'CATALOG',
           status: 'NEW',

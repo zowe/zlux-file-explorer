@@ -1,6 +1,9 @@
 .mat-dialog-title {
   font: 500 20px/32px Roboto, "Helvetica Neue", sans-serif;
   text-align: center;
+  border-bottom: 2px solid;
+  width: fit-content;
+  margin-left: 350px;
 }
 
 .mat-dialog-container {
@@ -13,22 +16,32 @@
   clear: both;
 }
 
-.column {
+.column1 {
   float: left;
+  margin-left: 12px;
+  width: 45%;
+  padding: 10px;
+}
+
+.column2 {
+  float: right;
+  margin-left: 30px;
   width: 45%;
   padding: 10px;
 }
 
 .mat-dialog-content {
   box-sizing: border-box;
-  padding: 5px 35px;
-  width: 1000px;
+  padding: 5px 0px 5px 35px;
+  width: 940px;
+  overflow: hidden;
 }
 
 .mat-dialog-content label {
   float: left;
   width: 200px;
   padding-top: 20px;
+  font-weight: 500;
 }
 
 .mat-form-field {
@@ -72,5 +85,11 @@
 .mandatory {
   font-style: Roboto, "Helvetica Neue", sans-serif;
   text-align: left;
-  margin-left: 25px;
+  margin-left: 20px;
+}
+
+.errorClass {
+  margin-left: 20px;
+  color: red;
+  position: absolute;
 }
