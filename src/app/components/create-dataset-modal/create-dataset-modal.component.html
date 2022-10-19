@@ -54,13 +54,13 @@
         </mat-select>
       </mat-form-field>
       <label class="required">Primary Space:</label>
-      <mat-form-field>
-        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher" #primeSpace>
+      <mat-form-field [ngClass]="{'mat-form-field-invalid': !isPrimeSpaceValid}">
+        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.primarySpace" #primarySpaceInput="ngModel" [errorStateMatcher]="matcher" (ngModelChange)="onPrimeSpaceChange(primarySpaceInput.value)" #primeSpace>
         <mat-error>Invalid Primary Space</mat-error>
       </mat-form-field>
       <label class="required">Record Length:</label>
-      <mat-form-field>
-        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.recordLength" #recLengthInput="ngModel" [errorStateMatcher]="matcher" #recordLength>
+      <mat-form-field [ngClass]="{'mat-form-field-invalid': !isRecLengthValid}">
+        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.recordLength" #recLengthInput="ngModel" [errorStateMatcher]="matcher" (ngModelChange)="onrecLengthChange(recLengthInput.value)" #recordLength>
         <mat-error>Invalid Record Length</mat-error>
       </mat-form-field>
       <label class="required">Directory Blocks:</label>
@@ -78,8 +78,8 @@
         </mat-select>
       </mat-form-field>
       <label class="required">Secondary Space:</label>
-      <mat-form-field>
-        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.secondarySpace" #secSpaceInput="ngModel" [errorStateMatcher]="matcher" #secondSpace>
+      <mat-form-field [ngClass]="{'mat-form-field-invalid': !isSecondSpaceValid}">
+        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.secondarySpace" #secSpaceInput="ngModel" [errorStateMatcher]="matcher" (ngModelChange)="onSecondSpaceChange(secSpaceInput.value)" #secondSpace>
         <mat-error>Invalid Secondary Space</mat-error>
       </mat-form-field>
       <label class="required">Record Format:</label>
@@ -90,14 +90,18 @@
         </mat-select>
       </mat-form-field>
       <label class="required">Block Size :</label>
-      <mat-form-field>
-        <input matInput [pattern]="numericPattern" [(ngModel)]="properties.blockSize" #blockSize="ngModel" [errorStateMatcher]="matcher">
+      <mat-form-field [ngClass]="{'mat-form-field-invalid': !isBlockSizeValid}">
+        <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.blockSize" #blockSize="ngModel" [errorStateMatcher]="matcher" (ngModelChange)="onBlockSizeChange(blockSize.value)">
         <mat-error>Invalid Block Size</mat-error>
       </mat-form-field>
     </div>
   </div>
 </mat-dialog-content>
 <div [hidden]="!isError" class="errorClass">{{errorText}}</div>
+<div [hidden]="isPrimeSpaceValid" class="errorClass">{{primarySpaceError}}</div>
+<div [hidden]="isSecondSpaceValid" class="errorClass">{{secondarySpaceError}}</div>
+<div [hidden]="isRecLengthValid" class="errorClass">{{recordLengthError}}</div>
+<div [hidden]="isBlockSizeValid" class="errorClass">{{blockSizeError}}</div>
 <mat-dialog-actions>
   <button 
     mat-button

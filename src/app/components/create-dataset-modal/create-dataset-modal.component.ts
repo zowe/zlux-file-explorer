@@ -109,6 +109,14 @@ export class CreateDatasetModal {
   private isError: boolean = false;
   private errorText: string;
   private dirBlockTouched: boolean = false;
+  private isPrimeSpaceValid: boolean = true;
+  private isSecondSpaceValid: boolean = true;
+  private isRecLengthValid: boolean = true;
+  private isBlockSizeValid: boolean = true;
+  private primarySpaceError: string = "Primary space value cannot be more than '16777215' ";
+  private secondarySpaceError: string = "Secondary space value cannot be more than '16777215' ";
+  private recordLengthError: string = "Record length value cannot be more than '32760' ";
+  private blockSizeError: string = "Block size value cannot be more than '32760' ";
 
   @ViewChild('dirblocks') dirblocks: ElementRef;
   @ViewChild('primeSpace') primeSpace: ElementRef;
@@ -218,6 +226,38 @@ export class CreateDatasetModal {
     }
     if(this.properties.organization == 'PO' && this.properties.directoryBlocks > '0') {
       this.isError = false;
+    }
+  }
+
+  onPrimeSpaceChange(primarySpace): void {
+    if(parseInt(primarySpace) > 16777215) {
+      this.isPrimeSpaceValid = false;
+    } else {
+      this.isPrimeSpaceValid = true;
+    }
+  }
+
+  onSecondSpaceChange(SecondarySpace): void {
+    if(parseInt(SecondarySpace) > 16777215) {
+      this.isSecondSpaceValid = false;
+    } else {
+      this.isSecondSpaceValid = true;
+    }
+  }
+
+  onrecLengthChange(recordLength): void {
+    if(parseInt(recordLength) > 32760) {
+      this.isRecLengthValid = false;
+    } else {
+      this.isRecLengthValid = true;
+    }
+  }
+
+  onBlockSizeChange(blockSize): void {
+    if(parseInt(blockSize) > 32760) {
+      this.isBlockSizeValid = false;
+    } else {
+      this.isBlockSizeValid = true;
     }
   }
 }
