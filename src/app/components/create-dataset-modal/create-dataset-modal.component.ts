@@ -117,6 +117,9 @@ export class CreateDatasetModal {
   private secondarySpaceError: string = "Secondary space value cannot be more than '16777215' ";
   private recordLengthError: string = "Record length value cannot be more than '32760' ";
   private blockSizeError: string = "Block size value cannot be more than '32760' ";
+  private isRecordFormatValid: boolean = true;
+  private recordFormatErrorMessage: string;
+  private blockSizeTouched: boolean = false;
 
   @ViewChild('dirblocks') dirblocks: ElementRef;
   @ViewChild('primeSpace') primeSpace: ElementRef;
@@ -162,7 +165,7 @@ export class CreateDatasetModal {
       this.properties.organization = DATASETNAMETYPE.get(datasetNameType)?.organization;
     }
     if(this.dirBlockTouched) {
-      this.checkForValidCombination();
+      this.checkForValidDirBlockCombination();
     }
   }
 
@@ -205,27 +208,77 @@ export class CreateDatasetModal {
     this.isError=false;
     this.properties.recordFormat = TEMPLATE.get(template).recordFormat;
     this.properties.recordLength = TEMPLATE.get(template).recordLength;
+    this.checkForValidDirBlockCombination();
+    if (this.blockSizeTouched) {
+      this.checkForValidRecordFormatCombination();
+    }
   }
 
   onDirBlockChange(value): void {
     this.dirBlockTouched = true;
-    this.checkForValidCombination();
+    this.checkForValidDirBlockCombination();
   }
 
-  checkForValidCombination():void {
+  checkForValidDirBlockCombination():void {
     if(this.properties.organization == 'PS' && this.properties.directoryBlocks > '0') {
       this.isError = true;
-      this.errorText = 'Invalid Combination: Directory blocks must be 0 for the sequential dataset';
+      this.errorText = 'Directory blocks must be 0 for the sequential dataset';
     }
     if(this.properties.organization == 'PS' && this.properties.directoryBlocks === '0') {
       this.isError = false;
     }
     if(this.properties.organization == 'PO' && this.properties.directoryBlocks < '1') {
       this.isError = true;
-      this.errorText = 'Invalid Combination: Directory blocks must be greater than 0 for the partitioned dataset';
+      this.errorText = 'Directory blocks must be greater than 0 for the partitioned dataset';
     }
     if(this.properties.organization == 'PO' && this.properties.directoryBlocks > '0') {
       this.isError = false;
+    }
+  }
+
+  checkForValidRecordFormatCombination(): void {
+    if (this.properties.recordFormat == 'F') {
+      if (this.properties.recordLength !== this.properties.blockSize) {
+        this.isRecordFormatValid = false;
+        this.recordFormatErrorMessage = 'Block size must be equal to the record length for fixed record format';
+      } else {
+        this.isRecordFormatValid = true;
+      }
+    }
+    if(this.properties.recordFormat == 'FB') {
+      if ((parseInt(this.properties.blockSize) % parseInt(this.properties.recordLength)) != 0) {
+        this.isRecordFormatValid = false;
+        this.recordFormatErrorMessage = 'Block size must be a multiple of the record length for fixed blocked record format';
+      } else {
+        this.isRecordFormatValid = true;
+      }
+    }
+    if (this.properties.recordFormat == 'V' || this.properties.recordFormat == 'VB') {
+      if (parseInt(this.properties.blockSize) < (parseInt(this.properties.recordLength)+4)) {
+        this.isRecordFormatValid = false;
+        this.recordFormatErrorMessage = 'Block size must be atleast 4 more than the record length for V, VB, VBA record format';
+      } else {
+        this.isRecordFormatValid = true;
+      }
+    }
+    if (this.properties.recordFormat == 'VBA') {
+      if (parseInt(this.properties.recordLength) < 5) {
+        this.isRecordFormatValid = false;
+        this.recordFormatErrorMessage = 'Record length must be atleast 5 for VBA record format';
+      } else if (parseInt(this.properties.blockSize) < (parseInt(this.properties.recordLength)+4)) {
+        this.isRecordFormatValid = false;
+        this.recordFormatErrorMessage = 'Block size must be atleast 4 more than the record length for V, VB, VBA record format';
+      } else {
+        this.isRecordFormatValid = true;
+      }
+    }
+    if (this.properties.recordFormat == 'U') {
+     if (parseInt(this.properties.recordLength) > 0) {
+      this.isRecordFormatValid = false;
+      this.recordFormatErrorMessage = 'Record length must be equal to 0 for undefined record format';
+     } else {
+      this.isRecordFormatValid = true;
+     }
     }
   }
 
@@ -245,19 +298,30 @@ export class CreateDatasetModal {
     }
   }
 
-  onrecLengthChange(recordLength): void {
+  onRecLengthChange(recordLength): void {
     if(parseInt(recordLength) > 32760) {
       this.isRecLengthValid = false;
     } else {
       this.isRecLengthValid = true;
     }
+    if(this.blockSizeTouched || this.properties.recordFormat =='U') {
+      this.checkForValidRecordFormatCombination();
+    }
   }
 
   onBlockSizeChange(blockSize): void {
+    this.blockSizeTouched = true;
     if(parseInt(blockSize) > 32760) {
       this.isBlockSizeValid = false;
     } else {
       this.isBlockSizeValid = true;
+    }
+    this.checkForValidRecordFormatCombination();
+  }
+
+  onRecordFormatChange(value): void {
+    if(this.blockSizeTouched || this.properties.recordFormat =='U') {
+      this.checkForValidRecordFormatCombination();
     }
   }
 }
