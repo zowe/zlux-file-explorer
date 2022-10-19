@@ -8,21 +8,23 @@
   Copyright Contributors to the Zowe Project.
 */
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { MatSelect } from '@angular/material/select';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 
-interface DatasetCreationParams {
-  organization? :string,
-  allocationUnit? :string,
-  primarySpace? :string,
-  secondarySpace? :string,
-  directoryBlocks? :string,
-  recordFormat? :string,
-  blockSize? :string,
-  recordLength? :string,
-  datasetNameType? :string
+interface templateParams {
+  allocationUnit: string,
+  primarySpace: string,
+  secondarySpace: string,
+  directoryBlocks: string,
+  recordFormat: string,
+  recordLength: string,
 }
 
-const PRESETS = new Map<string, DatasetCreationParams> ([
+interface dsntParams {
+  organization: string;
+}
+
+const TEMPLATE = new Map<string, templateParams> ([
   ['JCL', {
     allocationUnit: 'TRKS',
     primarySpace: '300',
@@ -30,7 +32,6 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'FB',
     recordLength: '80',
-    organization: 'PO'
   }],
   ['COBOL', {
     allocationUnit: 'TRKS',
@@ -39,7 +40,6 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'FB',
     recordLength: '133',
-    organization: 'PO'
   }],
   ['PLX', {
     allocationUnit: 'TRKS',
@@ -48,7 +48,6 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'VB',
     recordLength: '132',
-    organization: 'PO'
   }],
   ['XML', {
     allocationUnit: 'TRKS',
@@ -57,22 +56,24 @@ const PRESETS = new Map<string, DatasetCreationParams> ([
     directoryBlocks: '20',
     recordFormat: 'VB',
     recordLength: '16383',
-    organization: 'PO'
   }],
 ]);
 
-const DATASETTYPE = new Map<string, DatasetCreationParams> ([
-  ['PS', {
-    organization: 'PS',
-    datasetNameType: ''
-  }],
+const DATASETNAMETYPE = new Map<string, dsntParams> ([
   ['PDS', {
     organization: 'PO',
-    datasetNameType: 'PDS'
   }],
   ['PDSE', {
     organization: 'PO',
-    datasetNameType: 'LIBRARY'
+  }],
+  ['LIBRARY', {
+    organization: 'PO',
+  }],
+  ['BASIC', {
+    organization: 'PS',
+  }],
+  ['LARGE', {
+    organization: 'PS',
   }]
 ]);
 
@@ -84,9 +85,8 @@ const DATASETTYPE = new Map<string, DatasetCreationParams> ([
 })
 export class CreateDatasetModal {
   private properties = {
-    preset: '',
+    template: '',
     name: '',
-    datasetType: '',
     allocationUnit: '',
     averageRecordUnit: '',
     primarySpace: '',
@@ -102,15 +102,22 @@ export class CreateDatasetModal {
   private numericPatternExZero: string;
   private datasetNamePattern: string;
   private alphaNumericPattern: string;
-  // private blocksizePattern: string;
-  private presetOptions: string[];
-  private datasetTypeOptions: string[];
+  private templateOptions: string[];
   private allocationUnitOptions: string[];
   private datasetNameTypeOptions: string[];
   private recordFormatOptions: string[];
   private organizationOptions: string[];
   private recordUnitOptions: string[];
   private matcher = new CustomErrorStateMatcher();
+
+  @ViewChild('dirblocks') dirblocks: ElementRef;
+  @ViewChild('primeSpace') primeSpace: ElementRef;
+  @ViewChild('allocUnit') allocUnit: MatSelect;
+  @ViewChild('secondSpace') secondSpace: ElementRef;
+  @ViewChild('recordLength') recordLength: ElementRef;
+  @ViewChild('recordFormat') recordFormat: MatSelect;
+  @ViewChild('dsorg') dsorg: ElementRef;
+
 
   constructor(private el: ElementRef,) { }
 
@@ -119,45 +126,70 @@ export class CreateDatasetModal {
     this.numericPatternExZero = "^[1-9][0-9]*$";
     this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,21}$";
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
-    // this.blocksizePattern = "^.{1, 100}$";
-    this.presetOptions = ['JCL','COBOL','PLX', 'XML'];
-    this.datasetTypeOptions = ['PS', 'PDS', 'PDSE'];
+    this.templateOptions = ['JCL','COBOL','PLX', 'XML'];
     this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
     this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'U'];
-    this.datasetNameTypeOptions = ['PDS','LIBRARY'];
+    this.datasetNameTypeOptions = ['PDS','LIBRARY', 'BASIC', 'LARGE'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
-    this.properties.datasetType = 'PS';
-    // this.properties.recordLength = '256';
-    // this.properties.recordFormat = 'FB';
-    // this.properties.blockSize = '5120'
-    this.properties.preset = 'JCL';
+    this.properties.datasetNameType = 'PDS';
+    this.properties.template = '';
     this.properties.averageRecordUnit = '';
-    this.setDatasetTypeProperties(this.properties.datasetType);
-    this.setPresetProperties(this.properties.preset);
+    this.setDatasetNameTypeProperties(this.properties.datasetNameType);
   }
 
-  onDatasetTypeChange(value:string): void {
-    this.setDatasetTypeProperties(value);
+  onTemplateChange(value: string): void {
+    this.setTemplateProperties(value);
   }
 
-  onPresetChange(value: string): void {
-    this.setPresetProperties(value);
+  setDatasetNameTypeProperties(datasetNameType: string): void {
+    this.dsorg.nativeElement.setAttribute('style', 'margin-bottom: -7px; border-bottom: 2px solid #000099');
+    setTimeout(() => {
+      this.dsorg.nativeElement.setAttribute('style', 'margin-bottom: 0px; border-bottom: 0px');
+    }, 3000)
+
+    if(!datasetNameType) {
+      this.properties.organization = 'PS';
+    } else {
+      this.properties.organization = DATASETNAMETYPE.get(datasetNameType)?.organization;
+    }
+    if(datasetNameType == 'LIBRARY') {
+      this.properties.datasetNameType = 'PDSE';
+    }
   }
 
-  setDatasetTypeProperties(datasetType: string): void {
-    this.properties.organization = DATASETTYPE.get(datasetType)?.organization;
-    this.properties.datasetNameType = DATASETTYPE.get(datasetType)?.datasetNameType;
-  }
+  setTemplateProperties(template: string): void  {
+    this.dirblocks.nativeElement.setAttribute('style', 'margin-bottom: -7px; border-bottom: 2px solid #000099');
+    this.allocUnit._elementRef.nativeElement.setAttribute('style', 'padding-bottom: 5px; margin-bottom: -7px; border-bottom: 2px solid #000099');
+    this.primeSpace.nativeElement.setAttribute('style', 'margin-bottom: -6px; border-bottom: 2px solid #000099');
+    this.secondSpace.nativeElement.setAttribute('style', 'margin-bottom: -7px; border-bottom: 2px solid #000099');
+    this.recordLength.nativeElement.setAttribute('style', 'margin-bottom: -6px; border-bottom: 2px solid #000099');
+    this.recordFormat._elementRef.nativeElement.setAttribute('style', 'padding-bottom: 5px; margin-bottom: -6px; border-bottom: 2px solid #000099');
 
-  setPresetProperties(preset: string): void  {
-    this.properties.allocationUnit = PRESETS.get(preset).allocationUnit;
-    this.properties.primarySpace = PRESETS.get(preset).primarySpace;
-    this.properties.secondarySpace = PRESETS.get(preset).secondarySpace;
-    this.properties.directoryBlocks = PRESETS.get(preset).directoryBlocks;
-    this.properties.recordFormat = PRESETS.get(preset).recordFormat;
-    this.properties.recordLength = PRESETS.get(preset).recordLength;
-    this.properties.organization = PRESETS.get(preset).organization;
+    setTimeout(() => {
+      this.dirblocks.nativeElement.setAttribute('style', 'margin-bottom: 0px; border-bottom: 0px');
+      this.allocUnit._elementRef.nativeElement.setAttribute('style', 'padding-bottom: 0px; margin-bottom: 0px; border-bottom: 0px');
+      this.primeSpace.nativeElement.setAttribute('style', 'margin-bottom: 0px; border-bottom: 0px');
+      this.secondSpace.nativeElement.setAttribute('style', 'margin-bottom: 0px; border-bottom: 0px');
+      this.recordLength.nativeElement.setAttribute('style', 'margin-bottom: 0px; border-bottom: 0px');
+      this.recordFormat._elementRef.nativeElement.setAttribute('style', 'padding-bottom: 0px; margin-bottom: 0px; border-bottom: 0px');
+    }, 3000)
+
+    if(!template) {
+      this.properties.allocationUnit = '';
+      this.properties.primarySpace = '';
+      this.properties.secondarySpace = '';
+      this.properties.directoryBlocks = '';
+      this.properties.recordFormat = '';
+      this.properties.recordLength = '';
+    }
+
+    this.properties.allocationUnit = TEMPLATE.get(template).allocationUnit;
+    this.properties.primarySpace = TEMPLATE.get(template).primarySpace;
+    this.properties.secondarySpace = TEMPLATE.get(template).secondarySpace;
+    this.properties.directoryBlocks = TEMPLATE.get(template).directoryBlocks;
+    this.properties.recordFormat = TEMPLATE.get(template).recordFormat;
+    this.properties.recordLength = TEMPLATE.get(template).recordLength;
   }
 }
 
