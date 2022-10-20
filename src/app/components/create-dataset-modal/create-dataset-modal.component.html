@@ -70,7 +70,7 @@
       </mat-form-field>
     </div>
     <div class="column2">
-      <label class="required">Average Record Unit:</label>
+      <label>Average Record Unit:</label>
       <mat-form-field floatLabel="never">
         <mat-select class="select-encoding" tabindex="0" placeholder="Select" [(ngModel)]="properties.averageRecordUnit">
           <mat-option *ngFor="let averageRecordUnit of recordUnitOptions" [value]="averageRecordUnit">
@@ -89,7 +89,7 @@
           {{recordFormat}}</mat-option>
         </mat-select>
       </mat-form-field>
-      <label class="required">Block Size :</label>
+      <label>Block Size :</label>
       <mat-form-field>
         <input matInput [pattern]="numericPatternExZero" [(ngModel)]="properties.blockSize" #blockSize="ngModel" [errorStateMatcher]="matcher" (ngModelChange)="onBlockSizeChange(blockSize.value)">
         <mat-error>Invalid Block Size</mat-error>
@@ -97,7 +97,7 @@
     </div>
   </div>
 </mat-dialog-content>
-<div [hidden]="!isError" class="errorClass">{{errorText}}</div>
+<div [hidden]="isDirBlockValid" class="errorClass">{{dirBlockError}}</div>
 <div [hidden]="isPrimeSpaceValid" class="errorClass">{{primarySpaceError}}</div>
 <div [hidden]="isSecondSpaceValid" class="errorClass">{{secondarySpaceError}}</div>
 <div [hidden]="isRecLengthValid" class="errorClass">{{recordLengthError}}</div>
@@ -111,7 +111,7 @@
     class="right" 
     color="primary" 
     [mat-dialog-close]="properties"
-    [disabled]="!properties.name || !properties.allocationUnit || !properties.averageRecordUnit || !properties.primarySpace || !properties.secondarySpace || !properties.directoryBlocks || !properties.recordFormat || !properties.recordLength || !properties.blockSize || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || isError">
+    [disabled]="!properties.name || !properties.allocationUnit || !properties.primarySpace || !properties.secondarySpace || !properties.directoryBlocks || !properties.recordFormat || !properties.recordLength || nameInput.invalid || primarySpaceInput.invalid || secSpaceInput.invalid || dirBlockInput.invalid || recLengthInput.invalid || blockSize.invalid || !isDirBlockValid || !isPrimeSpaceValid || !isSecondSpaceValid || !isRecLengthValid || !isBlockSizeValid || !isRecordFormatValid || !isAllocUnitValid">
     Save
   </button>
 </mat-dialog-actions>
