@@ -69,6 +69,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   private searchInputCtrl: any;
   private searchInputValueSubscription: Subscription;
   private selectedNode: any;
+  private ussPathExists = false;
 
   //TODO:define interface types for uss-data/data
   private data: FileTreeNode[];
@@ -148,8 +149,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         return of('/');
       }),
     ).subscribe(home => {
-      this.path = home;
-      this.updateUss(home);
+      if(!this.ussPathExists) {
+        this.path = home;
+        this.updateUss(home);
+        this.ussPathExists = true;
+      }
     });
     this.initializeRightClickProperties();
     // TODO: Uncomment & fix auto-update of node data based on an interval. Maybe future setting?
@@ -224,6 +228,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       { text: "Copy", action:() => { 
         this.copyFile(this.rightClickedFile);
       }},
+      { text: "Copy Link", action:() => {
+        this.copyLink(this.rightClickedFile);
+      }},
       { text: "Copy Path", action:() => {
         this.copyPath(this.rightClickedFile);
       }},
@@ -256,6 +263,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
       }},
       { text: "Upload...", action:() => { 
         this.showUploadDialog(this.rightClickedFile);
+      }},
+      { text: "Copy Link", action:() => {
+        this.copyLink(this.rightClickedFile);
       }},
       { text: "Copy Path", action:() => {
         this.copyPath(this.rightClickedFile);
@@ -683,6 +693,21 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.displayTree(this.path, false);
         this.fileUploaded.emit(this.path);
       }
+    });
+  }
+
+  copyLink(rightClickedFile: any) {
+    let link = '';
+    if (rightClickedFile.directory){
+      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDir","name":"${encodeURIComponent(rightClickedFile.path)}","toggleTree":false}`;
+    } else {
+      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openFile","name":"${encodeURIComponent(rightClickedFile.path)}","toggleTree":true}`;
+    }
+    navigator.clipboard.writeText(link).then(() => {
+      this.log.debug("Link copied to clipboard");
+      this.snackBar.open("Copied link successfully", 'Dismiss', quickSnackbarOptions);
+    }).catch(() => {
+      console.error("Failed to copy Link to clipboard");
     });
   }
 
@@ -1175,6 +1200,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   updateUss(path: string): void {
     this.displayTree(path, true);
+    this.ussPathExists = true;
   }
 
   createFile(pathAndName: string, node: any, update: boolean): void {

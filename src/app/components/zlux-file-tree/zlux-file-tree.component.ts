@@ -370,6 +370,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
 
   updateDSList(query: string) {
     this.showDatasets();
+    this.mvsComponent.setPath(query);
     this.mvsComponent.updateTreeView(query);
   }
 
