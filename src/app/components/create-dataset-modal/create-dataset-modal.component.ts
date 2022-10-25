@@ -121,7 +121,7 @@ export class CreateDatasetModal {
   private recordFormatErrorMessage: string;
   private blockSizeTouched: boolean = false;
   private isAllocUnitValid: boolean = true;
-  private allocUnitErrorMessage: string = "If allocation unit is 'BLKS' then record format must be blocked type: FB, VB, VBA";
+  private allocUnitErrorMessage: string = "If allocation unit is 'BLK' then record format must be blocked type: FB, VB, VBA";
   private isRecFormatTouched: boolean = false;
 
   @ViewChild('dirblocks') dirblocks: ElementRef;
@@ -141,7 +141,7 @@ export class CreateDatasetModal {
     this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,21}$";
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.templateOptions = ['JCL','COBOL','PLX', 'XML'];
-    this.allocationUnitOptions = ['BLKS','TRK','CYL', 'KB', 'MB', 'BYTE', 'RECORDS'];
+    this.allocationUnitOptions = ['BLK','TRK','CYL', 'KB', 'MB', 'BYTE', 'RECORD'];
     this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'VBA', 'U'];
     this.datasetNameTypeOptions = ['PDS','LIBRARY', 'BASIC', 'LARGE'];
     this.organizationOptions = ['PS', 'PO'];
@@ -293,7 +293,7 @@ export class CreateDatasetModal {
   }
 
   checkForValidAllocUnitCombination(): void {
-    if (this.properties.allocationUnit == 'BLKS') {
+    if (this.properties.allocationUnit == 'BLK') {
       if (this.properties.recordFormat !== 'FB' && this.properties.recordFormat !== 'VB' && this.properties.recordFormat !== 'VBA' ) {
         this.isAllocUnitValid = false;
       } else {
