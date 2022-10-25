@@ -26,7 +26,7 @@ interface dsntParams {
 
 const TEMPLATE = new Map<string, templateParams> ([
   ['JCL', {
-    allocationUnit: 'TRKS',
+    allocationUnit: 'TRK',
     primarySpace: '300',
     secondarySpace: '100',
     directoryBlocks: '20',
@@ -34,7 +34,7 @@ const TEMPLATE = new Map<string, templateParams> ([
     recordLength: '80',
   }],
   ['COBOL', {
-    allocationUnit: 'TRKS',
+    allocationUnit: 'TRK',
     primarySpace: '300',
     secondarySpace: '150',
     directoryBlocks: '20',
@@ -42,7 +42,7 @@ const TEMPLATE = new Map<string, templateParams> ([
     recordLength: '133',
   }],
   ['PLX', {
-    allocationUnit: 'TRKS',
+    allocationUnit: 'TRK',
     primarySpace: '300',
     secondarySpace: '150',
     directoryBlocks: '20',
@@ -50,7 +50,7 @@ const TEMPLATE = new Map<string, templateParams> ([
     recordLength: '132',
   }],
   ['XML', {
-    allocationUnit: 'TRKS',
+    allocationUnit: 'TRK',
     primarySpace: '200',
     secondarySpace: '100',
     directoryBlocks: '20',
@@ -141,7 +141,7 @@ export class CreateDatasetModal {
     this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,21}$";
     this.alphaNumericPattern = "^[a-zA-Z0-9]*$";
     this.templateOptions = ['JCL','COBOL','PLX', 'XML'];
-    this.allocationUnitOptions = ['BLKS','TRKS','CYLS', 'KB', 'MB', 'BYTES', 'RECORDS'];
+    this.allocationUnitOptions = ['BLKS','TRK','CYL', 'KB', 'MB', 'BYTE', 'RECORDS'];
     this.recordFormatOptions = ['F', 'FB', 'V', 'VB', 'VBA', 'U'];
     this.datasetNameTypeOptions = ['PDS','LIBRARY', 'BASIC', 'LARGE'];
     this.organizationOptions = ['PS', 'PO'];
