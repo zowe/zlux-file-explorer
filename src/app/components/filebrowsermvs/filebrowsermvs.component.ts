@@ -751,7 +751,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
   createDatasetDialog() {
     let saveRef = this.dialog.open(CreateDatasetModal, {
-      maxWidth: '1000px'
+      maxWidth: '1000px',
+      disableClose: true
     });
 
     saveRef.afterClosed().subscribe(attributes => {
