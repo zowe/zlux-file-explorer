@@ -128,6 +128,14 @@ export class DatasetCrudService {
       );
   }
 
+  createDataset(datasetAttributes: any, name: string): Observable<any> {
+    const contentsURI = ZoweZLUX.uriBroker.datasetContentsUri(name);
+    return this.http.put(contentsURI, datasetAttributes)
+      .pipe(
+        catchError(error => throwError(error)),
+        map((res:any) => res)
+      );
+  }
 }
 
 /*

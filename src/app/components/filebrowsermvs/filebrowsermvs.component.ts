@@ -31,6 +31,7 @@ import * as _ from 'lodash';
 import { SearchHistoryService } from '../../services/searchHistoryService';
 import { UtilsService } from '../../services/utils.service';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
+import { CreateDatasetModal } from '../create-dataset-modal/create-dataset-modal.component';
 
 const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
 
@@ -747,6 +748,49 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     } 
     return false;
   }
+
+  createDatasetDialog() {
+    let saveRef = this.dialog.open(CreateDatasetModal, {
+      maxWidth: '1000px',
+      disableClose: true
+    });
+
+    saveRef.afterClosed().subscribe(attributes => {
+      if (attributes.datasetNameType == 'LIBRARY') {
+        attributes.datasetNameType = 'PDSE';
+      }
+      if (attributes) {
+        const datasetAttributes = {
+          ndisp: 'CATALOG',
+          status: 'NEW',
+          space: attributes.allocationUnit,
+          dsorg: attributes.organization,
+          lrecl: parseInt(attributes.recordLength),
+          recfm: attributes.recordFormat,
+          dir: parseInt(attributes.directoryBlocks),
+          prime: parseInt(attributes.primarySpace),
+          secnd: parseInt(attributes.secondarySpace),
+          dsnt: attributes.datasetNameType,
+          close: 'true'
+        }
+
+        if(attributes.averageRecordUnit) {
+          datasetAttributes['avgr'] = attributes.averageRecordUnit;
+        }
+        if(attributes.blockSize) {
+          datasetAttributes['blksz'] = parseInt(attributes.blockSize);
+        }
+
+        this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
+          this.snackBar.open(`Dataset created successfully.`, 'Dismiss', longSnackbarOptions);
+        }, error => {
+          this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', longSnackbarOptions);
+          }
+        );
+      }
+    });
+  }
+
 }
 
 
