@@ -46,12 +46,12 @@ var config = {
   ],
   },
   'plugins': [
-    new CopyWebpackPlugin([
+    new CopyWebpackPlugin({patterns:[
       {
         from: path.resolve(__dirname, './src/assets'),
         to: path.resolve('./dist/assets')
       }
-    ])
+    ]})
   ]
 };
 
