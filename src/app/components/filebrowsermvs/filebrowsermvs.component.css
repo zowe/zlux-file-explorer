@@ -21,6 +21,7 @@
   margin-left: 5px;
   display: inline-block;
   height: 40px;
+  padding-right: 15px;
 }
 
 .filebrowsermvs-search-input{
@@ -68,12 +69,12 @@
 }
 
 .filebrowsermvs-loading-icon {
-  margin-left: 8px !important;
   font-size: large !important;
 }
 
 .filebrowsermvs-plus-icon {
   font-size: large;
+  margin-left: -11px;
 }
 
 /*
