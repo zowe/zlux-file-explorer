@@ -68,13 +68,19 @@
 }
 
 .filebrowsermvs-loading-icon {
-  margin-left: 8px !important;
+  /* margin-left: 8px !important; */
   font-size: large !important;
 }
 
 .filebrowsermvs-plus-icon {
+  /* margin-left: 12px; */
   font-size: large;
+  margin-left: -11px;
 }
+
+/* .fa-plus:before {
+  margin-left: -11px;
+} */
 
 /*
   This program and the accompanying materials are
