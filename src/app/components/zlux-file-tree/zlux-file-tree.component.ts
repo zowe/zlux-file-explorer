@@ -115,7 +115,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
     let type = typeAndData.type;
     let data = typeAndData.data;
-    let isDataset = data.volser ? true : false;
+    let isDataset = (data.data && data.data.datasetAttrs) ? true : false;
 
     if (type =='properties') {
       isDataset
