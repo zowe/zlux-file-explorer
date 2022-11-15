@@ -90,10 +90,9 @@
   cursor: pointer;
 }
 
-.filebrowser-icon.special
+.special-utility
 { 
   margin-left: 9px; 
-  border: 1px solid #464646;
 }
 
 /*
