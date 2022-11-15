@@ -33,6 +33,7 @@ import { UtilsService } from '../../services/utils.service';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
 
 const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
+const SEARCH_ID = 'mvs';
 
 @Component({
   selector: 'file-browser-mvs',
@@ -83,7 +84,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
              ) {
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
-    this.mvsSearchHistory.onInit('mvs');
+    this.mvsSearchHistory.onInit(SEARCH_ID);
     this.path = "";
     this.lastPath = "";
     this.hideExplorer = false;
@@ -691,7 +692,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   clearSearchHistory(): void {
-    this.mvsSearchHistory.clearSearchHistory();
+    this.mvsSearchHistory.deleteSearchHistory().subscribe();
+    this.mvsSearchHistory.onInit(SEARCH_ID);
   }
 
 /**

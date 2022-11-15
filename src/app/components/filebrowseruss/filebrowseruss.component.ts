@@ -41,6 +41,8 @@ import { DownloaderService } from '../../services/downloader.service';
 import { SearchHistoryService } from '../../services/searchHistoryService';
 // TODO: re-implement to add fetching of previously opened tree view data --- import { PersistentDataService } from '../../services/persistentData.service';
 
+const SEARCH_ID = 'uss';
+
 @Component({
   selector: 'file-browser-uss',
   templateUrl: './filebrowseruss.component.html',
@@ -92,7 +94,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
       //this.componentClass = ComponentClass.FileBrowser;
       this.initalizeCapabilities();
-      this.ussSearchHistory.onInit('uss');
+      this.ussSearchHistory.onInit(SEARCH_ID);
       this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
       this.path = this.root;
       this.data = []; // Main treeData array (the nodes the Explorer displays)
@@ -978,7 +980,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   clearSearchHistory(): void {
-    this.ussSearchHistory.clearSearchHistory();
+    this.ussSearchHistory.deleteSearchHistory().subscribe();
+    this.ussSearchHistory.onInit(SEARCH_ID);
   }
 
   //Adds children to the existing node to update this.data array, 
