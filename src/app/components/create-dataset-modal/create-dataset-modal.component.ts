@@ -219,7 +219,12 @@ export class CreateDatasetModal {
 
   onDirBlockChange(value): void {
     this.dirBlockTouched = true;
-    this.checkForValidDirBlockCombination();
+    if(this.properties.directoryBlocks > '16777215') {
+      this.isDirBlockValid = false;
+      this.dirBlockError = 'Directory blocks cannot be more than 16777215';
+    } else {
+      this.checkForValidDirBlockCombination();
+    }
   }
 
   checkForValidDirBlockCombination():void {
