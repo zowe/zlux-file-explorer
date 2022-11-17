@@ -92,6 +92,9 @@ export class DatasetPropertiesModal implements OnInit {
       case "V":
         recordFormat = "V - Variable"
         break;
+      default:
+        recordFormat = "N/A"
+        break;
     }
     return recordFormat;
   }
@@ -99,17 +102,25 @@ export class DatasetPropertiesModal implements OnInit {
   formatSummary(org: string, recfm: string, reclen: number): string {
     let summary = "N/A";
     if (org.substring(0, 2) == "PS") {
-      if (recfm[0] == 'F') {
-        if (reclen > 0) {
-          summary = "FB" + reclen;
-        } else {
-          summary = "FB";
+      if (recfm && recfm != "N/A") {
+        if (recfm[0] == 'F') {
+          if (reclen > 0) {
+            summary = "FB" + reclen;
+          } else {
+            summary = "FB";
+          }
+        } else if (recfm[0] == 'V') {
+          if (reclen > 0) {
+            summary = "VB" + reclen;
+          } else {
+            summary = "VB";
+          }
         }
-      } else if (recfm[0] == 'V') {
+      } else {
         if (reclen > 0) {
-          summary = "VB" + reclen;
+          summary = "S" + reclen;
         } else {
-          summary = "VB";
+          summary = "S";
         }
       }
     } else if (org.substring(0, 2) == "PO") {
