@@ -1,5 +1,8 @@
 # ZLUX Angular File Tree
 
+## 1.3.0
+* Added a UI for creating datasets
+
 ## 1.2.0
 * Added the option to receive USS/MVS node data
 * Added the option to copy path of USS file or dereoctory
