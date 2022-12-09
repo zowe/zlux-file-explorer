@@ -219,14 +219,19 @@ export class CreateDatasetModal {
 
   onDirBlockChange(value): void {
     this.dirBlockTouched = true;
-    this.checkForValidDirBlockCombination();
+    if(parseInt(this.properties.directoryBlocks) > 16777215) {
+      this.isDirBlockValid = false;
+      this.dirBlockError = 'Directory blocks cannot be more than 16777215';
+    } else {
+      this.checkForValidDirBlockCombination();
+    }
   }
 
   checkForValidDirBlockCombination():void {
     if(this.properties.organization == 'PS') {
       if(this.properties.directoryBlocks == '') {
         this.isDirBlockValid = true;
-      } else if(this.properties.directoryBlocks > '0'){
+      } else if(parseInt(this.properties.directoryBlocks) > 0){
         this.isDirBlockValid = false;
         this.dirBlockError = 'Directory blocks must be 0 for the sequential dataset';
       } else {
@@ -237,7 +242,7 @@ export class CreateDatasetModal {
     if(this.properties.organization == 'PO') {
       if(this.properties.directoryBlocks == '') {
         this.isDirBlockValid = true;
-      } else if(this.properties.directoryBlocks < '1') {
+      } else if(parseInt(this.properties.directoryBlocks) < 1) {
         this.isDirBlockValid = false;
         this.dirBlockError = 'Directory blocks must be greater than 0 for the partitioned dataset';
       } else {
