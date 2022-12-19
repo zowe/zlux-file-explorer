@@ -393,9 +393,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   copyLink(rightClickedFile: any) {
     let link = '';
     if(rightClickedFile.type == 'file'){
-       link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDataset","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":true}`;
+       link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:${encodeURIComponent(`{"type":"openDataset","name":"${rightClickedFile.data.path}","toggleTree":true}`)}`;
     } else {
-      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDSList","name":"${encodeURIComponent(rightClickedFile.data.path)}","toggleTree":false}`;
+      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:${encodeURIComponent(`{"type":"openDSList","name":"${rightClickedFile.data.path}","toggleTree":false}`)}`;
     }
     navigator.clipboard.writeText(link).then(() => {
       this.log.debug("Link copied to clipboard");
