@@ -2,6 +2,7 @@
 
 ## 1.3.0
 * Added a UI for creating datasets
+* Bugfix: Getting 400 BAD REQUEST in browser when opening the file or dataset after copying its link
 
 ## 1.2.0
 * Added the option to receive USS/MVS node data
