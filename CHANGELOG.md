@@ -1,16 +1,17 @@
 # ZLUX Angular File Tree
 
 ## 1.3.0
-* Added a UI for creating datasets
+* Added a UI for creating datasets.
+* Bugfix: Fixed DS Properties menu not spawning with sequential datasets.
 
 ## 1.2.0
-* Added the option to receive USS/MVS node data
-* Added the option to copy path of USS file or dereoctory
-* Bugfix: Set USS path to correct directory, when opening the directory or file in new browser tab respectively
+* Added the option to receive USS/MVS node data.
+* Added the option to copy path of USS file or directory.
+* Bugfix: Set USS path to correct directory, when opening the directory or file in new browser tab respectively.
 
 ## 1.1.0
 * Added the option to download the dataset file.
-* Added create folder, delete and collapse icons in tree explorer.
+* Added create folder, delete and collapse icons in the File Tree.
 * Rename the file when doing copy/paste, when same named file exists in destination.
 * Create an empty file by selecting the folder.
 * Bugfix: Fixing the bug to download the dataset file.
