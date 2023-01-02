@@ -52,6 +52,7 @@
       [showUpArrow]="showUpArrow"
     ></file-browser-uss>
     <file-browser-mvs #mvsComponent
+      (createDatasetStatusEvent)="createDatasetStatus($event)"
       [hidden]="currentIndex != 1"
       (nodeClick)="onNodeClick($event)"
       (nodeDblClick)="onNodeDblClick($event)"

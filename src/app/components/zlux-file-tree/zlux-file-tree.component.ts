@@ -129,6 +129,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
       this.ussComponent.showCreateFolderDialog(data);
     } else if (type == 'requestUpload' && !isDataset) {
       this.ussComponent.showUploadDialog(data);
+    } else if (type="createDataset") {
+      this.mvsComponent.createDatasetDialog(data);
     }
   }
 
@@ -155,6 +157,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
+  @Output() createDatasetStatusEvent: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     // var obj = {
@@ -228,6 +231,11 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     //     this.persistentDataService.setData(dataObject)
     //       .subscribe((res: any) => { });
     //   })
+  }
+
+  createDatasetStatus($event): any {
+    // Event to tell if the dataset creation is successful or not
+    this.createDatasetStatusEvent.emit($event);
   }
 
   deleteFileOrFolder(pathAndName: string) {
