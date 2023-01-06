@@ -699,9 +699,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowse
   copyLink(rightClickedFile: any) {
     let link = '';
     if (rightClickedFile.directory){
-      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openDir","name":"${encodeURIComponent(rightClickedFile.path)}","toggleTree":false}`;
+      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:${encodeURIComponent(`{"type":"openDir","name":"${rightClickedFile.path}","toggleTree":false}`)}`;
     } else {
-      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:{"type":"openFile","name":"${encodeURIComponent(rightClickedFile.path)}","toggleTree":true}`;
+      link = `${window.location.origin}${window.location.pathname}?pluginId=${this.pluginDefinition.getBasePlugin().getIdentifier()}:data:${encodeURIComponent(`{"type":"openFile","name":"${rightClickedFile.path}","toggleTree":true}`)}`;
     }
     navigator.clipboard.writeText(link).then(() => {
       this.log.debug("Link copied to clipboard");
