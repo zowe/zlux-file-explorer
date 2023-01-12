@@ -788,7 +788,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
           this.snackBar.open(`Dataset: ${attributes.name} created successfully.`, 'Dismiss', quickSnackbarOptions);
-          this.createDatasetStatusEvent.emit({status: 'success', name: attributes.name, org: attributes.organization});
+          this.createDatasetStatusEvent.emit({status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data});
         }, error => {
           this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', longSnackbarOptions);
           this.createDatasetStatusEvent.emit({status: 'error', error: error.error, name: attributes.name});
