@@ -157,7 +157,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
-  @Output() createDatasetStatusEvent: EventEmitter<any> = new EventEmitter<any>();
+  @Output() createDataset: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     // var obj = {
@@ -233,9 +233,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     //   })
   }
 
-  createDatasetStatus($event): any {
+  onCreateDataset($event): any {
     // Event to tell if the dataset creation is successful or not
-    this.createDatasetStatusEvent.emit($event);
+    this.createDataset.emit($event);
   }
 
   deleteFileOrFolder(pathAndName: string) {

@@ -58,7 +58,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesPanel: ContextMenuItem[];
   @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
   @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
-  @Output() createDatasetStatusEvent = new EventEmitter<any>();
+  @Output() createDataset = new EventEmitter<any>();
 
   //TODO:define interface types for mvs-data/data
   private data: any;
@@ -788,10 +788,10 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
 
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
           this.snackBar.open(`Dataset: ${attributes.name} created successfully.`, 'Dismiss', quickSnackbarOptions);
-          this.createDatasetStatusEvent.emit({status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data});
+          this.createDataset.emit({status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data});
         }, error => {
           this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', longSnackbarOptions);
-          this.createDatasetStatusEvent.emit({status: 'error', error: error.error, name: attributes.name});
+          this.createDataset.emit({status: 'error', error: error.error, name: attributes.name});
           }
         );
       }

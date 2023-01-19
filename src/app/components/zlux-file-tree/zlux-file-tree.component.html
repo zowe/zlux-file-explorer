@@ -52,7 +52,6 @@
       [showUpArrow]="showUpArrow"
     ></file-browser-uss>
     <file-browser-mvs #mvsComponent
-      (createDatasetStatusEvent)="createDatasetStatus($event)"
       [hidden]="currentIndex != 1"
       (nodeClick)="onNodeClick($event)"
       (nodeDblClick)="onNodeDblClick($event)"
@@ -61,6 +60,7 @@
       (rightClick)="onRightClick($event)"
       (pathChanged)="onPathChanged($event)"
       (dataChanged)="onDataChanged($event)"
+      (createDataset)="onCreateDataset($event)"
       [inputStyle]="inputStyle"
       [treeStyle]="treeStyle"
       [searchStyle]="searchStyle"
