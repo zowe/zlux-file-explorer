@@ -58,7 +58,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   private rightClickPropertiesPanel: ContextMenuItem[];
   @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
   @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
-  @Output() createDataset = new EventEmitter<any>();
 
   //TODO:define interface types for mvs-data/data
   private data: any;
@@ -112,6 +111,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
+  @Output() createDataset = new EventEmitter<any>();
   ngOnInit() {
     this.intervalId = setInterval(() => {
       if(this.data){

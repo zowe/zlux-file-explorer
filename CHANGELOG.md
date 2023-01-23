@@ -1,5 +1,8 @@
 # ZLUX Angular File Tree
 
+## 1.4.0
+* Enhancing the create dataset form to be prefilled with certain dataset attributes.
+
 ## 1.3.0
 * Added a UI for creating datasets
 * Bugfix: Getting 400 BAD REQUEST in browser when opening the file or dataset after copying its link
