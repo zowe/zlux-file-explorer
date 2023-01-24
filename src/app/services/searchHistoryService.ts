@@ -23,7 +23,7 @@ export class SearchHistoryService {
     
   }
 
-  onInit(type:string) {
+  onInit(type: string) { //'uss' or 'mvs'
     this.type = type;
     this.basePlugin = this.pluginDefinition.getBasePlugin();
     this.resourceName = `${type}Search.json`;

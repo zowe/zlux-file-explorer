@@ -32,7 +32,10 @@ import { SearchHistoryService } from '../../services/searchHistoryService';
 import { UtilsService } from '../../services/utils.service';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
 import { CreateDatasetModal } from '../create-dataset-modal/create-dataset-modal.component';
+/* TODO: re-implement to add fetching of previously opened tree view data
+import { PersistentDataService } from '../../services/persistentData.service'; */
 
+// Used for DS async deletion UX
 const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
 
 @Component({
@@ -42,68 +45,85 @@ const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
   styleUrls: ['./filebrowsermvs.component.css'],
   providers: [DatasetCrudService, /*PersistentDataService,*/ SearchHistoryService ]
 })
-export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowserMVS,
+export class FileBrowserMVSComponent implements OnInit, OnDestroy {
+
+  /* TODO: Legacy, capabilities code (unused for now) */
+  //IFileBrowserMVS,
   //componentClass:ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities:Array<Capability>;
-  public hideExplorer: boolean;
-  private path: string;
-  private lastPath: string;
-  private intervalId: any;
-  private updateInterval: number = 3000000;
-  private searchInputCtrl: any;
-  private searchInputValueSubscription: Subscription;
-  private selectedNode: any;
-  private showSearch: boolean;
-  private rightClickPropertiesPanel: ContextMenuItem[];
-  @ViewChild('searchInputMVS') searchInputMVS: ElementRef;
-  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
 
-  //TODO:define interface types for mvs-data/data
-  private data: any;
-  private dataCached: any;
+  /* TODO: Fetching updates for automatic refresh (disabled for now) */
+  // private intervalId: any;
+  // private updateInterval: number = 3000000;
+
+  /* Tree UI and modals */
+  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
+  public hideExplorer: boolean;
+  private rightClickPropertiesPanel: ContextMenuItem[];
   public isLoading: boolean;
-  private rightClickedFile: any;
-  private rightClickedEvent:any;
   private rightClickPropertiesDatasetFile: ContextMenuItem[];
   private rightClickPropertiesDatasetFolder: ContextMenuItem[];
-  private deletionQueue = new Map();
+
+  /* Quick search (Alt + P) stuff */
+  @ViewChild('searchMVS') searchMVS: ElementRef;
+  private searchCtrl: any;
+  private searchValueSubscription: Subscription;
+  private showSearch: boolean;
+
+  /* Data and navigation */
+  private path: string;
+  private selectedNode: any;
+  //TODO: Define interface types for mvs-data/data
+  private data: any; //Main data displayed in the visual tree as nodes
+  private dataCached: any;  // Used for filtering against quick search
+  private rightClickedFile: any;
+  //TODO: May not needed anymore? (may need replacing w/ rightClickedFile)
+  private rightClickedEvent: any;
+  private deletionQueue = new Map(); //DS deletion is async, so queue is used
+  private deleteSubscription: Subscription;
+  //TODO: May not needed anymore? (could be cleaned up into deleteSubscription)
+  private deleteVsamSubscription: Subscription;
+  //TODO: May not needed anymore? (could be cleaned up into deleteSubscription)
+  private deleteNonVsamSubscription: Subscription;
   private additionalQualifiers: boolean;
   
 
   constructor(private elementRef:ElementRef,
               private utils:UtilsService,
-              // private persistentDataService: PersistentDataService,
-              private mvsSearchHistory:SearchHistoryService,
+              private mvsSearchHistory: SearchHistoryService,
               private snackBar: MatSnackBar,
               private datasetService: DatasetCrudService,
               private downloadService:DownloaderService,
+              private dialog: MatDialog,
               @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
               @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
-              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions,
-              private dialog: MatDialog
+              @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions
              ) {
+    /* TODO: Legacy, capabilities code (unused for now) */
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
     this.mvsSearchHistory.onInit('mvs');
     this.path = "";
-    this.lastPath = "";
     this.hideExplorer = false;
     this.isLoading = false;
     this.additionalQualifiers = true;
     this.showSearch = false;
-    this.searchInputCtrl = new FormControl();
-    this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
-      debounceTime(500),
+    this.searchCtrl = new FormControl();
+    this.searchValueSubscription = this.searchCtrl.valueChanges.pipe(
+      debounceTime(500), // By default, 500 ms until user input, for quick search to update results
     ).subscribe((value) => {this.searchInputChanged(value)});
     this.selectedNode = null;
   }
+
+  /* Customizeable tree styles */
   @Input() inputStyle: any;
   @Input() searchStyle: any;
   @Input() treeStyle: any;
   @Input() style: any;
   @Input() showUpArrow: boolean;
 
+  /* Tree outgoing events */
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -111,28 +131,45 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
+
   ngOnInit() {
-    this.intervalId = setInterval(() => {
-      if(this.data){
-        this.getTreeForQueryAsync(this.lastPath).then((response: any) => {
-          let newData = response;
-          this.updateTreeData(this.data, newData);
+    // TODO: Fetching updates for automatic refresh (disabled for now)
+    // this.intervalId = setInterval(() => {
+    //   if(this.data){
+    //     this.getTreeForQueryAsync(this.path).then((response: any) => {
+    //       let newData = response;
+    //       this.updateTreeData(this.data, newData);
           
-          if (this.showSearch) {
-            if (this.dataCached) {
-              this.updateTreeData(this.dataCached, newData);
-            }
-          }
-        });
-      }
-    }, this.updateInterval);
+    //       if (this.showSearch) {
+    //         if (this.dataCached) {
+    //           this.updateTreeData(this.dataCached, newData);
+    //         }
+    //       }
+    //       /* We don't update search history, nor emit path changed event, because this method is meant
+    //       to be a fetched update, not a user action new path */
+    //     });
+    //   }
+    // }, this.updateInterval);
     this.initializeRightClickProperties();
   }
 
   ngOnDestroy(){
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
+    if (this.searchValueSubscription) {
+      this.searchValueSubscription.unsubscribe();
     }
+    if (this.deleteSubscription) {
+      this.deleteSubscription.unsubscribe();
+    }
+    if (this.deleteNonVsamSubscription) {
+      this.deleteNonVsamSubscription.unsubscribe();
+    }
+    if (this.deleteVsamSubscription) {
+      this.deleteVsamSubscription.unsubscribe();
+    }
+    // TODO: Fetching updates for automatic refresh (disabled for now)
+    // if (this.intervalId) {
+    //   clearInterval(this.intervalId);
+    // }
   }
 
   // Updates the 'data' array with new data, preserving existing expanded datasets
@@ -163,6 +200,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
   }
 
+  /* TODO: Legacy, capabilities code (unused for now) */
   /*initalizeCapabilities(){
     this.capabilities = new Array<Capability>();
     this.capabilities.push(FileBrowserCapabilities.FileBrowser);
@@ -217,7 +255,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     }
 
     let fileDeleteRef:MatDialogRef<DeleteFileModal> = this.dialog.open(DeleteFileModal, fileDeleteConfig);
-    const deleteFileOrFolder = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
+    this.deleteSubscription = fileDeleteRef.componentInstance.onDelete.subscribe(() => {
       let vsamCSITypes = ['R', 'D', 'G', 'I', 'C'];
       if (vsamCSITypes.indexOf(rightClickedFile.data.datasetAttrs.csiEntryType) != -1) {
         this.deleteVsamDataset(rightClickedFile);
@@ -231,7 +269,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.isLoading = true;
     this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
     rightClickedFile.styleClass = CSS_NODE_DELETING;
-    let deleteSubscription = this.datasetService.deleteNonVsamDatasetOrMember(rightClickedFile)
+    this.deleteNonVsamSubscription = this.datasetService.deleteNonVsamDatasetOrMember(rightClickedFile)
     .subscribe(
       resp => {
         this.isLoading = false;
@@ -266,7 +304,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     );
 
     setTimeout(() => {
-      if (deleteSubscription.closed == false) {
+      if (this.deleteNonVsamSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
           'Dismiss', quickSnackbarOptions);
       }
@@ -277,7 +315,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     this.isLoading = true;
     this.deletionQueue.set(rightClickedFile.data.path, rightClickedFile);
     rightClickedFile.styleClass = CSS_NODE_DELETING;
-    let deleteSubscription = this.datasetService.deleteVsamDataset(rightClickedFile)
+    this.deleteVsamSubscription = this.datasetService.deleteVsamDataset(rightClickedFile)
     .subscribe(
       resp => {
         this.isLoading = false;
@@ -316,7 +354,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     );
 
     setTimeout(() => {
-      if (deleteSubscription.closed == false) {
+      if (this.deleteVsamSubscription.closed == false) {
         this.snackBar.open('Deleting ' + rightClickedFile.data.path + '... Larger payloads may take longer. Please be patient.', 
           'Dismiss', quickSnackbarOptions);
       }
@@ -430,8 +468,8 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
   }
 
   focusSearchInput(attemptCount?: number): void {
-    if (this.searchInputMVS) {
-      this.searchInputMVS.nativeElement.focus();
+    if (this.searchMVS) {
+      this.searchMVS.nativeElement.focus();
       return;
     }
     const maxAttempts = 10;
@@ -517,11 +555,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
     
   onNodeDblClick($event: any): void{
     this.selectedNode = $event.node;
-    if($event.node.data.hasChildren && $event.node.children.length > 0){
+    if(this.selectedNode.data?.hasChildren && this.selectedNode.children?.length > 0){
       this.path = $event.node.data.path;
-      this.getTreeForQueryAsync($event.node.data.path).then((res) => {
-        this.data = res[0].children;
-      });
+      if (this.path) {
+        this.getTreeForQueryAsync(this.path).then((res) => {
+          this.data = res[0].children;
+          this.onPathChanged(this.path);
+          this.refreshHistory(this.path);
+        });
+      } else {
+        this.log.debug("A DS node double click event was received to open, but no path was found");
+      }
     }
     this.nodeDblClick.emit($event.node);
   }
@@ -593,8 +637,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
             'Dismiss', defaultSnackbarOptions);
       }
       this.log.severe(error);
-    }
-    );
+    });
     this.onPathChanged(path);
     this.refreshHistory(path);
   }
@@ -618,7 +661,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {//IFileBrowse
         this.onDataChanged(res);
         let parents: TreeNode[] = [];
         let parentMap = {};
-        this.lastPath = path;
         if(res.datasets.length > 0){
           for(let i:number = 0; i < res.datasets.length; i++){
             let currentNode:TreeNode = {};
