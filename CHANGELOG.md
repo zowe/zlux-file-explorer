@@ -9,7 +9,6 @@
 * Remove unnecessary MVS data fetch update feature (currently it's 3000000 ms or 50 minutes)
 * Add clarifying comments, renames, TODOs, and organization to variables, services, and a few methods
 
-
 ## 1.3.0
 * Added a UI for creating datasets
 * Bugfix: Getting 400 BAD REQUEST in browser when opening the file or dataset after copying its link
