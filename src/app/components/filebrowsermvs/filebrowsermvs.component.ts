@@ -37,6 +37,7 @@ import { PersistentDataService } from '../../services/persistentData.service'; *
 
 // Used for DS async deletion UX
 const CSS_NODE_DELETING = "filebrowsermvs-node-deleting";
+const SEARCH_ID = 'mvs';
 
 @Component({
   selector: 'file-browser-mvs',
@@ -103,7 +104,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     /* TODO: Legacy, capabilities code (unused for now) */
     //this.componentClass = ComponentClass.FileBrowser;
     //this.initalizeCapabilities();
-    this.mvsSearchHistory.onInit('mvs');
+    this.mvsSearchHistory.onInit(SEARCH_ID);
     this.path = "";
     this.hideExplorer = false;
     this.isLoading = false;
@@ -763,6 +764,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
                   .subscribe(()=>{
                     if(sub) sub.unsubscribe();
                   });
+  }
+
+  clearSearchHistory(): void {
+    this.mvsSearchHistory.deleteSearchHistory().subscribe();
+    this.mvsSearchHistory.onInit(SEARCH_ID);
   }
 
 /**

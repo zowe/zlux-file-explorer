@@ -7,11 +7,11 @@ SPDX-License-Identifier: EPL-2.0
 Copyright Contributors to the Zowe Project.
 # File Tree
 
-This is an angular component that can be included in applications to be able to locate & browse the hierarchy of files and datasets on z/OS through the Zowe ZSS server APIs. Using the Zowe context menu, there is also a growing support of CRUD & other actions.
+This is an Angular component included in some Zowe Desktop apps (like Zowe Editor) to browse and edit files and datasets on z/OS through the Zowe ZSS server APIs, in a tree-like experience. Using the Zowe context menu, there is also a growing support of right click CRUD & other actions.
 
-**NOTE: Because this relies upon ZSS APIs, it must be used in an environment which handles session lifecycles, as you must log in to ZSS prior to using those APIs. One way to utilize this is to use this within a Zowe App, within the Zowe Desktop**
+**NOTE: Because this relies upon ZSS APIs, it must be used in an environment which handles session lifecycles, as you must log in to ZSS prior to using those APIs. One way to utilize this is to use this within a Zowe App, within the Zowe Desktop. An alternative to ZSS if you don't have access to a mainframe is the ZSS mock server (https://github.com/zowe/zss/tree/v2.x/staging/mock)**
 
-## Installing
+## Installing dependencies
 You must set the @zowe registry scope to get this library, as it is not yet on npmjs.org
 
 ```
@@ -19,7 +19,7 @@ npm config set @zowe:registry https://zowe.jfrog.io/zowe/api/npm/npm-release/
 npm install --save-prod @zowe/zlux-angular-file-tree
 ```
 
-## Embedding
+## Embedding FT into your own app
 
 Then, navigate to your application's module file. Import the File Tree module by adding
 ```import { FileTreeModule } from '@zowe/zlux-angular-file-tree/src/plugin';```
@@ -34,7 +34,7 @@ Now, in your application's HTML template, given they are within the scope of you
 with an optional (style) input to specify the color, size, or other properties of the main tree container.
 
 
-## Linking locally for development
+## (Develop your app with local version of FT option 1) Linking
 If you want to develop the File Tree and your own app simultaneously, you can do the following:
 
 ### Part I- How to link
@@ -67,10 +67,21 @@ npm uninstall
 ```
 
 ### node-sass vendor folder not found
-if experience this issue
+If you experience this issue
 ```
 node node_modules/node-sass/scripts/install.js
 npm rebuild node-sass
+```
+
+## (Develop your app with local version of FT option 2) Local path
+An alternative to option 1 is to use a local path.
+
+#### Add local path of built FT
+Change your package.json of your app to point to the local path of the built FT. For example in package.json,
+```
+[...]
+"@zowe/zlux-angular-file-tree": "file://../../your-local-path/zlux-file-explorer",
+[...]
 ```
 
 ## How to build a File Tree release
@@ -79,6 +90,10 @@ npm rebuild node-sass
 2. Reinstall the app to update the package-lock.json too.
 3. Click on GitHub "Actions" tab at the top. Select "Build and Test Workflow".
 4. Click on "Run workflow" dropdown. Select desired branch and release text string i.e. "RC1" to build a FT npm release
+
+## What version of Font Awesome does the FT use?
+It's a dependency not listed in package.json because it comes with PrimeNG. Our current version of PrimeNG is 6, therefore
+we are using FA v4 (https://fontawesome.com/v4/icons/)
 
 This program and the accompanying materials are
 made available under the terms of the Eclipse Public License v2.0 which accompanies
