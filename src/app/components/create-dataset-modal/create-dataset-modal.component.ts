@@ -7,8 +7,9 @@
   
   Copyright Contributors to the Zowe Project.
 */
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, Inject } from '@angular/core';
 import { MatSelect } from '@angular/material/select';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CustomErrorStateMatcher } from '../../shared/error-state-matcher';
 
 interface templateParams {
@@ -133,9 +134,15 @@ export class CreateDatasetModal {
   @ViewChild('dsorg') dsorg: ElementRef;
 
 
-  constructor(private el: ElementRef,) { }
-
-  ngOnInit() {
+  constructor(private el: ElementRef, @Inject(MAT_DIALOG_DATA) data ) {
+    if(data && data.data) {
+      this.properties.name = data.data.dsName;
+      this.properties.datasetNameType = data.data.dsNameType;
+      this.properties.organization = data.data.dsOrg;
+    } else {
+      this.properties.datasetNameType = 'PDS';
+      this.properties.organization = 'PO'
+    }
     this.numericPattern = "^[0-9]*$";
     this.numericPatternExZero = "^[1-9][0-9]*$";
     this.datasetNamePattern = "^[a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}([.][a-zA-Z#$@][a-zA-Z0-9#$@-]{0,7}){0,21}$";
@@ -146,8 +153,6 @@ export class CreateDatasetModal {
     this.datasetNameTypeOptions = ['PDS','LIBRARY', 'BASIC', 'LARGE'];
     this.organizationOptions = ['PS', 'PO'];
     this.recordUnitOptions = ['U', 'K', 'M', ];
-    this.properties.datasetNameType = 'PDS';
-    this.properties.organization = 'PO'
     this.properties.template = '';
     this.properties.averageRecordUnit = '';
   }

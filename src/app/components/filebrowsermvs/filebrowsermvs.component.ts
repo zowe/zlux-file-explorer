@@ -132,6 +132,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
+  @Output() createDataset = new EventEmitter<any>();
 
   ngOnInit() {
     // TODO: Fetching updates for automatic refresh (disabled for now)
@@ -797,11 +798,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  createDatasetDialog() {
-    let saveRef = this.dialog.open(CreateDatasetModal, {
-      maxWidth: '1000px',
-      disableClose: true
-    });
+  createDatasetDialog(data?: any) {
+    const dsCreateConfig = new MatDialogConfig();
+    dsCreateConfig.data = {
+      data
+    };
+    dsCreateConfig.maxWidth = '1000px';
+    dsCreateConfig.disableClose = true;
+
+    let saveRef = this.dialog.open(CreateDatasetModal, dsCreateConfig);
 
     saveRef.afterClosed().subscribe(attributes => {
       if (attributes.datasetNameType == 'LIBRARY') {
@@ -830,9 +835,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
         }
 
         this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe(resp => {
-          this.snackBar.open(`Dataset created successfully.`, 'Dismiss', longSnackbarOptions);
+          this.snackBar.open(`Dataset: ${attributes.name} created successfully.`, 'Dismiss', quickSnackbarOptions);
+          this.createDataset.emit({status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data});
         }, error => {
           this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', longSnackbarOptions);
+          this.createDataset.emit({status: 'error', error: error.error, name: attributes.name});
           }
         );
       }

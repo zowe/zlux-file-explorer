@@ -1,5 +1,8 @@
 # ZLUX Angular File Tree
 
+## 1.5.0
+* Enhancing the create dataset form to be prefilled with certain dataset attributes.
+
 ## 1.4.0
 * Bugfix: Make it so an MVS double click ("drill into") event correctly emits a path change
 * Bugfix: Clean up all USS/MVS subscriptions
