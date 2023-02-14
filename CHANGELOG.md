@@ -8,6 +8,7 @@
 * Bugfix: Clean up all USS/MVS subscriptions
 * Remove unnecessary MVS data fetch update feature (currently it's 3000000 ms or 50 minutes)
 * Add clarifying comments, renames, TODOs, and organization to variables, services, and a few methods
+* Added the option to clear search history
 
 ## 1.3.0
 * Added a UI for creating datasets

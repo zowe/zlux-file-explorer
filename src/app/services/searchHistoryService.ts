@@ -95,4 +95,14 @@ export class SearchHistoryService {
      return this.searchHistory;
   }
 
+  public deleteSearchHistory():Observable<any> {
+    return this.http.delete(this.uri).pipe(
+      catchError((err => {
+        let type = this.type;
+        console.log(`delete${type}SearchHistory error`, err);
+        return null
+      }))
+    )
+  }
+
 }

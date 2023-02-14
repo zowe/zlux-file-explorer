@@ -46,6 +46,7 @@
     <div class="fa fa-minus-square-o filebrowseruss-collapse-icon" title="Collapse Folders in Explorer" (click)="collapseTree();" style="margin-right: 9px; float:right; cursor: pointer;"></div>
     <div class="fa fa-trash-o filebrowseruss-delete-icon" title="Delete" (click)="showDeleteDialog(selectedNode);" style="margin-right: 9px; float:right; cursor: pointer;"></div>
     <div class="fa fa-plus" title="Create new dataset" (click)="createDatasetDialog()" style="margin-right: 9px; float:right; cursor: pointer;"></div>
+    <div class="fa fa-eraser filebrowser-icon special-utility" title="Clear Search History" (click)="clearSearchHistory();"></div>
   </div>
   <!-- Main tree -->
   <div [hidden]="hideExplorer" style="height: 100%;">

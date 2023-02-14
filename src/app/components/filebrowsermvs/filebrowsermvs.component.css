@@ -70,6 +70,17 @@
 .filebrowsermvs-loading-icon {
   margin-left: 8px !important;
   font-size: large !important;
+
+}
+
+.filebrowser-icon { 
+  margin-right: 9px; 
+  float: right; 
+  cursor: pointer;
+}
+
+.special-utility { 
+  margin-left: 9px; 
 }
 
 /*

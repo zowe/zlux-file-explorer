@@ -43,6 +43,8 @@ import { SearchHistoryService } from '../../services/searchHistoryService';
 /* TODO: re-implement to add fetching of previously opened tree view data
 import { PersistentDataService } from '../../services/persistentData.service'; */
 
+const SEARCH_ID = 'uss';
+
 @Component({
   selector: 'file-browser-uss',
   templateUrl: './filebrowseruss.component.html',
@@ -105,7 +107,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       /* TODO: Legacy, capabilities code (unused for now) */
       //this.componentClass = ComponentClass.FileBrowser;
       this.initalizeCapabilities();
-      this.ussSearchHistory.onInit('uss');
+      this.ussSearchHistory.onInit(SEARCH_ID);
       this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
       this.path = this.root;
       this.data = [];
@@ -1002,7 +1004,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     );
     this.refreshHistory(this.path);
   }
-
   private refreshHistory(path:string) {
     const sub = this.ussSearchHistory
                   .saveSearchHistory(path)
@@ -1011,6 +1012,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
                   });
   }
 
+  clearSearchHistory(): void {
+    this.ussSearchHistory.deleteSearchHistory().subscribe();
+    this.ussSearchHistory.onInit(SEARCH_ID);
+  }
 
   //Adds children to the existing node to update this.data array, 
   //fetch - fetches new data, expand - expands or not folder node after fetching new data
