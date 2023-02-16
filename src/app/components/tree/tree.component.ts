@@ -14,6 +14,8 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, 
 import { TreeNode } from 'primeng/primeng';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
+import { TreeDragDropService } from 'primeng/api';
+
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -27,7 +29,7 @@ import { FileNode } from '../../structures/file-node';
   templateUrl: './tree.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./tree.component.css'],
-  providers: []
+  providers: [TreeDragDropService]
 })
 /**
  * [Input treeData supplies the tree structure]
@@ -47,7 +49,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   selectedNode: FileNode;
   lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
   lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
-  @ViewChild('fileExplorerPTree') fileExplorerTree: ElementRef;
+  @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
   constructor() {
     this.lastClickedNodeName = null;
   }
@@ -93,6 +95,18 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
 
   ngOnDestroy() { // PrimeNG as of 6.0 has no native right click support for its tree
     this.fileExplorerTree.nativeElement.removeEventListener('contextmenu', this.panelRightClickSelect.bind(this));
+  }
+
+  onDrop(_event?: any) { 
+    const dragNode = _event.dragNode;
+    const dropNode =_event.dropNode;
+    if(dragNode.data == 'Folder' || dropNode.data != 'Folder'){
+      console.log('cannot perform action');
+    } else{
+      console.log('event acepted');
+      _event.accept();
+      console.log('after event acepted');
+    }
   }
 }
 
