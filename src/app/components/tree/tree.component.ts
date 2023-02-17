@@ -47,6 +47,9 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();
   @Output() panelRightClickEvent = new EventEmitter<MouseEvent>();
+  @Output() dragAndDropEvent = new EventEmitter();
+  // @Output() dragAndDropEvent = new EventEmitter<{dragData: any, dropData: any}>();
+  // @Output() dragAndDropEvent = new EventEmitter<object>();
   selectedNode: FileNode;
   lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
   lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
@@ -102,14 +105,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   }
 
   onDrop(_event?: any) { 
-    const dragNode = _event.dragNode;
-    const dropNode =_event.dropNode;
-    if(dragNode.data == 'Folder' || dropNode.data != 'Folder'){
-      console.log('cannot perform action');
-    } else{
-      console.log('event acepted');
-      console.log('after event acepted');
-    }
+    this.dragAndDropEvent.emit({dragData: _event.dragNode, dropData: _event.dropNode});
   }
 
   _overrideAllowDrop(dragNode, dropNode, dragNodeScope): boolean {
@@ -117,7 +113,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
       if(dragNode.data == 'Folder' || dropNode.data != 'Folder') {
         return false;
       } else {
-          return true;
+        return true;
       }
     }
     return false;

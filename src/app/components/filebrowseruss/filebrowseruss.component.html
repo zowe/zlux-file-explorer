@@ -51,6 +51,7 @@
       [ngStyle]="treeStyle"
       (rightClickEvent)="onNodeRightClick($event)"
       (panelRightClickEvent)="onPanelRightClick($event)"
+      (dragAndDropEvent)="onDragAndDrop($event)"
       (dataChanged)="onDataChanged($event)"
     ></tree-root>
   </div>

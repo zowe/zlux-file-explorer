@@ -39,11 +39,7 @@ import { UtilsService } from '../../services/utils.service';
 import { UssCrudService } from '../../services/uss.crud.service';
 import { DownloaderService } from '../../services/downloader.service';
 import { SearchHistoryService } from '../../services/searchHistoryService';
-
-/* TODO: re-implement to add fetching of previously opened tree view data
-import { PersistentDataService } from '../../services/persistentData.service'; */
-
-const SEARCH_ID = 'uss';
+// TODO: re-implement to add fetching of previously opened tree view data --- import { PersistentDataService } from '../../services/persistentData.service';
 
 @Component({
   selector: 'file-browser-uss',
@@ -53,50 +49,41 @@ const SEARCH_ID = 'uss';
   providers: [UssCrudService, /*PersistentDataService,*/ SearchHistoryService]
 })
 
-export class FileBrowserUSSComponent implements OnInit, OnDestroy {
-
-  /* TODO: Legacy, capabilities code (unused for now) */
-  //IFileBrowserUSS,
+export class FileBrowserUSSComponent implements OnInit, OnDestroy {//IFileBrowserUSS,
   //componentClass: ComponentClass;
   //fileSelected: Subject<FileBrowserFileSelectedEvent>;
   //capabilities: Array<Capability>;
 
-  /* TODO: Fetching updates for automatic refresh (disabled for now) */
-  // private intervalId: any;
-  // private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
-
-  /* Data and navigation */
-  private path: string;
-  private selectedNode: any;
-  private homePath: string; // If stays null after init, ZSS was unable to find a user home directory
-  private root: string; // Default / directory (different from homePath)
-  private rightClickedFile: any;
-  //TODO: May not needed anymore? (may need replacing w/ rightClickedFile)
-  private rightClickedEvent: any;
-  private deletionQueue = new Map(); //multiple files deletion is async, so queue is used
-  private fileToCopyOrCut: any;
-  //TODO: Define interface types for uss-data/data
-  private data: FileTreeNode[]; //Main data displayed in the visual tree as nodes
-  private dataCached: FileTreeNode[]; // Used for filtering against quick search
-
-  /* Quick search (Alt + P) stuff */
-  private showSearch: boolean;
-  private searchCtrl: any;
-  private searchValueSubscription: Subscription;
-
-  /* Tree UI and modals */
-  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
-  @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
-  @ViewChild('searchUSS') searchUSS: ElementRef;
   public hideExplorer: boolean;
+  private path: string;
+  private root: string;
+  private rightClickedFile: any;
+  private rightClickedEvent: any;
   public isLoading: boolean;
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
+  private deletionQueue = new Map();
+  private fileToCopyOrCut: any;
+  private showSearch: boolean;
+  private searchInputCtrl: any;
+  private searchInputValueSubscription: Subscription;
+  private selectedNode: any;
+  private ussPathExists = false;
+
+  //TODO:define interface types for uss-data/data
+  private data: FileTreeNode[];
+  private dataCached: FileTreeNode[]; // Used for filtering against search bar
+  private intervalId: any;
+  private updateInterval: number = 10000;// TODO: time represents in ms how fast tree updates changes from mainframe
+  @ViewChild('pathInputUSS') pathInputUSS: ElementRef;
+  @ViewChild('searchInputUSS') searchInputUSS: ElementRef;
+  @ViewChild(TreeComponent)  private treeComponent: TreeComponent;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
-    private utils: UtilsService,
+    private utils: UtilsService, 
+    /*private persistentDataService: PersistentDataService,*/
     private ussSearchHistory:SearchHistoryService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
@@ -104,24 +91,22 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
-      /* TODO: Legacy, capabilities code (unused for now) */
       //this.componentClass = ComponentClass.FileBrowser;
       this.initalizeCapabilities();
-      this.ussSearchHistory.onInit(SEARCH_ID);
+      this.ussSearchHistory.onInit('uss');
       this.root = "/"; // Dev purposes: Replace with home directory to test Explorer functionalities
       this.path = this.root;
-      this.data = [];
+      this.data = []; // Main treeData array (the nodes the Explorer displays)
       this.hideExplorer = false;
       this.isLoading = false;
       this.showSearch = false;
-      this.searchCtrl = new FormControl();
-      this.searchValueSubscription = this.searchCtrl.valueChanges.pipe(
-        debounceTime(500), // By default, 500 ms until user input, for quick search to update results
+      this.searchInputCtrl = new FormControl();
+      this.searchInputValueSubscription = this.searchInputCtrl.valueChanges.pipe(
+        debounceTime(500),
       ).subscribe((value) => {this.searchInputChanged(value)});
       this.selectedNode = null;
   }
 
-  /* Tree outgoing events */
   @Output() pathChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() nodeClick: EventEmitter<any> = new EventEmitter<any>();
@@ -137,11 +122,25 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   @Output() rightClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() openInNewTab: EventEmitter<any> = new EventEmitter<any>();
 
-  /* Customizeable tree styles */
   @Input() inputStyle: any;
   @Input() searchStyle: any;
   @Input() treeStyle: any;
   @Input() showUpArrow: boolean;
+  @Input()
+  set fileEdits(input: any) {
+    if (input && input.action && input.action === "save-file") {
+      //this.ussSrv.saveFile(input.fileName, input.data)
+      this.ussSrv.saveFile(input.fileAddress, input.data)
+      .subscribe(
+        response =>{
+          this.log.debug("No errors");
+        },
+        error => {
+          this.log.debug(error);
+        }
+      );
+    }
+  }
 
   ngOnInit() {
     this.loadUserHomeDirectory().pipe(
@@ -150,10 +149,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
         return of('/');
       }),
     ).subscribe(home => {
-      if(!this.homePath) {
+      if(!this.ussPathExists) {
         this.path = home;
         this.updateUss(home);
-        this.homePath = home;
+        this.ussPathExists = true;
       }
     });
     this.initializeRightClickProperties();
@@ -173,13 +172,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    /* TODO: Fetching updates for automatic refresh (disabled for now) */
-    // if (this.intervalId) {
-    //   clearInterval(this.intervalId);
-    // }
-    if (this.searchValueSubscription) {
-      this.searchValueSubscription.unsubscribe();
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
     }
+    this.searchInputValueSubscription.unsubscribe();
   }
 
   getDOMElement(): HTMLElement {
@@ -329,7 +325,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       this.rightClickPropertiesFolder.splice(this.rightClickPropertiesFolder.map(item => item.text).indexOf("Paste"),1);
       this.rightClickPropertiesPanel.splice(this.rightClickPropertiesPanel.map(item => item.text).indexOf("Paste"),1);
     }
-    this.log.debug(`cutfile for  ${this.fileToCopyOrCut}, ${this.rightClickedFile.path}, ${this.path}`);
+    this.log.debug(`cutfile for  ${this.fileToCopyOrCut}, ${rightClickedFile.path}, ${this.path}`);
     this.rightClickPropertiesFolder.push( // Create a paste option for the folder
       { text: "Paste", action:() => { 
         this.pasteFile(this.fileToCopyOrCut, this.rightClickedFile.path, true)
@@ -742,8 +738,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     if (this.showSearch) {
       this.focusSearchInput();
       this.dataCached = _.cloneDeep(this.data); // We want a deep clone so we can modify this.data w/o changing this.dataCached
-      if (this.searchCtrl.value) {
-        this.searchInputChanged(this.searchCtrl.value)
+      if (this.searchInputCtrl.value) {
+        this.searchInputChanged(this.searchInputCtrl.value)
       }
     } else {
       if (this.dataCached) {
@@ -754,8 +750,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   
   // TODO: There's an app2app opportunity here, where an app using the File Tree could spawn with a pre-filtered list of nodes
   focusSearchInput(attemptCount?: number): void {
-    if (this.searchUSS) {
-      this.searchUSS.nativeElement.focus();
+    if (this.searchInputUSS) {
+      this.searchInputUSS.nativeElement.focus();
       return;
     }
     const maxAttempts = 10;
@@ -834,6 +830,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       }
     }
     this.rightClickedEvent = $event;
+  }
+
+  onDragAndDrop($event: any) {
+    console.log('im here in the Drag Drop: BEFORE');
+    this.cutFile($event.dragData);
+    this.pasteFile($event.dragData, $event.dropData.path, true)
+    console.log('im here in the Drag Drop: AFTER');
   }
 
   onPathChanged($event: any): void {
@@ -1004,6 +1007,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     );
     this.refreshHistory(this.path);
   }
+
   private refreshHistory(path:string) {
     const sub = this.ussSearchHistory
                   .saveSearchHistory(path)
@@ -1012,10 +1016,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
                   });
   }
 
-  clearSearchHistory(): void {
-    this.ussSearchHistory.deleteSearchHistory().subscribe();
-    this.ussSearchHistory.onInit(SEARCH_ID);
-  }
 
   //Adds children to the existing node to update this.data array, 
   //fetch - fetches new data, expand - expands or not folder node after fetching new data
@@ -1207,6 +1207,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
 
   updateUss(path: string): void {
     this.displayTree(path, true);
+    this.ussPathExists = true;
   }
 
   createFile(pathAndName: string, node: any, update: boolean): void {
