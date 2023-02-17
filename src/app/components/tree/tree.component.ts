@@ -12,9 +12,11 @@
 declare var require:any;
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, ViewChild, AfterContentInit, OnDestroy} from '@angular/core';
 import { TreeNode } from 'primeng/primeng';
-import { TreeDragDropService } from 'primeng/api';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
+import { TreeDragDropService } from 'primeng/api';
+import { Tree } from 'primeng/tree';
+
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -51,6 +53,9 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
   constructor() {
     this.lastClickedNodeName = null;
+    Tree.prototype.allowDrop = (dragNode: any, dropNode: any, dragNodeScope: any): boolean => {
+      return this._overrideAllowDrop(dragNode, dropNode, dragNodeScope);
+    };
   }
 
 /**
@@ -103,9 +108,19 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
       console.log('cannot perform action');
     } else{
       console.log('event acepted');
-      _event.accept();
       console.log('after event acepted');
     }
+  }
+
+  _overrideAllowDrop(dragNode, dropNode, dragNodeScope): boolean {
+    if (dragNode && dropNode) {
+      if(dragNode.data == 'Folder' || dropNode.data != 'Folder') {
+        return false;
+      } else {
+          return true;
+      }
+    }
+    return false;
   }
 }
 
