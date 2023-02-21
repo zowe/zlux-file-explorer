@@ -30,7 +30,7 @@
     "@angular/platform-browser": "12.0.0",
     "@angular/router": "12.0.0",
     "carbon-components": "8.23.1",
-    "primeng": "6.1.7",
+    "primeng": "9.0.0",
     "lodash": "4.17.21"
   },
   "devDependencies": {
