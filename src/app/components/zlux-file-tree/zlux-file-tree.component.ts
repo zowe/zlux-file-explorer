@@ -20,7 +20,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ContextMenuModule, TreeModule, MenuModule, DialogModule } from 'primeng/primeng';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { TreeModule } from 'primeng/tree';
+import { DialogModule } from 'primeng/dialog';
+import { MenuModule } from 'primeng/menu';
 import { TreeComponent } from '../tree/tree.component';
 import { ZluxTabbingModule } from '@zlux/widgets';
 // import {FileContents} from '../../structures/filecontents';
