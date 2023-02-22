@@ -2,6 +2,7 @@
 
 ## 1.5.0
 * Enhancing the create dataset form to be prefilled with certain dataset attributes.
+* Feature: Add the Drag and Drop feature, to cut and paste USS files.
 
 ## 1.4.0
 * Bugfix: Make it so an MVS double click ("drill into") event correctly emits a path change
