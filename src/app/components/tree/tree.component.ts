@@ -11,10 +11,9 @@
 
 declare var require:any;
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, ViewChild, AfterContentInit, OnDestroy} from '@angular/core';
-import { TreeNode } from 'primeng/primeng';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
-import { TreeDragDropService } from 'primeng/api';
+import { TreeDragDropService, TreeNode } from 'primeng/api';
 import { Tree } from 'primeng/tree';
 
 /**
@@ -104,6 +103,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
 
   onDrop(_event?: any) { 
     this.dragAndDropEvent.emit({dragData: _event.dragNode, dropData: _event.dropNode});
+    _event.reject();
   }
 
   _overrideAllowDrop(dragNode, dropNode, dragNodeScope): boolean {

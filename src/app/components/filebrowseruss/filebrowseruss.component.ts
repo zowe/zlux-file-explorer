@@ -845,7 +845,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   }
 
   onDragAndDrop($event: any) {
-    this.cutFile($event.dragData);
+    this.rightClickedFile = $event.dropData;
     this.pasteFile($event.dragData, $event.dropData.path, true)
   }
 
