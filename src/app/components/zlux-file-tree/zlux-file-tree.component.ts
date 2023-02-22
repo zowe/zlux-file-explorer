@@ -470,8 +470,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   providers: [
     KeybindingService,
     UploaderService,
-    DownloaderService,
-    TreeDragDropService
+    DownloaderService
   ]
 })
 export class ZluxFileTreeModule { }
