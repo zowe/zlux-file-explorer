@@ -117,20 +117,37 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     let data = typeAndData.data;
     let isDataset = (data.data && data.data.datasetAttrs) ? true : false;
 
-    if (type =='properties') {
-      isDataset
-        ? this.mvsComponent.showPropertiesDialog(data)
-        : this.ussComponent.showPropertiesDialog(data);
-    } else if (type == 'delete') {
-      isDataset
-        ? this.mvsComponent.showDeleteDialog(data)
-        : this.ussComponent.showDeleteDialog(data);
-    } else if (type == 'createFolder' && !isDataset) {
-      this.ussComponent.showCreateFolderDialog(data);
-    } else if (type == 'requestUpload' && !isDataset) {
-      this.ussComponent.showUploadDialog(data);
-    } else if (type="createDataset") {
-      this.mvsComponent.createDatasetDialog(data);
+    switch(type){
+      case 'properties':
+        isDataset ? this.mvsComponent.showPropertiesDialog(data) : this.ussComponent.showPropertiesDialog(data);
+        break;
+      case 'delete':
+        isDataset ? this.mvsComponent.showDeleteDialog(data) : this.ussComponent.showDeleteDialog(data);
+        break;
+      case 'createFolder':
+        !isDataset && this.ussComponent.showCreateFolderDialog(data);
+        break;
+      case 'requestUpload':
+        !isDataset && this.ussComponent.showUploadDialog(data);
+        break;
+      case 'createDataset':
+        this.mvsComponent.createDatasetDialog(data);
+        break;
+      case 'changeOwners':
+        this.ussComponent.showOwnerDialog(data);
+        break;
+      case 'tagFile':
+        this.ussComponent.showTaggingDialog(data);
+        break;
+      case 'changePermissions':
+        this.ussComponent.showPermissionsDialog(data);
+        break;
+      case 'createFile':
+        this.ussComponent.showCreateFileDialog(data);
+        break;
+      default:
+        //invalid type
+        break;
     }
   }
 
