@@ -16,7 +16,7 @@ import {
   NgModule, Component,
   Input, Output, ViewChild, ViewEncapsulation,
   ElementRef, ChangeDetectorRef,
-  EventEmitter, OnInit, OnDestroy
+  EventEmitter, OnInit, OnDestroy, Inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -101,7 +101,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     private utils: UtilsService, 
     private elemRef: ElementRef,
     private cd: ChangeDetectorRef,
-    private appKeyboard: KeybindingService)
+    private appKeyboard: KeybindingService,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,)
   {
     //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
@@ -147,6 +148,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
         break;
       default:
         //invalid type
+        this.log.warn(`Unsuccessful in spawning modal for type: `, type);
         break;
     }
   }
