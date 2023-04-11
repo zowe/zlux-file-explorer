@@ -1219,7 +1219,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   }
 
   updateUss(path: string): void {
-    console.log('updateUss:', path);
     this.displayTree(path, true);
   }
 
@@ -1449,7 +1448,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
 
       this.displayTree(this.path, false);
     } else {
-      console.log('updateUss with path from levelUp()')
       this.updateUss(this.path);
     }
   }
