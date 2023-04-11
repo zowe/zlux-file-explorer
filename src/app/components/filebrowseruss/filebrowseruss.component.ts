@@ -93,6 +93,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   private rightClickPropertiesFile: ContextMenuItem[];
   private rightClickPropertiesFolder: ContextMenuItem[];
   private rightClickPropertiesPanel: ContextMenuItem[];
+  private processedLaunchMetadata = false;
 
   constructor(private elementRef: ElementRef, 
     private ussSrv: UssCrudService,
@@ -102,6 +103,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private downloadService:DownloaderService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+    @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
       /* TODO: Legacy, capabilities code (unused for now) */
@@ -151,9 +153,15 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       }),
     ).subscribe(home => {
       if(!this.homePath) {
-        this.path = home;
-        this.updateUss(home);
-        this.homePath = home;
+        if(this.launchMetadata && this.launchMetadata.data && this.launchMetadata.data.name){
+          this.path = this.launchMetadata.data.name;
+          this.updateUss(this.path);
+          this.homePath = home;
+        } else {
+          this.path = home;
+          this.updateUss(home);
+          this.homePath = home;
+        }
       }
     });
     this.initializeRightClickProperties();
@@ -886,7 +894,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     }
     this.selectedNode = null;
     this.isLoading = true;
-    let ussData = this.ussSrv.getFile(path); 
+    let ussData = this.ussSrv.getFile((path as any).home ? (path as any).home : path);
     ussData.subscribe(
     files => {
       files.entries.sort(this.sortFn);
@@ -972,7 +980,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
           this.showSearch = false;
         }
       }
-      this.path = path;
+      if(this.launchMetadata.data && this.launchMetadata.data.type === 'openDir' && !this.processedLaunchMetadata){
+        this.processedLaunchMetadata = true;
+        this.path = this.launchMetadata.data.name || (path as any).home ? (path as any).home : path; //this line is cursed
+      } else {
+        this.path = (path as any).home ? (path as any).home : path;
+      }
+      
       this.onPathChanged(this.path);
 
       // this.persistentDataService.getData()
@@ -1206,6 +1220,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   }
 
   updateUss(path: string): void {
+    console.log('updateUss:', path);
     this.displayTree(path, true);
   }
 
@@ -1434,8 +1449,10 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       this.log.debug("Going up to: " + parent);
 
       this.displayTree(this.path, false);
-    } else
+    } else {
+      console.log('updateUss with path from levelUp()')
       this.updateUss(this.path);
+    }
   }
 
   getPathFromPathAndName(pathAndName: string): string {
