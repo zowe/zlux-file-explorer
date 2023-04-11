@@ -156,12 +156,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
         if(this.launchMetadata && this.launchMetadata.data && this.launchMetadata.data.name){
           this.path = this.launchMetadata.data.name;
           this.updateUss(this.path);
-          this.homePath = home;
         } else {
           this.path = home;
           this.updateUss(home);
-          this.homePath = home;
         }
+        this.homePath = home;
       }
     });
     this.initializeRightClickProperties();
