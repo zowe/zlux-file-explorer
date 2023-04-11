@@ -2,6 +2,8 @@
 
 ## 1.5.0
 * Enhancing the create dataset form to be prefilled with certain dataset attributes.
+* Bugfix: Fix typo to create correctly spawning USS and MVS modals
+* Added the option to emit spawning Change Owners (USS), Tagging (USS), Change Permissions (USS), Create File (USS)
 
 ## 1.4.0
 * Bugfix: Make it so an MVS double click ("drill into") event correctly emits a path change
