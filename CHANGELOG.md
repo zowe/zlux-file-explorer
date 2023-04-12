@@ -1,5 +1,8 @@
 # ZLUX Angular File Tree
 
+## 1.6.0
+* Enhance tree display method to correctly work with app2app launch args
+
 ## 1.5.0
 * Enhancing the create dataset form to be prefilled with certain dataset attributes.
 * Bugfix: Fix typo to create correctly spawning USS and MVS modals
