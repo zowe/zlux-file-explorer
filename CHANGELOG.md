@@ -4,6 +4,7 @@
 * Enhance tree display method to correctly work with app2app launch args
 
 ## 1.5.0
+* Feature: Add the Drag and Drop feature, to cut and paste USS files.
 * Enhancing the create dataset form to be prefilled with certain dataset attributes.
 * Bugfix: Fix typo to create correctly spawning USS and MVS modals
 * Added the option to emit spawning Change Owners (USS), Tagging (USS), Change Permissions (USS), Create File (USS)

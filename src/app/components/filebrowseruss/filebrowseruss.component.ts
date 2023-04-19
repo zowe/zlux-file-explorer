@@ -850,6 +850,11 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     this.dataChanged.emit($event);
   }
 
+  onDragAndDrop($event: any) {
+    this.rightClickedFile = $event.dropData;
+    this.pasteFile($event.dragData, $event.dropData.path, true)
+  }
+
   sortFn(a: any, b: any) {
     if (a.directory !== b.directory) {
       if (a.directory === true) {
