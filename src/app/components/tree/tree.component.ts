@@ -107,7 +107,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
 
   _overrideAllowDrop(dragNode, dropNode, dragNodeScope): boolean {
     if (dragNode && dropNode) {
-      if(dragNode.data == 'Folder' || dropNode.data != 'Folder' || dragNode.parent.path === dropNode.path) {
+      if(dragNode.data == 'Folder' || dropNode.data != 'Folder' || (dragNode.parent && dragNode.parent.path === dropNode.path)) {
         return false;
       } else {
         return true;
