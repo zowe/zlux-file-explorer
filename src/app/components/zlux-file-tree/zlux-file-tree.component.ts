@@ -16,7 +16,7 @@ import {
   NgModule, Component,
   Input, Output, ViewChild, ViewEncapsulation,
   ElementRef, ChangeDetectorRef,
-  EventEmitter, OnInit, OnDestroy
+  EventEmitter, OnInit, OnDestroy, Inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -76,6 +76,7 @@ import { UtilsService } from '../../services/utils.service';
 import { KeyCode } from '../../services/keybinding.service';
 import { KeybindingService } from '../../services/keybinding.service';
 import { ɵAnimationGroupPlayer } from '@angular/animations';
+import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
 
 @Component({
   selector: 'zlux-file-tree',
@@ -105,7 +106,8 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     private utils: UtilsService, 
     private elemRef: ElementRef,
     private cd: ChangeDetectorRef,
-    private appKeyboard: KeybindingService)
+    private appKeyboard: KeybindingService,
+    @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,)
   {
     //this.componentClass = ComponentClass.FileBrowser;
     this.currentIndex = 0;
@@ -121,20 +123,38 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     let data = typeAndData.data;
     let isDataset = (data.data && data.data.datasetAttrs) ? true : false;
 
-    if (type =='properties') {
-      isDataset
-        ? this.mvsComponent.showPropertiesDialog(data)
-        : this.ussComponent.showPropertiesDialog(data);
-    } else if (type == 'delete') {
-      isDataset
-        ? this.mvsComponent.showDeleteDialog(data)
-        : this.ussComponent.showDeleteDialog(data);
-    } else if (type == 'createFolder' && !isDataset) {
-      this.ussComponent.showCreateFolderDialog(data);
-    } else if (type == 'requestUpload' && !isDataset) {
-      this.ussComponent.showUploadDialog(data);
-    } else if (type="createDataset") {
-      this.mvsComponent.createDatasetDialog(data);
+    switch(type){
+      case 'properties':
+        isDataset ? this.mvsComponent.showPropertiesDialog(data) : this.ussComponent.showPropertiesDialog(data);
+        break;
+      case 'delete':
+        isDataset ? this.mvsComponent.showDeleteDialog(data) : this.ussComponent.showDeleteDialog(data);
+        break;
+      case 'createFolder':
+        !isDataset && this.ussComponent.showCreateFolderDialog(data);
+        break;
+      case 'requestUpload':
+        !isDataset && this.ussComponent.showUploadDialog(data);
+        break;
+      case 'createDataset':
+        this.mvsComponent.createDatasetDialog(data);
+        break;
+      case 'changeOwners':
+        this.ussComponent.showOwnerDialog(data);
+        break;
+      case 'tagFile':
+        this.ussComponent.showTaggingDialog(data);
+        break;
+      case 'changePermissions':
+        this.ussComponent.showPermissionsDialog(data);
+        break;
+      case 'createFile':
+        this.ussComponent.showCreateFileDialog(data);
+        break;
+      default:
+        //invalid type
+        this.log.warn(`Unsuccessful in spawning modal for type: `, type);
+        break;
     }
   }
 

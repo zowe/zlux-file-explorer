@@ -38,14 +38,6 @@ export class UssCrudService {
     )
   }
 
-  getFile(path:string): Observable<any> {
-    let filePath:string = this.utils.filePathCheck(path);
-    let url:string = ZoweZLUX.uriBroker.unixFileUri('contents', filePath);
-    return this.http.get(url).pipe(
-      catchError(this.handleErrorObservable)
-    )
-  }
-
   getFileContents(path:string): Observable<any> {
     let filePath:string = this.utils.filePathCheck(path);
     let url:string = ZoweZLUX.uriBroker.unixFileUri('contents', filePath);

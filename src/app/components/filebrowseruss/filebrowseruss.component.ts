@@ -102,6 +102,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private downloadService:DownloaderService,
     @Inject(Angular2InjectionTokens.LOGGER) private log: ZLUX.ComponentLogger,
+    @Inject(Angular2InjectionTokens.LAUNCH_METADATA) private launchMetadata: any,
     @Inject(Angular2InjectionTokens.PLUGIN_DEFINITION) private pluginDefinition: ZLUX.ContainerPluginDefinition,
     @Optional() @Inject(Angular2InjectionTokens.WINDOW_ACTIONS) private windowActions: Angular2PluginWindowActions) {
       /* TODO: Legacy, capabilities code (unused for now) */
@@ -151,8 +152,13 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       }),
     ).subscribe(home => {
       if(!this.homePath) {
-        this.path = home;
-        this.updateUss(home);
+        if(this.launchMetadata && this.launchMetadata.data && this.launchMetadata.data.name){
+          this.path = this.launchMetadata.data.name;
+          this.updateUss(this.path);
+        } else {
+          this.path = home;
+          this.updateUss(home);
+        }
         this.homePath = home;
       }
     });
@@ -361,7 +367,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
         return;
       }else{
         this.isLoading = true;
-        let destinationMetadata = this.ussSrv.getFile(destinationPath);
+        let destinationMetadata = this.ussSrv.getFileContents(destinationPath);
         destinationMetadata.subscribe(result => {
           /*rename the file when doing paste, in case same named file exists in the destination.*/
           for (let i: number = 0; i < result.entries.length; i++) {
@@ -879,21 +885,22 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   //Displays the starting file structure of 'path'. When update == true, tree will be updated
   //instead of reset to 'path' (meaning currently opened children don't get wiped/closed)
   private displayTree(path: string, update: boolean): void {
+    //To reduce unintentional bugs by defaulting to root directory or dropping if caller sent an object we're not supposed to be using
     if (path === undefined || path === '') {
       path = this.root; 
-    }
-    if (path === '') {
-      this.snackBar.open("Please enter a valid path. For example: '/'", 
-              'Dismiss', quickSnackbarOptions);
-      this.data = [];
-      this.dataCached = [];
+    } else if (typeof path !== 'string') {
+      this.log.warn("The FT received a path object that wasn't a string so it couldn't continue, object=", path);
       return;
     }
+
     this.selectedNode = null;
     this.isLoading = true;
-    let ussData = this.ussSrv.getFile(path); 
+    let ussData = this.ussSrv.getFileContents(path);
     ussData.subscribe(
     files => {
+      if (files.entries == undefined) { // Reduces console errors and other bugs by accidentally providing a USS file as USS path
+        return;
+      }
       files.entries.sort(this.sortFn);
       this.onDataChanged(files.entries);
       const tempChildren: FileTreeNode[] = [];
@@ -978,6 +985,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
         }
       }
       this.path = path;
+      
       this.onPathChanged(this.path);
 
       // this.persistentDataService.getData()
@@ -1047,7 +1055,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
     {
       this.refreshFileMetadata(node);
       node.expanded = expand !== undefined ? expand : true;
-      let ussData = this.ussSrv.getFile(path);
+      let ussData = this.ussSrv.getFileContents(path);
       let tempChildren: FileTreeNode[] = [];
       ussData.subscribe(
         files => {
@@ -1439,8 +1447,9 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       this.log.debug("Going up to: " + parent);
 
       this.displayTree(this.path, false);
-    } else
+    } else {
       this.updateUss(this.path);
+    }
   }
 
   getPathFromPathAndName(pathAndName: string): string {
