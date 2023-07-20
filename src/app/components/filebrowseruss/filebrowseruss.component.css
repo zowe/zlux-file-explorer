@@ -49,10 +49,16 @@
   font-family: sans-serif;
   font-size: 15px;
   height: 35px;
-  background-color: #464646;
+  background-color: #313030;
   color: white;
   border: 0px;
   margin-top: -10px;
+}
+
+.filebrowseruss-search-bottom-input:focus {
+  outline: none; 
+  border: 1px solid rgb(161, 160, 160);
+  border-radius: 3px;
 }
 
 .filebrowseruss-dialog-menu{

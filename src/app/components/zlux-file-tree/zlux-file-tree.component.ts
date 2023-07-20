@@ -154,6 +154,22 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     }
   }
 
+  @Input() set toggleSearchInput(path: any) {
+    console.log("---Inside set func");
+    if (path) {
+      if( path.path.startsWith("/")) {
+        console.log("USS");
+        if(this.ussComponent) {
+          this.ussComponent.toggleSearch();
+        }
+      } else {
+        if(this.mvsComponent) {
+          this.mvsComponent.toggleSearch();
+        }
+      }
+    }
+  }
+
   @Input() selectPath: string;
   @Input() style: ZluxFileTreeStyle = {};
   @Input() headerStyle: ZluxFileTreeStyle = {};
