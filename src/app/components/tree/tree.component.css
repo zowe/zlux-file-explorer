@@ -32,7 +32,7 @@
 }
 
 .ui-tree .ui-tree-container {
-  padding: 15px !important;
+  padding: 15px 15px 9px 15px !important;
   font-size: medium !important;
   color: inherit !important; 
   overflow: auto !important;
