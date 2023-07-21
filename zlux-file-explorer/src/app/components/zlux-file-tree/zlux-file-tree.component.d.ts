@@ -1,0 +1,75 @@
+import { ElementRef, ChangeDetectorRef, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { UtilsService } from '../../services/utils.service';
+import { KeybindingService } from '../../services/keybinding.service';
+export declare class ZluxFileTreeComponent implements OnInit, OnDestroy {
+    private utils;
+    private elemRef;
+    private cd;
+    private appKeyboard;
+    private log;
+    private currentIndex;
+    private tabs;
+    private showUpArrow;
+    private keyBindingSub;
+    private ussComponent;
+    private mvsComponent;
+    fileExplorerGlobal: ElementRef<any>;
+    constructor(/*private persistentDataService: PersistentDataService,*/ utils: UtilsService, elemRef: ElementRef, cd: ChangeDetectorRef, appKeyboard: KeybindingService, log: ZLUX.ComponentLogger);
+    set spawnModal(typeAndData: any);
+    set toggleSearchInput(value: any);
+    selectPath: string;
+    style: ZluxFileTreeStyle;
+    headerStyle: ZluxFileTreeStyle;
+    inputStyle: ZluxFileTreeStyle;
+    searchStyle: ZluxFileTreeStyle;
+    treeStyle: ZluxFileTreeStyle;
+    theme: string;
+    fileOutput: EventEmitter<any>;
+    nodeClick: EventEmitter<any>;
+    nodeDblClick: EventEmitter<any>;
+    newFolderClick: EventEmitter<any>;
+    fileUploaded: EventEmitter<any>;
+    copyClick: EventEmitter<any>;
+    deleteClick: EventEmitter<any>;
+    ussRenameEvent: EventEmitter<any>;
+    datasetSelect: EventEmitter<any>;
+    ussSelect: EventEmitter<any>;
+    pathChanged: EventEmitter<any>;
+    dataChanged: EventEmitter<any>;
+    rightClick: EventEmitter<any>;
+    openInNewTab: EventEmitter<any>;
+    createDataset: EventEmitter<any>;
+    ngOnInit(): void;
+    ngOnDestroy(): void;
+    onCreateDataset($event: any): any;
+    deleteFileOrFolder(pathAndName: string): void;
+    createDirectory(pathAndName?: string): void;
+    getActiveDirectory(): string;
+    hideExplorers(): void;
+    toggleSearch(): void;
+    displayUpArrow(show: boolean): void;
+    onCopyClick($event: any): void;
+    onDeleteClick($event: any): void;
+    onUSSRenameEvent($event: any): void;
+    onNewFolderClick($event: any): void;
+    onFileUploaded($event: any): void;
+    onNodeClick($event: any): void;
+    onNodeDblClick($event: any): void;
+    onPathChanged($event: any): void;
+    onDataChanged($event: any): void;
+    onRightClick($event: any): void;
+    onOpenInNewTab($event: any): void;
+    provideZLUXDispatcherCallbacks(): ZLUX.ApplicationCallbacks;
+    setIndex(inputIndex: number): void;
+    showDatasets(): void;
+    showUss(): void;
+    spawnUploadModal(): void;
+    updateDirectory(dirName: string): void;
+    updateDSList(query: string): void;
+    refreshFileMetadatdaByPath(path: string): void;
+    zluxOnMessage(eventContext: any): Promise<void>;
+}
+export declare class ZluxFileTreeModule {
+}
+export interface ZluxFileTreeStyle {
+}
