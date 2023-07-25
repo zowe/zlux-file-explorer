@@ -34,7 +34,7 @@ Now, in your application's HTML template, given they are within the scope of you
 with an optional (style) input to specify the color, size, or other properties of the main tree container.
 
 
-## (Develop your app with local version of FT option 1) Linking
+## Develop your app with local version of FT - Option 1 Linking
 If you want to develop the File Tree and your own app simultaneously, you can do the following:
 
 ### Part I- How to link
@@ -73,14 +73,21 @@ node node_modules/node-sass/scripts/install.js
 npm rebuild node-sass
 ```
 
-## (Develop your app with local version of FT option 2) Local path
+## Develop your app with local version of FT - Option 2 Local path
 An alternative to option 1 is to use a local path.
 
 #### Add local path of built FT
-Change your package.json of your app to point to the local path of the built FT. For example in package.json,
+Change the package.json of your app to point to the local path of the built FT. For example in package.json,
 ```
 [...]
 "@zowe/zlux-angular-file-tree": "file://../../your-local-path/zlux-file-explorer",
+[...]
+```
+## Develop your app with local version of FT - Option 3 Git path
+Change the package.json of your app to point to the Git repo & branch. Your Git repo may also be your fork. For example in package.json,
+```
+[...]
+"@zowe/zlux-angular-file-tree": "git+https://github.com/zowe/zlux-file-explorer.git#<your-branch>",
 [...]
 ```
 
