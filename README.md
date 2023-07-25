@@ -77,14 +77,14 @@ npm rebuild node-sass
 An alternative to option 1 is to use a local path.
 
 #### Add local path of built FT
-Change your package.json of your app to point to the local path of the built FT. For example in package.json,
+Change the package.json of your app to point to the local path of the built FT. For example in package.json,
 ```
 [...]
 "@zowe/zlux-angular-file-tree": "file://../../your-local-path/zlux-file-explorer",
 [...]
 ```
 ## Develop your app with local version of FT - Option 3 Git path
-Change your package.json of your app to point to the Git repo & branch. Your Git repo may also be your fork. For example in package.json,
+Change the package.json of your app to point to the Git repo & branch. Your Git repo may also be your fork. For example in package.json,
 ```
 [...]
 "@zowe/zlux-angular-file-tree": "git+https://github.com/zowe/zlux-file-explorer.git#<your-branch>",
