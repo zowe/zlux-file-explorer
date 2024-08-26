@@ -22,6 +22,10 @@
   </p-tree> -->
   <p-tree
     class="fileexplorer-p-tree"
+    [draggableNodes]="true"
+    [droppableNodes]="true"
+    (onNodeDrop)="onDrop($event)"
+    [validateDrop]="true"
     [value]="treeData" 
     [id]="treeId"
     selectionMode="single"

@@ -11,9 +11,11 @@
 
 declare var require:any;
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, ViewChild, AfterContentInit, OnDestroy} from '@angular/core';
-import { TreeNode } from 'primeng/primeng';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
+import { TreeDragDropService, TreeNode } from 'primeng/api';
+import { Tree } from 'primeng/tree';
+
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -27,7 +29,7 @@ import { FileNode } from '../../structures/file-node';
   templateUrl: './tree.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./tree.component.css'],
-  providers: []
+  providers: [TreeDragDropService]
 })
 /**
  * [Input treeData supplies the tree structure]
@@ -44,12 +46,16 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   @Output() dblClickEvent = new EventEmitter<MouseEvent>();
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();
   @Output() panelRightClickEvent = new EventEmitter<MouseEvent>();
+  @Output() dragAndDropEvent = new EventEmitter();
   selectedNode: FileNode;
   lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
   lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
   @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
   constructor() {
     this.lastClickedNodeName = null;
+    Tree.prototype.allowDrop = (dragNode: any, dropNode: any, dragNodeScope: any): boolean => {
+      return this._overrideAllowDrop(dragNode, dropNode, dragNodeScope);
+    };
   }
 
 /**
@@ -93,6 +99,21 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
 
   ngOnDestroy() { // PrimeNG as of 6.0 has no native right click support for its tree
     this.fileExplorerTree.nativeElement.removeEventListener('contextmenu', this.panelRightClickSelect.bind(this));
+  }
+
+  onDrop(_event?: any) { 
+    this.dragAndDropEvent.emit({dragData: _event.dragNode, dropData: _event.dropNode});
+  }
+
+  _overrideAllowDrop(dragNode, dropNode, dragNodeScope): boolean {
+    if (dragNode && dropNode) {
+      if(dragNode.data == 'Folder' || dropNode.data != 'Folder' || (dragNode.parent && dragNode.parent.path === dropNode.path)) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
