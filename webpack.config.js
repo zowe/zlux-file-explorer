@@ -37,7 +37,7 @@ var config = {
         {
           loader: 'css-loader',
           options: {
-            sourceMap: true, // Set to false if you don't want source maps for CSS
+            sourceMap: false,
           },
         },
         'sass-loader',
