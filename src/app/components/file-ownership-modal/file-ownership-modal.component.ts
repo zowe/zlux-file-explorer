@@ -133,7 +133,7 @@ export class FileOwnershipModal {
     console.error(error.message || error);
     this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
             'Dismiss', defaultSnackbarOptions);
-    return throwError(() => new Error(error.message || 'Unknown error occurred'));
+    return throwError(() => new Error(error.message || error));
   }
 }
 
