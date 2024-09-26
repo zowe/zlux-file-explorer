@@ -22,8 +22,14 @@ var config = {
     path.resolve(__dirname, './src/plugin.ts')
   ],
   'output': {
-    'path': path.resolve(__dirname, '../web/v3'),
+    'path': path.resolve(__dirname, './web/v3'),
     'filename': 'main.js',
+  },
+  'resolve': {
+    'alias': {
+      pluginlib: path.resolve(process.env.MVD_DESKTOP_DIR, 'src/pluginlib/')
+    },
+    extensions: ['.ts', '.js']
   },
   'module': {
     'rules': [{
@@ -33,8 +39,6 @@ var config = {
     {
       test: /\.scss$/,
       use: [
-        // For development, inject styles into the DOM using 'style-loader'
-        // For production, consider using MiniCssExtractPlugin.loader for separate CSS files
         'style-loader', 
         {
           loader: 'css-loader',
@@ -42,7 +46,7 @@ var config = {
             sourceMap: true, // Set to false if you don't want source maps for CSS
           },
         },
-        'sass-loader', // Compiles Sass to CSS
+        'sass-loader',
       ],
     }
   ],
@@ -51,7 +55,7 @@ var config = {
     new CopyWebpackPlugin({patterns:[
       {
         from: path.resolve(__dirname, './src/assets'),
-        to: path.resolve(__dirname, '../web/v3/assets')
+        to: path.resolve(__dirname, './web/v3/assets')
       }
     ]})
   ]
