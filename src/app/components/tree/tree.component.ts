@@ -11,7 +11,7 @@
 
 declare var require:any;
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, ViewChild, AfterContentInit, OnDestroy} from '@angular/core';
-import { TreeNode } from 'primeng/primeng';
+import { TreeNode } from 'primeng/api';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
 /**

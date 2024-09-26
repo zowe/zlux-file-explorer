@@ -15,7 +15,7 @@ import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, Eve
 import { take, finalize, debounceTime } from 'rxjs/operators';
 import { ProjectStructure, DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from 'pluginlib/inject-resources';
-import { TreeNode } from 'primeng/primeng';
+import { TreeNode } from 'primeng/api';
 import { DownloaderService } from '../../services/downloader.service';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';

@@ -32,16 +32,18 @@ var config = {
     },
     {
       test: /\.scss$/,
-      'use': [
-        'exports-loader?module.exports.toString()',
+      use: [
+        // For development, inject styles into the DOM using 'style-loader'
+        // For production, consider using MiniCssExtractPlugin.loader for separate CSS files
+        'style-loader', 
         {
-          'loader': 'css-loader',
-          'options': {
-            'sourceMap': false
-          }
+          loader: 'css-loader',
+          options: {
+            sourceMap: true, // Set to false if you don't want source maps for CSS
+          },
         },
-        'sass-loader'
-      ]
+        'sass-loader', // Compiles Sass to CSS
+      ],
     }
   ],
   },
