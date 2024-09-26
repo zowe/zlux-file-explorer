@@ -35,9 +35,9 @@ var config = {
       use: [
         'style-loader', 
         {
-          loader: 'css-loader',
-          options: {
-            sourceMap: false,
+          'loader': 'css-loader',
+          'options': {
+            'sourceMap': false,
           },
         },
         'sass-loader',
