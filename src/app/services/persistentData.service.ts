@@ -14,7 +14,7 @@ import { TreeNode } from 'primeng/api';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens } from '../../../../zlux-app-manager/virtual-desktop/src/pluginlib/inject-resources';
 
 @Injectable()
 export class PersistentDataService {

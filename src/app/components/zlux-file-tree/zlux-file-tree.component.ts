@@ -75,7 +75,7 @@ import { UtilsService } from '../../services/utils.service';
 import { KeyCode } from '../../services/keybinding.service';
 import { KeybindingService } from '../../services/keybinding.service';
 import { ɵAnimationGroupPlayer } from '@angular/animations';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens } from '../../../../../zlux-app-manager/virtual-desktop/src/pluginlib/inject-resources';
 
 @Component({
   selector: 'zlux-file-tree',

@@ -8,7 +8,7 @@
 
 import { Inject, Injectable } from '@angular/core';
 import * as streamSaver from 'streamsaver'
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens } from '../../../../zlux-app-manager/virtual-desktop/src/pluginlib/inject-resources';
 import { WritableStream, ReadableStream, CountQueuingStrategy } from 'web-streams-polyfill'
 
 export enum ConfigVariables {

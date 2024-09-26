@@ -21,8 +21,6 @@
       "es2016",
       "dom"
     ],
-    "paths": {
-      "pluginlib/*": ["../zlux-app-manager/virtual-desktop/src/pluginlib/*"]
-    }
+    "paths": {}
   }
 }

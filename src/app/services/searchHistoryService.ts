@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Injectable, Inject } from '@angular/core';
-import { Angular2InjectionTokens } from 'pluginlib/inject-resources';
+import { Angular2InjectionTokens } from '../../../../zlux-app-manager/virtual-desktop/src/pluginlib/inject-resources';
 import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 

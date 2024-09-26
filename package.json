@@ -57,6 +57,7 @@
     "webpack": "~5.92.0",
     "webpack-cli": "~5.1.4",
     "webpack-config": "~7.5.0",
+    "@zlux/widgets": "git+https://github.com/zowe/zlux-widgets.git#feature/upgrade-angular",
     "web-streams-polyfill": "~4.0.0",
     "zone.js": "~0.14.4"
   }

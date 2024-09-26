@@ -25,12 +25,6 @@ var config = {
     'path': path.resolve(__dirname, './web/v3'),
     'filename': 'main.js',
   },
-  'resolve': {
-    'alias': {
-      pluginlib: path.resolve(process.env.MVD_DESKTOP_DIR, 'src/pluginlib/')
-    },
-    extensions: ['.ts', '.js']
-  },
   'module': {
     'rules': [{
       test: /\.svg$/,
