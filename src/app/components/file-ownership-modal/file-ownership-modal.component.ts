@@ -14,7 +14,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { defaultSnackbarOptions } from '../../shared/snackbar-options';
-import { finalize, catchError, map } from "rxjs/operators";
+import { finalize } from "rxjs/operators";
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'file-ownership-modal',
@@ -132,7 +133,7 @@ export class FileOwnershipModal {
     console.error(error.message || error);
     this.snackBar.open(error.status + " - A problem was encountered: " + error._body, 
             'Dismiss', defaultSnackbarOptions);
-    return Observable.throw(error.message || error);
+    return throwError(() => new Error(error.message || 'Unknown error occurred'));
   }
 }
 

@@ -487,19 +487,6 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     ReactiveFormsModule
   ],
   exports: [ZluxFileTreeComponent],
-  entryComponents: [
-    ZluxFileTreeComponent,
-    FilePermissionsModal,
-    FilePropertiesModal,
-    FileOwnershipModal,
-    FileTaggingModal,
-    DatasetPropertiesModal,
-    DeleteFileModal,
-    CreateFolderModal,
-    CreateFileModal,
-    UploadModal,
-    CreateDatasetModal
-  ],
   providers: [
     KeybindingService,
     UploaderService,
