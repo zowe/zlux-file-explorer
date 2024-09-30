@@ -26,7 +26,6 @@ import { MenuModule } from 'primeng/menu';
 import { DialogModule } from 'primeng/dialog';
 import { TreeComponent } from '../tree/tree.component';
 import { ZluxTabbingModule } from '@zlux/widgets';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {FileContents} from '../../structures/filecontents';
 import { tab } from '../../structures/tab';
 //import {ComponentClass} from '../../../../../../zlux-platform/interface/src/registry/classes';
@@ -463,7 +462,6 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     TreeComponent,
     CreateDatasetModal],
   imports: [
-    BrowserAnimationsModule, 
     CommonModule, 
     FormsModule, 
     TreeModule, 
