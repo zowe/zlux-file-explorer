@@ -31,7 +31,7 @@
       ]
     },
     "types": [
-      "../../zlux-platform/interface/src/index.d.ts"
+      "../zlux-platform/interface/src/index.d.ts"
     ]
   },
   "angularCompilerOptions": {

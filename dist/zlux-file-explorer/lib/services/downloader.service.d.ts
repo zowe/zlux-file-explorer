@@ -1,4 +1,4 @@
-/// <reference types="../../../../zlux-platform/interface/src/index.d.ts" />
+/// <reference types="../../../zlux-platform/interface/src/index.d.ts" />
 import * as i0 from "@angular/core";
 export declare enum ConfigVariables {
     ASCII = "819",
