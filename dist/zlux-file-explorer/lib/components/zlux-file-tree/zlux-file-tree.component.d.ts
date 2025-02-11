@@ -1,6 +1,8 @@
 /// <reference types="../../../zlux-platform/interface/src/index.d.ts" />
 import { ElementRef, ChangeDetectorRef, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { tab } from '../../structures/tab';
+import { FileBrowserMVSComponent } from '../filebrowsermvs/filebrowsermvs.component';
+import { FileBrowserUSSComponent } from '../filebrowseruss/filebrowseruss.component';
 import { UtilsService } from '../../services/utils.service';
 import { KeybindingService } from '../../services/keybinding.service';
 import * as i0 from "@angular/core";
@@ -14,8 +16,8 @@ export declare class ZluxFileTreeComponent implements OnInit, OnDestroy {
     tabs: Array<tab>;
     showUpArrow: boolean;
     private keyBindingSub;
-    private ussComponent;
-    private mvsComponent;
+    ussComponent: FileBrowserUSSComponent;
+    mvsComponent: FileBrowserMVSComponent;
     fileExplorerGlobal: ElementRef<any>;
     constructor(/*private persistentDataService: PersistentDataService,*/ utils: UtilsService, elemRef: ElementRef, cd: ChangeDetectorRef, appKeyboard: KeybindingService, log: ZLUX.ComponentLogger);
     set spawnModal(typeAndData: any);
