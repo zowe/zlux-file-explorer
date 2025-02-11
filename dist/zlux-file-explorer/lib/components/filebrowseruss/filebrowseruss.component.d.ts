@@ -12,7 +12,7 @@ import { SearchHistoryService } from '../../services/searchHistoryService';
 import * as i0 from "@angular/core";
 export declare class FileBrowserUSSComponent implements OnInit, OnDestroy {
     private elementRef;
-    private ussSrv;
+    ussSrv: UssCrudService;
     private utils;
     ussSearchHistory: SearchHistoryService;
     dialog: MatDialog;
