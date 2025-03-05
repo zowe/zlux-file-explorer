@@ -68,6 +68,13 @@ export class FilePropertiesModal implements OnInit {
       this.fileIcon = node.collapsedIcon;
     }
     this.fileCreatedAt = this.fileCreatedAt.replace('T', ' ');
+    console.log('------ this.fileName: ', this.fileName);
+    console.log('------ this.fileCreatedAt: ', this.fileCreatedAt);
+    console.log('------ this.filePath: ', this.filePath);
+    console.log('------ this.fileMode: ', this.fileMode);
+    console.log('------ this.fileOwner: ', this.fileOwner);
+    console.log('------ this.fileGroup: ', this.fileGroup);
+    console.log('------ this.fileIcon: ', this.fileIcon);
   }
 
   ngOnInit() {

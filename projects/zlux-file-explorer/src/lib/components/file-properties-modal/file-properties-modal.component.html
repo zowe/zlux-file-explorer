@@ -13,14 +13,21 @@ Copyright Contributors to the Zowe Project.
     <!-- FA Icon is determined by class name, so we hardcode the style here -->
     <div class="modal-icon-container">
       <i class="{{fileIcon}}" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 3px;"></i>
+      <i class="fa fa-folder" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 3px;"></i>
     </div>
     <div>
       <h2 mat-dialog-title class="modal-mat-header">{{fileName}} - Properties</h2>
+      <h2 mat-dialog-title>Properties</h2>
     </div>
     <div>
       <button mat-dialog-close class="close-dialog-btn"><i class="fa fa-close"></i></button>
     </div>
   </div>
+  <i class="{{fileIcon}}" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 3px;"></i>
+  <i class="fa fa-folder" style="font-size:24px; position: absolute; margin-top: 4px; margin-left: 3px;"></i>
+  <button mat-dialog-close class="close-dialog-btn"><i class="fa fa-close"></i></button>
+  <h2 mat-dialog-title class="modal-mat-header">{{fileName}} - Properties</h2>
+  <h2 mat-dialog-title class="modal-mat-header">Properties</h2>
 
   <!-- Possible future filter code -->
   <!-- <mat-form-field>
@@ -62,8 +69,11 @@ Copyright Contributors to the Zowe Project.
     </div>
     <div class="modal-column">
       <mat-list>
-        <mat-list-item>
+        <!-- <mat-list-item>
           <div class="selectable-text">{{fileCreatedAt}}</div>
+        </mat-list-item> -->
+        <mat-list-item>
+          <div class="selectable-text">Creation Date & Time</div>
         </mat-list-item>
         <mat-list-item>
           <div class="selectable-text">{{fileType}}</div>
