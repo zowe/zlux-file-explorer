@@ -36,6 +36,7 @@ export class FilePropertiesModal implements OnInit {
     @Inject(MAT_DIALOG_DATA) data,
   ) 
   {
+    console.log('---data.event: ', data.event);
     const node = data.event;
     this.fileName = node.name;
     this.fileCreatedAt = node.createdAt;
