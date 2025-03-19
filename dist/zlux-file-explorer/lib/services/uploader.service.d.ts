@@ -1,4 +1,4 @@
-/// <reference types="../../../../zlux-platform/interface/src/index.d.ts" />
+/// <reference types="../../../../zowe/zlux/zlux-platform/interface/src/index.d.ts" />
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';

@@ -1,4 +1,4 @@
-/// <reference types="../../../../zlux-platform/interface/src/index.d.ts" />
+/// <reference types="../../../../zowe/zlux/zlux-platform/interface/src/index.d.ts" />
 export interface FileTag {
     name: string;
     codeset: number;

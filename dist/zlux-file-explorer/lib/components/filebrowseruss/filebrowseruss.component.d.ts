@@ -1,4 +1,4 @@
-/// <reference types="../../../../zlux-platform/interface/src/index.d.ts" />
+/// <reference types="../../../../zowe/zlux/zlux-platform/interface/src/index.d.ts" />
 import { ElementRef, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Angular2PluginWindowActions } from '../../../pluginlib/inject-resources';
@@ -12,7 +12,7 @@ import { SearchHistoryService } from '../../services/searchHistoryService';
 import * as i0 from "@angular/core";
 export declare class FileBrowserUSSComponent implements OnInit, OnDestroy {
     private elementRef;
-    private ussSrv;
+    ussSrv: UssCrudService;
     private utils;
     ussSearchHistory: SearchHistoryService;
     dialog: MatDialog;
