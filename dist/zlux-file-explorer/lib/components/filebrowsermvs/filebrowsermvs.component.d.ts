@@ -1,4 +1,4 @@
-/// <reference types="../../../../zowe/zlux/zlux-platform/interface/src/index.d.ts" />
+/// <reference types="../../../zlux-platform/interface/src/index.d.ts" />
 import { ElementRef, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2PluginWindowActions } from '../../../pluginlib/inject-resources';

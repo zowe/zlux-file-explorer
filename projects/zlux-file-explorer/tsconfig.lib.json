@@ -10,7 +10,7 @@
     "paths": {    
     },
     "types": [
-      "../../../../zowe/zlux/zlux-platform/interface/src/index.d.ts"
+      "../../../zlux-platform/interface/src/index.d.ts"
     ]
   },
   "exclude": [

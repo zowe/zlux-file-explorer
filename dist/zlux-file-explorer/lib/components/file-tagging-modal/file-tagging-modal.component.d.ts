@@ -1,4 +1,4 @@
-/// <reference types="../../../../zowe/zlux/zlux-platform/interface/src/index.d.ts" />
+/// <reference types="../../../zlux-platform/interface/src/index.d.ts" />
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
