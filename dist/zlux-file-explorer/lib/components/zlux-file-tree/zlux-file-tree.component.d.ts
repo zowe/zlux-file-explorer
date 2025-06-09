@@ -1,4 +1,4 @@
-/// <reference types="../../../../zlux-platform/interface/src/index.d.ts" />
+/// <reference types="../../../zlux-platform/interface/src/index.d.ts" />
 import { ElementRef, ChangeDetectorRef, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { tab } from '../../structures/tab';
 import { UtilsService } from '../../services/utils.service';
