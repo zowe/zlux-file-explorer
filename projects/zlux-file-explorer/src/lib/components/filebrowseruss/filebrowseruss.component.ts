@@ -99,7 +99,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   private rightClickPropertiesPanel: ContextMenuItem[];
 
   constructor(private elementRef: ElementRef,
-    private ussSrv: UssCrudService,
+    public ussSrv: UssCrudService,
     private utils: UtilsService,
     public ussSearchHistory: SearchHistoryService,
     public dialog: MatDialog,

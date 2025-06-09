@@ -57,10 +57,10 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   private keyBindingSub: Subscription = new Subscription();
 
   @ViewChild(FileBrowserUSSComponent)
-  private ussComponent: FileBrowserUSSComponent;
+  public ussComponent: FileBrowserUSSComponent;
 
   @ViewChild(FileBrowserMVSComponent)
-  private mvsComponent: FileBrowserMVSComponent;
+  public mvsComponent: FileBrowserMVSComponent;
 
   @ViewChild('fileExplorerGlobal', { static: true })
   fileExplorerGlobal: ElementRef<any>;
