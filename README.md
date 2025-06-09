@@ -38,6 +38,7 @@ with an optional (style) input to specify the color, size, or other properties o
 If you want to develop the File Tree and your own app simultaneously, you can do the following:
 
 ### Part I- How to link
+
 #### Add npm symlink 
 Note: @zowe/zlux-angular-file-tree is package name in package.json
 ```
@@ -49,36 +50,34 @@ npm link
 cd my-app/webClient
 npm link @zowe/zlux-angular-file-tree
 ```
+
 ### Part II - Back to normal, how to delink
+
 #### Remove Dependency link
 ```
 cd my-app/webClient
 npm unlink
 ```
+
 #### Delete npm symlink
+
 ```
 cd zlux-file-explorer
 npm uninstall
-```
-### node-sass vendor folder not found
-If you experience this issue
-```
-node node_modules/node-sass/scripts/install.js
-npm rebuild node-sass
 ```
 
 ## Develop your app with local version of FT - Option 2 Local path
 An alternative to option 1 is to use a local path.
 
 #### Add local path of built FT
-Change your package.json of your app to point to the local path of the built FT. For example in package.json,
+Change the package.json of your app to point to the local path of the built FT. For example in package.json,
 ```
 [...]
 "@zowe/zlux-angular-file-tree": "file://../../your-local-path/zlux-file-explorer",
 [...]
 ```
 ## Develop your app with local version of FT - Option 3 Git path
-Change your package.json of your app to point to the Git repo & branch. Your Git repo may also be your fork. For example in package.json,
+Change the package.json of your app to point to the Git repo & branch. Your Git repo may also be your fork. For example in package.json,
 ```
 [...]
 "@zowe/zlux-angular-file-tree": "git+https://github.com/zowe/zlux-file-explorer.git#<your-branch>",
@@ -91,11 +90,15 @@ Change your package.json of your app to point to the Git repo & branch. Your Git
 2. Reinstall the app to update the package-lock.json too.
 3. Click on GitHub "Actions" tab at the top. Select "Build and Test Workflow".
 4. Click on "Run workflow" dropdown. Select desired branch and release text string i.e. "RC1" to build a FT npm release
+
 ## What version of Font Awesome does the FT use?
 It's a dependency not listed in package.json because it comes with PrimeNG. Our current version of PrimeNG is 6, therefore
 we are using FA v4 (https://fontawesome.com/v4/icons/)
+
 This program and the accompanying materials are
 made available under the terms of the Eclipse Public License v2.0 which accompanies
 this distribution, and is available at https://www.eclipse.org/legal/epl-v20.html
+
 SPDX-License-Identifier: EPL-2.0
+
 Copyright Contributors to the Zowe Project.
