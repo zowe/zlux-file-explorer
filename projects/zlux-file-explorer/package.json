@@ -9,7 +9,7 @@
     "@angular/forms": "~18.0.0"
   },
   "dependencies": {
-    "primeng": "^17.18.10",
+    "primeng": "17.18.10",
     "streamsaver": "^2.0.6",
     "web-streams-polyfill": "^4.0.0"
   },
