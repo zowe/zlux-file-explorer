@@ -37,7 +37,7 @@
     "rxjs": "~7.8.0",
     "streamsaver": "2.0.6",
     "tslib": "^2.3.0",
-    "web-streams-polyfill": "^4.0.0",
+    "web-streams-polyfill": "4.0.0",
     "zlux-widgets": "github:zowe/zlux-widgets#v3.x/master",
     "zone.js": "~0.14.3"
   },

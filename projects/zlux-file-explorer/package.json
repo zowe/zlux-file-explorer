@@ -11,7 +11,7 @@
   "dependencies": {
     "primeng": "17.18.10",
     "streamsaver": "2.0.6",
-    "web-streams-polyfill": "^4.0.0"
+    "web-streams-polyfill": "4.0.0"
   },
   "sideEffects": false
 }
