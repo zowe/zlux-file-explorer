@@ -9,9 +9,9 @@
     "inlineSources": true,
     "paths": {    
     },
-    "types": [
-      "../../../zlux-platform/interface/src/index.d.ts"
-    ]
+    // "types": [
+    //   "../../../zlux-platform/interface/src/index.d.ts"
+    // ]
   },
   "exclude": [
     "**/*.spec.ts"
