@@ -1,5 +1,5 @@
 import * as i0 from '@angular/core';
-import { Component, Inject, ViewChild, EventEmitter, ViewEncapsulation, Input, Output, Injectable, Optional, NgModule } from '@angular/core';
+import { ViewChild, Inject, Component, EventEmitter, Output, Input, ViewEncapsulation, Injectable, Optional, NgModule } from '@angular/core';
 import * as i1 from '@angular/material/dialog';
 import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 import * as i4 from '@angular/forms';
@@ -13,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import * as i6 from '@angular/material/select';
 import { MatSelectModule } from '@angular/material/select';
 import * as i9 from '@angular/material/core';
-import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
+import { ShowOnDirtyErrorStateMatcher, ErrorStateMatcher } from '@angular/material/core';
 import * as i3 from 'zlux-widgets';
 import { ZluxTabbingModule } from 'zlux-widgets';
 import * as i1$1 from '@angular/common/http';
