@@ -107,7 +107,7 @@ jobs:
         uses: zowe-actions/shared-actions/publish@main
         if: success()
         with:
-          artifacts: dist/zlux-file-explorer
+          artifacts: dist/zlux-file-explorer/**
           perform-release: ${{ github.event.inputs.PERFORM_RELEASE }}
           pre-release-string: ${{ github.event.inputs.PRE_RELEASE_STRING }}
 
