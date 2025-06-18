@@ -4,7 +4,6 @@ on:
     branches:
       - v2.x/staging
       - v3.x/staging
-      - new-v3-branch
   pull_request:
     types: [opened, synchronize]
   workflow_dispatch:
@@ -95,11 +94,6 @@ jobs:
         run: |
           export MVD_DESKTOP_DIR=zlux/zlux-app-manager/virtual-desktop
           npm run build
-
-      - name: 'Check dist exists'
-        run: |
-          echo "Checking dist folder..."
-          ls -R dist || echo "dist not found"
 
       # note: this step is not actually doing upload to artifactory because no artifact input is provided.
       # this is just to parse and create a PUBLISH_VERSION then export, later NPM publish step can use.
