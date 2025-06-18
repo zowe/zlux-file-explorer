@@ -4,6 +4,7 @@ on:
     branches:
       - v2.x/staging
       - v3.x/staging
+      - new-v3-branch
   pull_request:
     types: [opened, synchronize]
   workflow_dispatch:
