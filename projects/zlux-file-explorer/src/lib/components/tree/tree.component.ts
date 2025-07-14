@@ -63,13 +63,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
    */
   nodeSelect(_event?: any) {
     if (_event) {
-      if (this.lastClickedNodeName == null || this.lastClickedNodeName != (_event.node.name || _event.node.data.name)) {
-        this.lastClickedNodeName = _event.node.name || _event.node.data.name;
-        this.clickEvent.emit(_event);
-        setTimeout(() => (this.lastClickedNodeName = null), this.lastClickedNodeTimeout);
-      } else {
-        this.dblClickEvent.emit(_event);
-      }
+      this.clickEvent.emit(_event);
     }
   }
 
@@ -86,6 +80,11 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
       this.panelRightClickEvent.emit(_event);
     }
   }
+
+  onNodeDblClick(event: any) {
+    this.dblClickEvent.emit(event);
+  }
+
 
   ngAfterContentInit() { // PrimeNG as of 6.0 has no native right click support for its tree
     this.fileExplorerTree.nativeElement.addEventListener('contextmenu', this.panelRightClickSelect.bind(this));

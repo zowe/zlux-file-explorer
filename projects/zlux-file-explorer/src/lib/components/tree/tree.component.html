@@ -26,12 +26,19 @@
     [id]="treeId"
     selectionMode="single"
     [(selection)]="selectedNode"
-    (onNodeSelect)="nodeSelect($event)"
     (onNodeContextMenuSelect)="nodeRightClickSelect($event)"
     [ngStyle]="treeStyle"
     [contextMenu]="dummy"
     emptyMessage=""
   >
+    <ng-template let-node pTemplate="default">
+      <div 
+        (click)="nodeSelect({node: node})"
+        (dblclick)="onNodeDblClick({node: node})"
+        style="display: flex; align-items: center; cursor: pointer;">
+        {{ node.label }}
+      </div>
+    </ng-template>
   <!-- add [filter]="true" with latest prime version (new feature March 2019) -->
   </p-tree>
   <!-- To properly use Prime's right click, we need a dummy context menu -->
