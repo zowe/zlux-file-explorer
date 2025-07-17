@@ -26,15 +26,13 @@
     selectionMode="single"
     [(selection)]="selectedNode"
     (onNodeContextMenuSelect)="nodeRightClickSelect($event)"
+    (onNodeSelect)="nodeSelect($event)"
     [ngStyle]="treeStyle"
     [contextMenu]="dummy"
     emptyMessage=""
   >
     <ng-template let-node pTemplate="default">
-      <div 
-        (click)="nodeSelect({node: node})"
-        (dblclick)="onNodeDblClick({node: node})"
-      >
+      <div (dblclick)="onNodeDblClick({node: node})">
         <i
           class="pi"
           [ngClass]="{
