@@ -21,7 +21,6 @@
   >
   </p-tree> -->
   <p-tree
-    class="fileexplorer-p-tree"
     [value]="treeData" 
     [id]="treeId"
     selectionMode="single"
@@ -35,7 +34,15 @@
       <div 
         (click)="nodeSelect({node: node})"
         (dblclick)="onNodeDblClick({node: node})"
-        style="display: flex; align-items: center; cursor: pointer;">
+      >
+        <i
+          class="pi"
+          [ngClass]="{
+            'pi-folder': !node.expanded && node.children,
+            'pi-folder-open': node.expanded && node.children,
+            'pi-file': !node.children
+          }"
+        >
         {{ node.label }}
       </div>
     </ng-template>
