@@ -54,6 +54,7 @@
   height: 35px;
   background-color: #464646;
   cursor: pointer;
+  padding: 0;
 }
 
 .fileexplorer-tabs-text {
