@@ -2,7 +2,9 @@ name: Codescan Workflow
 on: 
   push:
     branches:
-      - master 
+      - master
+      - v2.x/staging
+      - v3.x/staging
   pull_request:
     types: [opened, synchronize]
 
@@ -14,7 +16,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
