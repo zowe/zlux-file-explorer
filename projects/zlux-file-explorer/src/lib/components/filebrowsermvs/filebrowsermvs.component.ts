@@ -544,8 +544,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
   onNodeClick($event: any): void {
     this.selectedNode = $event.node;
     if ($event.node.type == 'folder') {
-      $event.node.expanded = !$event.node.expanded; // Toggle open/close
-
+      $event.node.expanded = !$event.node.expanded;
       if (this.showSearch) { // Update search bar cached data
         let nodeCached = this.findNodeByPath(this.dataCached, $event.node.data.path)[0];
         if (nodeCached) {
@@ -561,19 +560,15 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
         .subscribe({
           next: attrs => {
             this.updateRecalledDatasetNode($event.node, attrs);
-
             if (this.showSearch) { // Update search bar cached data
               let nodeCached = this.findNodeByPath(this.dataCached, $event.node.data.path)[0];
               if (nodeCached) {
                 this.updateRecalledDatasetNode(nodeCached, attrs);
               }
             }
-
             this.nodeClick.emit($event.node);
           },
-          error: _err => {
-            this.snackBar.open(`Failed to recall dataset '${path}'`, 'Dismiss', defaultSnackbarOptions)
-          }
+          error: _err => this.snackBar.open(`Failed to recall dataset '${path}'`, 'Dismiss', defaultSnackbarOptions)
         });
       return;
     }
