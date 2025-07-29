@@ -542,22 +542,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
   }
 
   onNodeClick($event: any): void {
-    console.log('from single click: ', $event);
     this.selectedNode = $event.node;
     if ($event.node.type == 'folder') {
-      console.log('Inside event.node.type == folder');
-
-      if (!$event.node.children || $event.node.children.length === 0) {
-        console.log('checks');
-        this.getTreeForQueryAsync($event.node.data.path).then(res => {
-          console.log('res: ', res);
-          $event.node.children = res[0]?.children || [];
-          $event.node.expanded = true; // Open after loading
-        });
-      } else {
-        console.log('else of checks');
-        $event.node.expanded = !$event.node.expanded; // Toggle open/close
-      }
+      $event.node.expanded = !$event.node.expanded; // Toggle open/close
 
       if (this.showSearch) { // Update search bar cached data
         let nodeCached = this.findNodeByPath(this.dataCached, $event.node.data.path)[0];
@@ -567,14 +554,12 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
       }
     }
     if (this.utils.isDatasetMigrated($event.node.data.datasetAttrs)) {
-      console.log('Migrated datasets');
       const path = $event.node.data.path;
       const snackBarRef = this.snackBar.open(`Recalling dataset '${path}'`, undefined, { panelClass: 'center' });
       this.datasetService.recallDataset($event.node.data.path)
         .pipe(finalize(() => snackBarRef.dismiss()))
         .subscribe({
           next: attrs => {
-            console.log('$event.node, attrs', $event.node, attrs);
             this.updateRecalledDatasetNode($event.node, attrs);
 
             if (this.showSearch) { // Update search bar cached data
@@ -587,7 +572,6 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
             this.nodeClick.emit($event.node);
           },
           error: _err => {
-            console.log('Snackbar error: ', _err);
             this.snackBar.open(`Failed to recall dataset '${path}'`, 'Dismiss', defaultSnackbarOptions)
           }
         });
@@ -597,34 +581,17 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
   }
 
   onNodeDblClick($event: any): void {
-    console.log("---Node Double Clicked");
-    console.log('event: ', $event);
-
     this.selectedNode = $event.node;
-    this.path = $event.node.data.path;
-
-    console.log(this.selectedNode);
     if (this.selectedNode.data?.hasChildren && this.selectedNode.children?.length > 0) {
       this.path = $event.node.data.path;
       if (this.path) {
         this.getTreeForQueryAsync(this.path).then((res) => {
-          console.log('res: ', res);
           this.data = res[0].children;
           this.onPathChanged(this.path);
           this.refreshHistory(this.path);
         });
       } else {
         this.log.debug("A DS node double click event was received to open, but no path was found");
-      }
-
-      if ($event.node.type === 'folder' && this.path) {
-        console.log('checks dbl click');
-        this.getTreeForQueryAsync(this.path).then((res) => {
-          console.log('res dbl click: ', res);
-          this.data = res[0]?.children || [];
-          this.onPathChanged(this.path);
-          this.refreshHistory(this.path);
-        });
       }
     }
     this.nodeDblClick.emit($event.node);

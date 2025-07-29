@@ -46,10 +46,13 @@
 }
 
 .p-treenode-label.p-state-highlight {
-  background-color: #e0e0e0;
   border-radius: 4px !important;
   padding-left: 5px !important;
   padding-right: 5px !important;
+}
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+  background-color: #5d0f30;
 }
 
 .p-tree .p-treenode-label.p-state-highlight {

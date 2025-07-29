@@ -862,10 +862,7 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   // }
 
   onNodeClick($event: any): void {
-    console.log('---On node single click');
     this.path = this.path.replace(/\/$/, '');
-    console.log('---this.path', this.path);
-    console.log('---event', $event);
     this.selectedNode = $event.node;
     if ($event.node.data === 'Folder') {
       if (this.checkIfInDeletionQueueAndMessage($event.node.path, "Cannot open a directory queued for deletion.") == true) {
@@ -883,8 +880,6 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
   }
 
   onNodeDblClick($event: any): void {
-    console.log("---Node Double Clicked");
-    console.log('---event', $event);
     let updateTree = false; // A double click drills into a folder, so we make a fresh query instead of update
     this.displayTree($event.node.path, updateTree);
     this.nodeDblClick.emit($event.node);

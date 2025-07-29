@@ -64,46 +64,21 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   // If user clicks the same node before timer expires, treat it as a double-click & clear the timer. Else, handle the original select/unselect event.
 
   nodeSelect(_event?: any) {
-    console.log('tree-component: node select');
     if (_event) {
       if (this.clickTimer) {
-        this.onNodeDblClick(_event);
+        this.dblClickEvent.emit(_event);
+        clearTimeout(this.clickTimer);
+        this.clickTimer = null;
       } else {
         this.clickTimer = setTimeout(() => {
-          this.onNodeSingleClick(_event);
+          this.clickEvent.emit(_event);
           this.clickTimer = null;
         }, this.doubleClickTimer);
       }
     }
-  }
-
-  nodeUnSelect(_event?: any) {
-    if(_event) {
-      if (this.clickTimer) {
-        this.onNodeDblClick(_event);
-      } else {
-        this.clickTimer = setTimeout(() => {
-          console.log('node unselected---', this.clickTimer);
-          this.clickTimer = null;
-        }, this.doubleClickTimer);
-      }
-    }
-  }
-
-  onNodeSingleClick(_event: any) {
-    console.log('tree-component: single click');
-    this.clickEvent.emit(_event);
-  }
-
-  onNodeDblClick(_event: any) {
-    console.log('tree-component: double click');
-    this.dblClickEvent.emit(_event);
-    clearTimeout(this.clickTimer);
-    this.clickTimer = null;
   }
 
   nodeRightClickSelect(_event?: any) {
-    console.log('tree-component: right click');
     if (_event) {
       this.rightClickEvent.emit(_event);
       _event.originalEvent.stopPropagation();
