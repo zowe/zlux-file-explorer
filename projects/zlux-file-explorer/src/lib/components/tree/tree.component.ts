@@ -49,7 +49,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();
   @Output() panelRightClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
-  doubleClickTimer : number = 300; // Interval of 300ms or less between two clicks is considered a double-click here.
+  private readonly doubleClickThreshold  : number = 300; // Interval of 300ms or less between two clicks is considered a double-click here.
   clickTimer: any = null;
   @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
 
@@ -73,7 +73,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
         this.clickTimer = setTimeout(() => {
           this.clickEvent.emit(_event);
           this.clickTimer = null;
-        }, this.doubleClickTimer);
+        }, this.doubleClickThreshold );
       }
     }
   }
