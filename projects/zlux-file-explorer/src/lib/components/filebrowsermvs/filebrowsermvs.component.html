@@ -51,8 +51,13 @@ Copyright Contributors to the Zowe Project.
   </div>
   <!-- Main tree -->
   <div [hidden]="hideExplorer" style="height: 100%;">
-    <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)" (dblClickEvent)="onNodeDblClick($event)"
-      [style]="style" (rightClickEvent)="onNodeRightClick($event)" (panelRightClickEvent)="onPanelRightClick($event)"
+    <tree-root 
+      [treeData]="data" 
+      (clickEvent)="onNodeClick($event)" 
+      (dblClickEvent)="onNodeDblClick($event)"
+      [style]="style" 
+      (rightClickEvent)="onNodeRightClick($event)" 
+      (panelRightClickEvent)="onPanelRightClick($event)"
       (dataChanged)="onDataChanged($event)">
     </tree-root>
   </div>

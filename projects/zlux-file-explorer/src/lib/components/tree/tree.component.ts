@@ -49,26 +49,31 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   @Output() rightClickEvent = new EventEmitter<MouseEvent>();
   @Output() panelRightClickEvent = new EventEmitter<MouseEvent>();
   selectedNode: FileNode;
-  lastClickedNodeName: string; // PrimeNG as of 6.0 has no native double click support for its tree
-  lastClickedNodeTimeout: number = 500; // < 500 ms becomes a double click
+  private readonly doubleClickThreshold  : number = 300; // Interval of 300ms or less between two clicks is considered a double-click here.
+  clickTimer: any = null;
   @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
-  constructor() {
-    this.lastClickedNodeName = null;
-  }
 
   /**
    * [nodeSelect provides the child folder click event to the parent file/folder tree tab]
    * @param  _event [click event]
    * @return        [void]
    */
+
+  // PrimeNG as of 17.18.10 has no native double-click support for p-tress, so we detect it using time interval between two clicks.
+  // After each select or unselect event, start a timer.
+  // If user clicks the same node before timer expires, treat it as a double-click & clear the timer. Else, handle the original select/unselect event.
+
   nodeSelect(_event?: any) {
     if (_event) {
-      if (this.lastClickedNodeName == null || this.lastClickedNodeName != (_event.node.name || _event.node.data.name)) {
-        this.lastClickedNodeName = _event.node.name || _event.node.data.name;
-        this.clickEvent.emit(_event);
-        setTimeout(() => (this.lastClickedNodeName = null), this.lastClickedNodeTimeout);
-      } else {
+      if (this.clickTimer) {
         this.dblClickEvent.emit(_event);
+        clearTimeout(this.clickTimer);
+        this.clickTimer = null;
+      } else {
+        this.clickTimer = setTimeout(() => {
+          this.clickEvent.emit(_event);
+          this.clickTimer = null;
+        }, this.doubleClickThreshold );
       }
     }
   }

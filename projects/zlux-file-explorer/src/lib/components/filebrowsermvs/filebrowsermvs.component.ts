@@ -554,8 +554,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     }
     if (this.utils.isDatasetMigrated($event.node.data.datasetAttrs)) {
       const path = $event.node.data.path;
-      const snackBarRef = this.snackBar.open(`Recalling dataset '${path}'`,
-        undefined, { panelClass: 'center' });
+      const snackBarRef = this.snackBar.open(`Recalling dataset '${path}'`, undefined, { panelClass: 'center' });
       this.datasetService.recallDataset($event.node.data.path)
         .pipe(finalize(() => snackBarRef.dismiss()))
         .subscribe({
@@ -569,8 +568,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
             }
             this.nodeClick.emit($event.node);
           },
-          error: _err => this.snackBar.open(`Failed to recall dataset '${path}'`,
-            'Dismiss', defaultSnackbarOptions)
+          error: _err => this.snackBar.open(`Failed to recall dataset '${path}'`, 'Dismiss', defaultSnackbarOptions)
         });
       return;
     }

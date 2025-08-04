@@ -43,9 +43,15 @@ Copyright Contributors to the Zowe Project.
 
   <!-- Main tree -->
   <div [hidden]="hideExplorer" style="height: 100%;">
-    <tree-root [treeData]="data" (clickEvent)="onNodeClick($event)" (dblClickEvent)="onNodeDblClick($event)"
-      [ngStyle]="treeStyle" (rightClickEvent)="onNodeRightClick($event)"
-      (panelRightClickEvent)="onPanelRightClick($event)" (dataChanged)="onDataChanged($event)"></tree-root>
+    <tree-root 
+      [treeData]="data"
+      (clickEvent)="onNodeClick($event)"
+      (dblClickEvent)="onNodeDblClick($event)"
+      [ngStyle]="treeStyle"
+      (rightClickEvent)="onNodeRightClick($event)"
+      (panelRightClickEvent)="onPanelRightClick($event)"
+      (dataChanged)="onDataChanged($event)">
+    </tree-root>
   </div>
 
   @if (showSearch) {
