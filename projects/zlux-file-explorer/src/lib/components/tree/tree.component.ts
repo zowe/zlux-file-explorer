@@ -65,11 +65,14 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
 
   nodeSelect(_event?: any) {
     if (_event) {
+      console.log("Node select fro, FT---", _event);
       if (this.clickTimer) {
+        console.log('Dbl click---');
         this.dblClickEvent.emit(_event);
         clearTimeout(this.clickTimer);
         this.clickTimer = null;
       } else {
+        console.log('Single click---');
         this.clickTimer = setTimeout(() => {
           this.clickEvent.emit(_event);
           this.clickTimer = null;
