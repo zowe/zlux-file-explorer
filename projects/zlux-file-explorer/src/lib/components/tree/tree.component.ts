@@ -51,6 +51,7 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   selectedNode: FileNode;
   private readonly doubleClickThreshold  : number = 300; // Interval of 300ms or less between two clicks is considered a double-click here.
   clickTimer: any = null;
+  lastClickedNode: any = null;
   @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
 
   /**
@@ -64,21 +65,35 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   // If user clicks the same node before timer expires, treat it as a double-click & clear the timer. Else, handle the original select/unselect event.
 
   nodeSelect(_event?: any) {
-    if (_event) {
-      console.log("Node select fro, FT---", _event);
-      if (this.clickTimer) {
-        console.log('Dbl click---');
-        this.dblClickEvent.emit(_event);
-        clearTimeout(this.clickTimer);
-        this.clickTimer = null;
-      } else {
-        console.log('Single click---');
-        this.clickTimer = setTimeout(() => {
-          this.clickEvent.emit(_event);
-          this.clickTimer = null;
-        }, this.doubleClickThreshold );
-      }
+    if (!_event) {
+      return;
     }
+
+    const isDirectory = _event.node.directory;
+    if (!isDirectory) {
+      // File click is always treated as single click
+      this.clickEvent.emit(_event);
+      return;
+    }
+
+    if (this.clickTimer && this.lastClickedNode === _event.node) {
+      this.resetClickDetection();
+      this.dblClickEvent.emit(_event);
+    } else {
+      this.lastClickedNode = _event.node;
+      this.clickTimer = setTimeout(() => {
+        this.resetClickDetection();
+        this.clickEvent.emit(_event);
+      }, this.doubleClickThreshold );
+    }
+  }
+
+  resetClickDetection() {
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+    }
+    this.clickTimer = null;
+    this.lastClickedNode = null;
   }
 
   nodeRightClickSelect(_event?: any) {
