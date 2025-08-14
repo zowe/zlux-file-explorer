@@ -70,14 +70,18 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
     }
 
     const isDirectory = _event.node.directory;
-    if (!isDirectory) {
-      // File click is always treated as single click
-      this.clickEvent.emit(_event);
-      return;
-    }
+    // if (!isDirectory) {
+    //   // File click is always treated as single click
+    //   this.clickEvent.emit(_event);
+    //   return;
+    // }
 
     if (this.clickTimer && this.lastClickedNode === _event.node) {
       this.resetClickDetection();
+      if(!isDirectory) {
+        this.clickEvent.emit(_event);
+        return;
+      }
       this.dblClickEvent.emit(_event);
     } else {
       this.lastClickedNode = _event.node;
