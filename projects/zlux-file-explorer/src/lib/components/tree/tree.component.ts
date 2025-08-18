@@ -93,12 +93,12 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
         this.dblClickEvent.emit(_event);
       }
     } else {
-      this.registerSingleClick(node, _event);
+      this.registerSingleClick(_event);
     }
   }
 
-  registerSingleClick(node: any, _event: any): void {
-    this.lastClickedNode = node;
+  registerSingleClick(_event: any): void {
+    this.lastClickedNode = _event?.node;
     if (this.clickTimer) {
       clearTimeout(this.clickTimer);
     }
