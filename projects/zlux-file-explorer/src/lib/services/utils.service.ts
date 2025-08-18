@@ -11,6 +11,7 @@
 */
 
 import { Injectable } from '@angular/core';
+import { DatasetAttributes } from '../structures/editor-project';
 
 @Injectable()
 export class UtilsService {
@@ -28,6 +29,10 @@ export class UtilsService {
         return path + "/";
     }
     return path;
+  }
+
+  isDatasetMigrated(attrs: DatasetAttributes): boolean {
+    return attrs.volser === 'MIGRAT' || attrs.volser === 'ARCIVE';
   }
 
   isUnixDirectory(node?: any): boolean {
