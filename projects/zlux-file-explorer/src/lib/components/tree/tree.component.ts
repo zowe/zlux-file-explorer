@@ -69,8 +69,14 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
+    console.log('---Event: ', _event);
+
     const isDirectory = _event.node?.directory;
     const type = _event.node?.type;
+
+    if(isDirectory === undefined && type === undefined) {
+      return;
+    }
 
     if (this.clickTimer && this.lastClickedNode === _event.node) {
       this.resetClickDetection();
