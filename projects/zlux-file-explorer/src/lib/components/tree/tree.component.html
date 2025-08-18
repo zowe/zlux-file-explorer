@@ -17,7 +17,7 @@
     [(selection)]="selectedNode"
     (onNodeContextMenuSelect)="nodeRightClickSelect($event)"
     (onNodeSelect)="nodeSelect($event)"
-    [metaKeySelection]="false"
+    (onNodeUnselect)="nodeSelect($event)"
     [ngStyle]="treeStyle"
     [contextMenu]="dummy"
     emptyMessage=""

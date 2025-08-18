@@ -98,12 +98,6 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
     this.lastClickedNode = null;
   }
 
-  nodeUnselect(_event?: any) {
-    this.selectedNode = _event.node;
-    // Calling nodeSelect to detect a double click
-    this.nodeSelect(_event);
-  }
-
   nodeRightClickSelect(_event?: any) {
     if (_event) {
       this.rightClickEvent.emit(_event);
