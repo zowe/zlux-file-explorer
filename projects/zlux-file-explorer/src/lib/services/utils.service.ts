@@ -11,7 +11,6 @@
 */
 
 import { Injectable } from '@angular/core';
-import { DatasetAttributes } from '../structures/editor-project';
 
 @Injectable()
 export class UtilsService {
@@ -23,6 +22,7 @@ export class UtilsService {
     }
     return path;
   }
+
   filePathEndCheck(path:string):string{
     if (path.slice(-1) !== '/') {
         return path + "/";
@@ -30,10 +30,22 @@ export class UtilsService {
     return path;
   }
 
-  isDatasetMigrated(attrs: DatasetAttributes): boolean {
-    return attrs.volser === 'MIGRAT' || attrs.volser === 'ARCIVE';
+  isUnixDirectory(node?: any): boolean {
+    return node?.data === "Folder" && node?.directory;
   }
 
+  isUnixFile(node?: any): boolean {
+    return node?.data === 'File' && !node?.directory;
+  }
+
+  isPDSDataset(node?: any): boolean {
+    return node?.data?.isDataset && node?.type === 'folder';
+  }
+
+  // Includes both, the sequential dataset and the dataset member 
+  isDatasetFile(node?: any): boolean {
+    return node?.data?.isDataset && node?.type==='file';
+  }
 }
 
 /*

@@ -14,6 +14,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, 
 import { TreeNode } from 'primeng/api';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
+import { UtilsService } from '../../services/utils.service';
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -54,6 +55,8 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   lastClickedNode: any = null;
   @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
 
+  constructor(private utils: UtilsService,){}
+
   /**
    * [nodeSelect provides the child folder click event to the parent file/folder tree tab]
    * @param  _event [click event]
@@ -69,31 +72,50 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    console.log('---Event: ', _event);
+    const node = _event.node;
 
-    const isDirectory = _event.node?.directory;
-    const type = _event.node?.type;
+    const isUnixDirectory = this.utils.isUnixDirectory(node);
+    const isUnixFile = this.utils.isUnixFile(node);
+    const isPDSFolder = this.utils.isPDSDataset(node);
+    const isDatasetFile = this.utils.isDatasetFile(node);
 
-    if(isDirectory === undefined && type === undefined) {
+    console.log('isUnixDirectory', isUnixDirectory);
+    console.log('isUnixFile', isUnixFile);
+    console.log('isPDSFolder', isPDSFolder);
+    console.log('isDatasetFile', isDatasetFile);
+
+    if (!isUnixDirectory && !isUnixFile && !isPDSFolder && !isDatasetFile) {
       return;
     }
 
-    if (this.clickTimer && this.lastClickedNode === _event.node) {
+    if (this.isDoubleClick(node)) {
       this.resetClickDetection();
 
       // Indicates a file, dataset member, or sequential dataset where double-click has no additional effect
-      if((!type && !isDirectory) || (type === 'file') ) {
+      if( isUnixFile || isDatasetFile ) {
         this.clickEvent.emit(_event);
-        return;
+      } else {
+        this.dblClickEvent.emit(_event);
       }
-      this.dblClickEvent.emit(_event);
     } else {
-      this.lastClickedNode = _event.node;
-      this.clickTimer = setTimeout(() => {
-        this.resetClickDetection();
-        this.clickEvent.emit(_event);
-      }, this.doubleClickThreshold );
+      this.registerSingleClick(node, _event);
     }
+  }
+
+  registerSingleClick(node: any, _event: any): void {
+    this.lastClickedNode = node;
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+    }
+
+    this.clickTimer = setTimeout(() => {
+      this.resetClickDetection();
+      this.clickEvent.emit(_event);
+    }, this.doubleClickThreshold);
+  }
+
+  isDoubleClick(node: any): boolean {
+    return this.clickTimer && this.lastClickedNode === node;
   }
 
   resetClickDetection() {
