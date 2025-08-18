@@ -79,11 +79,6 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
     const isPDSFolder = this.utils.isPDSDataset(node);
     const isDatasetFile = this.utils.isDatasetFile(node);
 
-    console.log('isUnixDirectory', isUnixDirectory);
-    console.log('isUnixFile', isUnixFile);
-    console.log('isPDSFolder', isPDSFolder);
-    console.log('isDatasetFile', isDatasetFile);
-
     if (!isUnixDirectory && !isUnixFile && !isPDSFolder && !isDatasetFile) {
       return;
     }
