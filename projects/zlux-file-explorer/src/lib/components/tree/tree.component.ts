@@ -69,16 +69,14 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
       return;
     }
 
-    const isDirectory = _event.node.directory;
-    // if (!isDirectory) {
-    //   // File click is always treated as single click
-    //   this.clickEvent.emit(_event);
-    //   return;
-    // }
+    const isDirectory = _event.node?.directory;
+    const type = _event.node?.type;
 
     if (this.clickTimer && this.lastClickedNode === _event.node) {
       this.resetClickDetection();
-      if(!isDirectory) {
+
+      // Indicates a file, dataset member, or sequential dataset where double-click has no additional effect
+      if((!type && !isDirectory) || (type === 'file') ) {
         this.clickEvent.emit(_event);
         return;
       }
@@ -98,6 +96,12 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
     }
     this.clickTimer = null;
     this.lastClickedNode = null;
+  }
+
+  nodeUnselect(_event?: any) {
+    this.selectedNode = _event.node;
+    // Calling nodeSelect to detect a double click
+    this.nodeSelect(_event);
   }
 
   nodeRightClickSelect(_event?: any) {
