@@ -53,6 +53,9 @@
 
 .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
   background-color: #e0e0e0;
+  color: black;
+  border-radius: 5px;
+  padding: 0 2px;
 }
 
 .p-tree .p-treenode-label.p-state-highlight {

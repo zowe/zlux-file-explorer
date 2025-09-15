@@ -14,6 +14,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation, ElementRef, 
 import { TreeNode } from 'primeng/api';
 import { FileTreeNode } from '../../structures/child-event';
 import { FileNode } from '../../structures/file-node';
+import { UtilsService } from '../../services/utils.service';
 /**
  * [The tree component serves collapse/expansion of file/datasets]
  * @param  selector     [tree-root]
@@ -51,7 +52,10 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   selectedNode: FileNode;
   private readonly doubleClickThreshold  : number = 300; // Interval of 300ms or less between two clicks is considered a double-click here.
   clickTimer: any = null;
+  lastClickedNode: any = null;
   @ViewChild('fileExplorerPTree', { static: true }) fileExplorerTree: ElementRef;
+
+  constructor(private utils: UtilsService,){}
 
   /**
    * [nodeSelect provides the child folder click event to the parent file/folder tree tab]
@@ -64,18 +68,57 @@ export class TreeComponent implements AfterContentInit, OnDestroy {
   // If user clicks the same node before timer expires, treat it as a double-click & clear the timer. Else, handle the original select/unselect event.
 
   nodeSelect(_event?: any) {
-    if (_event) {
-      if (this.clickTimer) {
-        this.dblClickEvent.emit(_event);
-        clearTimeout(this.clickTimer);
-        this.clickTimer = null;
-      } else {
-        this.clickTimer = setTimeout(() => {
-          this.clickEvent.emit(_event);
-          this.clickTimer = null;
-        }, this.doubleClickThreshold );
-      }
+    if (!_event) {
+      return;
     }
+
+    const node = _event.node;
+
+    const isUnixDirectory = this.utils.isUnixDirectory(node);
+    const isUnixFile = this.utils.isUnixFile(node);
+    const isPDSFolder = this.utils.isPDSDataset(node);
+    const isDatasetFile = this.utils.isDatasetFile(node);
+
+    if (!isUnixDirectory && !isUnixFile && !isPDSFolder && !isDatasetFile) {
+      return;
+    }
+
+    if (this.isDoubleClick(node)) {
+      this.resetClickDetection();
+
+      // Indicates a file, dataset member, or sequential dataset where double-click has no additional effect
+      if( isUnixFile || isDatasetFile ) {
+        this.clickEvent.emit(_event);
+      } else {
+        this.dblClickEvent.emit(_event);
+      }
+    } else {
+      this.registerSingleClick(_event);
+    }
+  }
+
+  registerSingleClick(_event: any): void {
+    this.lastClickedNode = _event?.node;
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+    }
+
+    this.clickTimer = setTimeout(() => {
+      this.resetClickDetection();
+      this.clickEvent.emit(_event);
+    }, this.doubleClickThreshold);
+  }
+
+  isDoubleClick(node: any): boolean {
+    return this.clickTimer && this.lastClickedNode === node;
+  }
+
+  resetClickDetection() {
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+    }
+    this.clickTimer = null;
+    this.lastClickedNode = null;
   }
 
   nodeRightClickSelect(_event?: any) {
