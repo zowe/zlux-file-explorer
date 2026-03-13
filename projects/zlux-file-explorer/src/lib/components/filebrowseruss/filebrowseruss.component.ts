@@ -156,7 +156,8 @@ export class FileBrowserUSSComponent implements OnInit, OnDestroy {
       }),
     ).subscribe(home => {
       if (!this.homePath) {
-        if (this.launchMetadata && this.launchMetadata.data && this.launchMetadata.data.name) {
+        if (this.launchMetadata && this.launchMetadata.data && this.launchMetadata.data.name
+            && this.launchMetadata.data.name.startsWith('/')) {
           this.path = this.launchMetadata.data.name;
           this.updateUss(this.path);
         } else {
