@@ -136,6 +136,17 @@ export class DatasetCrudService {
         map((res:any) => res)
       );
   }
+
+  createMember(datasetName: string, memberName: string): Observable<any> {
+    const normalizedDatasetName = datasetName.trim().toUpperCase();
+    const normalizedMemberName = memberName.trim().toUpperCase();
+    const memberPath = `${normalizedDatasetName}(${normalizedMemberName})`;
+    const contentsURI = ZoweZLUX.uriBroker.datasetContentsUri(memberPath);
+    return this.http.put(contentsURI, { records: [] })
+      .pipe(
+        catchError(error => throwError(error))
+      );
+  }
 }
 
 /*

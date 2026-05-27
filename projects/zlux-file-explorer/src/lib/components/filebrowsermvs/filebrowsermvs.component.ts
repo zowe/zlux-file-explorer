@@ -31,6 +31,7 @@ import { SearchHistoryService } from '../../services/searchHistoryService';
 import { UtilsService } from '../../services/utils.service';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
 import { CreateDatasetModal } from '../create-dataset-modal/create-dataset-modal.component';
+import { CreateMemberModal } from '../create-member-modal/create-member-modal.component';
 import { TreeNode } from 'primeng/api';
 /* TODO: re-implement to add fetching of previously opened tree view data
 import { PersistentDataService } from '../../services/persistentData.service'; */
@@ -248,6 +249,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
         }
       },
       {
+        text: "Create Member", action: () => {
+          this.showCreateMemberDialog(this.rightClickedFile);
+        }
+      },
+      {
         text: "Properties", action: () => {
           this.showPropertiesDialog(this.rightClickedFile);
         }
@@ -287,6 +293,79 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
         this.deleteNonVsamDataset(rightClickedFile);
       }
     });
+  }
+
+  showCreateMemberDialog(rightClickedFile: any) {
+    const datasetName = rightClickedFile?.data?.path;
+    if (!datasetName) {
+      this.snackBar.open('Unable to determine dataset path for member creation.',
+        'Dismiss', defaultSnackbarOptions);
+      return;
+    }
+
+    if (!this.isPartitionedDataset(rightClickedFile)) {
+      this.snackBar.open(`Cannot create member in non-partitioned dataset '${datasetName}'.`,
+        'Dismiss', defaultSnackbarOptions);
+      return;
+    }
+
+    if (this.checkIfInDeletionQueueAndMessage(datasetName,
+      'Cannot create a member inside a dataset queued for deletion.') == true) {
+      return;
+    }
+
+    const createMemberConfig = new MatDialogConfig();
+    createMemberConfig.data = {
+      datasetName,
+      width: '600px'
+    };
+
+    let createMemberRef: MatDialogRef<CreateMemberModal> = this.dialog.open(CreateMemberModal, createMemberConfig);
+    createMemberRef.componentInstance.onCreate.subscribe(onCreateResponse => {
+      const memberName = onCreateResponse.get('memberName');
+      const selectedDatasetName = onCreateResponse.get('datasetName');
+      this.datasetService.createMember(selectedDatasetName, memberName)
+        .pipe(take(1))
+        .subscribe({
+          next: _resp => {
+            this.snackBar.open(`Member '${memberName}' created successfully in '${selectedDatasetName}'.`,
+              'Dismiss', quickSnackbarOptions);
+            this.updateTreeView(this.path);
+          },
+          error: error => {
+            const errorMessage = error?.error?.msg || error?.error || `Status ${error?.status ?? 'unknown'}`;
+            this.snackBar.open(`Failed to create member '${memberName}': ${errorMessage}`,
+              'Dismiss', longSnackbarOptions);
+          }
+        });
+    });
+  }
+
+  private isPartitionedDataset(node: any): boolean {
+    // A node with type 'folder' in the MVS tree is always a partitioned dataset
+    if (node?.type === 'folder') {
+      return true;
+    }
+
+    const dsorg = node?.data?.datasetAttrs?.dsorg;
+    if (!dsorg) {
+      return false;
+    }
+
+    const organization = dsorg.organization;
+    if (typeof organization === 'string') {
+      const upper = organization.toUpperCase();
+      // Server returns 'partitioned' or formatted as 'PO'/'PO-E'
+      if (upper === 'PARTITIONED' || upper.startsWith('PO')) {
+        return true;
+      }
+    }
+
+    if (dsorg.isPDSDir || dsorg.isPDSE) {
+      return true;
+    }
+
+    return false;
   }
 
   deleteNonVsamDataset(rightClickedFile: any): void {
@@ -599,7 +678,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
       rightClickProperties = this.rightClickPropertiesDatasetFile;
     }
     else {
-      rightClickProperties = this.rightClickPropertiesDatasetFolder;
+      rightClickProperties = this.rightClickPropertiesDatasetFolder.filter(item => {
+        return item.text !== 'Create Member' || this.isPartitionedDataset(node);
+      });
     }
     if (this.windowActions) {
       let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
