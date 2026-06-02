@@ -96,13 +96,13 @@
 
 .filebrowser-icon {
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   padding: 2px;
   line-height: 1;
 }
 
 .special-utility {
-  margin-left: 9px;
+  margin-left: 0;
 }
 
 
