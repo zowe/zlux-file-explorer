@@ -37,6 +37,9 @@ Copyright Contributors to the Zowe Project.
     <div class="fa fa-folder-o filebrowser-icon" title="Create New Folder"
       (click)="showCreateFolderDialog(!selectedNode || (!selectedNode.parent && !selectedNode.directory) ? { 'path' : path } : selectedNode.directory ? selectedNode : selectedNode.parent);">
     </div>
+    <div class="fa fa-file-o filebrowser-icon" title="Create New File"
+      (click)="showCreateFileDialog(!selectedNode || (!selectedNode.parent && !selectedNode.directory) ? { 'path' : path } : selectedNode.directory ? selectedNode : selectedNode.parent);">
+    </div>
     <div class="fa fa-eraser filebrowser-icon special-utility" title="Clear Search History"
       (click)="clearSearchHistory();"></div>
   </div>
