@@ -64,6 +64,12 @@
 .file-tree-utilities {
   overflow: hidden;
   border: 1px solid #464646;
+  padding: 4px 6px;
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }
 
 .filebrowsermvs-loading-icon {
@@ -73,9 +79,10 @@
 }
 
 .filebrowser-icon {
-  margin-right: 9px;
-  float: right;
   cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  line-height: 1;
 }
 
 .special-utility {
