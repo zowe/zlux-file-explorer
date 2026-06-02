@@ -28,7 +28,7 @@ Copyright Contributors to the Zowe Project.
   <div class="fileexplorer-browser-module" [ngStyle]="style">
     <file-browser-uss #ussComponent [hidden]="currentIndex != 0" (nodeClick)="onNodeClick($event)"
       (nodeDblClick)="onNodeDblClick($event)" (openInNewTab)="onOpenInNewTab($event)"
-      (newFolderClick)="onNewFolderClick($event)" (fileUploaded)="onFileUploaded($event)"
+      (newFileClick)="onNewFileClick($event)" (newFolderClick)="onNewFolderClick($event)" (fileUploaded)="onFileUploaded($event)"
       (deleteClick)="onDeleteClick($event)" (ussRenameEvent)="onUSSRenameEvent($event)"
       (copyClick)="onCopyClick($event)" (rightClick)="onRightClick($event)" (pathChanged)="onPathChanged($event)"
       (dataChanged)="onDataChanged($event)" [style]="style" [inputStyle]="inputStyle" [treeStyle]="treeStyle"

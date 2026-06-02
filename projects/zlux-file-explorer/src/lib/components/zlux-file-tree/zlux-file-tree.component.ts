@@ -147,7 +147,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
-  // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -291,9 +291,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     this.ussRenameEvent.emit($event);
   }
 
-  // onNewFileClick($event:any){
-  //   this.newFileClick.emit($event);
-  // }
+  onNewFileClick($event:any){
+    this.newFileClick.emit($event);
+  }
 
   onNewFolderClick($event: any) {
     this.newFolderClick.emit($event);
