@@ -86,12 +86,18 @@
 .file-tree-utilities {
   overflow: hidden;
   border: 1px solid #464646;
+  padding: 6px 4px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .filebrowser-icon {
   margin-right: 9px;
-  float: right;
   cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
 }
 
 .special-utility {
