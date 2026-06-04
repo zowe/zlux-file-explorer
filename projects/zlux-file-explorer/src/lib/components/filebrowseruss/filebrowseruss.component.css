@@ -99,6 +99,11 @@
   font-size: 15px;
   padding: 2px;
   line-height: 1;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .special-utility {
