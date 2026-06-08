@@ -68,8 +68,8 @@
   min-height: 26px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  justify-content: flex-end;
+  gap: 5px;
 }
 
 .filebrowsermvs-loading-icon {
