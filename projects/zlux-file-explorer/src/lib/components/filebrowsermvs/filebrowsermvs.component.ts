@@ -315,9 +315,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     }
 
     const createMemberConfig = new MatDialogConfig();
+    createMemberConfig.width = '600px';
     createMemberConfig.data = {
-      datasetName,
-      width: '600px'
+      datasetName
     };
 
     let createMemberRef: MatDialogRef<CreateMemberModal> = this.dialog.open(CreateMemberModal, createMemberConfig);
@@ -328,6 +328,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .subscribe({
           next: _resp => {
+            createMemberRef.close();
             this.snackBar.open(`Member '${memberName}' created successfully in '${selectedDatasetName}'.`,
               'Dismiss', quickSnackbarOptions);
             this.updateTreeView(this.path);

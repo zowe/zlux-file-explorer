@@ -27,7 +27,7 @@ export class DatasetCrudService {
 
   private handleErrorObservable (error: Response | any) {
     console.error(error.message || error);
-    return throwError(error.message || error);
+    return throwError(() => error.message || error);
   }
   
   //addfolder
@@ -123,7 +123,7 @@ export class DatasetCrudService {
           // ensure that dataset is recalled, otherwise throw an error
           datasetAttrs =>
             this.utils.isDatasetMigrated(datasetAttrs) ?
-              throwError(new Error('Unable to recall dataset')) : of(datasetAttrs)
+              throwError(() => new Error('Unable to recall dataset')) : of(datasetAttrs)
         )
       );
   }
@@ -132,7 +132,7 @@ export class DatasetCrudService {
     const contentsURI = ZoweZLUX.uriBroker.datasetContentsUri(name);
     return this.http.put(contentsURI, datasetAttributes)
       .pipe(
-        catchError(error => throwError(error)),
+        catchError(error => throwError(() => error)),
         map((res:any) => res)
       );
   }
@@ -144,7 +144,7 @@ export class DatasetCrudService {
     const contentsURI = ZoweZLUX.uriBroker.datasetContentsUri(memberPath);
     return this.http.put(contentsURI, { records: [] })
       .pipe(
-        catchError(error => throwError(error))
+        catchError(error => throwError(() => error))
       );
   }
 }
