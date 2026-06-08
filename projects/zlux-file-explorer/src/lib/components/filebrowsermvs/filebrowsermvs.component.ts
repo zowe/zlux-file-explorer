@@ -12,7 +12,7 @@
 
 
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional, ViewChild } from '@angular/core';
-import { take, takeUntil, finalize, debounceTime } from 'rxjs/operators';
+import { take, finalize, debounceTime } from 'rxjs/operators';
 import { ProjectStructure, DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from '../../../pluginlib/inject-resources';
 import { DownloaderService } from '../../services/downloader.service';
@@ -315,26 +315,28 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     }
 
     const createMemberConfig = new MatDialogConfig();
-    createMemberConfig.width = '600px';
     createMemberConfig.data = {
-      datasetName
+      datasetName,
+      width: '600px'
     };
 
     let createMemberRef: MatDialogRef<CreateMemberModal> = this.dialog.open(CreateMemberModal, createMemberConfig);
-    createMemberRef.componentInstance.onCreate.pipe(takeUntil(createMemberRef.afterClosed())).subscribe(onCreateResponse => {
+    createMemberRef.componentInstance.onCreate.subscribe(onCreateResponse => {
       const memberName = onCreateResponse.get('memberName');
       const selectedDatasetName = onCreateResponse.get('datasetName');
       this.datasetService.createMember(selectedDatasetName, memberName)
         .pipe(take(1))
         .subscribe({
           next: _resp => {
-            createMemberRef.close();
             this.snackBar.open(`Member '${memberName}' created successfully in '${selectedDatasetName}'.`,
               'Dismiss', quickSnackbarOptions);
+            createMemberRef.close();
             this.updateTreeView(this.path);
           },
           error: error => {
-            const errorMessage = error?.error?.msg || error?.error || `Status ${error?.status ?? 'unknown'}`;
+            const raw = error?.error;
+            const errorMessage = (typeof raw === 'string') ? raw
+              : raw?.msg || raw?.message || JSON.stringify(raw) || `Status ${error?.status ?? 'unknown'}`;
             this.snackBar.open(`Failed to create member '${memberName}': ${errorMessage}`,
               'Dismiss', longSnackbarOptions);
           }
@@ -343,31 +345,27 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
   }
 
   private isPartitionedDataset(node: any): boolean {
-    // A node with type 'folder' in the MVS tree is typically a partitioned dataset,
-    // but exclude VSAM clusters which may also appear as folders
-    if (node?.type === 'folder') {
-      const dsorg = node?.data?.datasetAttrs?.dsorg;
-      if (dsorg?.isVSAM) {
-        return false;
-      }
-      return true;
-    }
-
+    // Check dsorg metadata first — more reliable than tree node type
     const dsorg = node?.data?.datasetAttrs?.dsorg;
-    if (!dsorg) {
+    if (dsorg) {
+      const organization = dsorg.organization;
+      if (typeof organization === 'string') {
+        const upper = organization.toUpperCase();
+        // Server returns 'partitioned' or formatted as 'PO'/'PO-E'
+        if (upper === 'PARTITIONED' || upper.startsWith('PO')) {
+          return true;
+        }
+      }
+      if (dsorg.isPDSDir || dsorg.isPDSE) {
+        return true;
+      }
+      // If dsorg exists but doesn't indicate PDS, it's not partitioned
       return false;
     }
 
-    const organization = dsorg.organization;
-    if (typeof organization === 'string') {
-      const upper = organization.toUpperCase();
-      // Server returns 'partitioned' or formatted as 'PO'/'PO-E'
-      if (upper === 'PARTITIONED' || upper.startsWith('PO')) {
-        return true;
-      }
-    }
-
-    if (dsorg.isPDSDir || dsorg.isPDSE) {
+    // Only trust 'folder' type if we have no dsorg metadata (fallback)
+    // This avoids showing "Create Member" for migrated/unknown datasets
+    if (node?.type === 'folder') {
       return true;
     }
 
@@ -917,42 +915,46 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     let saveRef = this.dialog.open(CreateDatasetModal, dsCreateConfig);
 
     saveRef.afterClosed().subscribe(attributes => {
+      if (!attributes) {
+        return;
+      }
       if (attributes.datasetNameType == 'LIBRARY') {
         attributes.datasetNameType = 'PDSE';
       }
-      if (attributes) {
-        const datasetAttributes = {
-          ndisp: 'CATALOG',
-          status: 'NEW',
-          space: attributes.allocationUnit,
-          dsorg: attributes.organization,
-          lrecl: parseInt(attributes.recordLength),
-          recfm: attributes.recordFormat,
-          dir: parseInt(attributes.directoryBlocks),
-          prime: parseInt(attributes.primarySpace),
-          secnd: parseInt(attributes.secondarySpace),
-          dsnt: attributes.datasetNameType,
-          close: 'true'
-        }
+      const datasetAttributes = {
+        ndisp: 'CATALOG',
+        status: 'NEW',
+        space: attributes.allocationUnit,
+        dsorg: attributes.organization,
+        lrecl: parseInt(attributes.recordLength),
+        recfm: attributes.recordFormat,
+        dir: parseInt(attributes.directoryBlocks),
+        prime: parseInt(attributes.primarySpace),
+        secnd: parseInt(attributes.secondarySpace),
+        dsnt: attributes.datasetNameType,
+        close: 'true'
+      };
 
-        if (attributes.averageRecordUnit) {
-          datasetAttributes['avgr'] = attributes.averageRecordUnit;
-        }
-        if (attributes.blockSize) {
-          datasetAttributes['blksz'] = parseInt(attributes.blockSize);
-        }
-
-        this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe({
-          next: resp => {
-            this.snackBar.open(`Dataset: ${attributes.name} created successfully.`, 'Dismiss', quickSnackbarOptions);
-            this.createDataset.emit({ status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data });
-          },
-          error: error => {
-            this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', longSnackbarOptions);
-            this.createDataset.emit({ status: 'error', error: error.error, name: attributes.name });
-          }
-        });
+      if (attributes.averageRecordUnit) {
+        datasetAttributes['avgr'] = attributes.averageRecordUnit;
       }
+      if (attributes.blockSize) {
+        datasetAttributes['blksz'] = parseInt(attributes.blockSize);
+      }
+
+      this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe({
+        next: resp => {
+          this.snackBar.open(`Dataset: ${attributes.name} created successfully.`, 'Dismiss', quickSnackbarOptions);
+          this.createDataset.emit({ status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data });
+        },
+        error: error => {
+          const raw = error?.error;
+          const errorMessage = (typeof raw === 'string') ? raw
+            : raw?.msg || raw?.message || JSON.stringify(raw) || `Status ${error?.status ?? 'unknown'}`;
+          this.snackBar.open(`Failed to create the dataset: ${errorMessage}`, 'Dismiss', longSnackbarOptions);
+          this.createDataset.emit({ status: 'error', error: errorMessage, name: attributes.name });
+        }
+      });
     });
   }
 

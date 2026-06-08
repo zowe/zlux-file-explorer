@@ -22,6 +22,7 @@ export class CreateMemberModal {
   public datasetName: string = "";
   // Member name pattern: must start with A-Z, #, $, @; alphanumeric + #$@ allowed; max 8 chars total
   public memberPattern = /^[a-zA-Z#$@][a-zA-Z0-9#$@]{0,7}$/;
+  public creating = false;
   onCreate = new EventEmitter();
 
   constructor(
@@ -33,20 +34,22 @@ export class CreateMemberModal {
   }
 
   createMember() {
-    if (!this.memberName || !this.memberPattern.test(this.memberName)) {
+    const trimmed = (this.memberName || '').trim();
+    if (!trimmed || !this.memberPattern.test(trimmed)) {
       return;
     }
 
+    this.creating = true;
     let onCreateResponse = new Map();
-    onCreateResponse.set("memberName", this.memberName.toUpperCase());
+    onCreateResponse.set("memberName", trimmed.toUpperCase());
     onCreateResponse.set("datasetName", this.datasetName);
     this.onCreate.emit(onCreateResponse);
   }
 
   get isValid(): boolean {
-    return !!this.memberName && this.memberPattern.test(this.memberName);
+    const trimmed = (this.memberName || '').trim();
+    return !!trimmed && this.memberPattern.test(trimmed);
   }
-
 }
 
 /*
