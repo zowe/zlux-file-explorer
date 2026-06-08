@@ -19,6 +19,18 @@
   padding-bottom: 0px !important;
 }
 
+.spinning {
+  animation: spin 1s linear infinite;
+  font-size: 18px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /*
   This program and the accompanying materials are
   made available under the terms of the Eclipse Public License v2.0 which accompanies

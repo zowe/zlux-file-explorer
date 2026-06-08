@@ -315,9 +315,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     }
 
     const createMemberConfig = new MatDialogConfig();
+    createMemberConfig.width = '600px';
     createMemberConfig.data = {
-      datasetName,
-      width: '600px'
+      datasetName
     };
 
     let createMemberRef: MatDialogRef<CreateMemberModal> = this.dialog.open(CreateMemberModal, createMemberConfig);
