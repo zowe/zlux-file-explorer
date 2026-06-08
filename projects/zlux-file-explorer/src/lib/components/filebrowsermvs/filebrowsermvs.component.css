@@ -81,8 +81,18 @@
 .filebrowser-icon {
   cursor: pointer;
   font-size: 15px;
-  padding: 2px;
-  line-height: 1;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.filebrowser-icon::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .special-utility {
