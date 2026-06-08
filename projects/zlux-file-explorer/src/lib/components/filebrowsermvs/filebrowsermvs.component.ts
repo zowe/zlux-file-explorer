@@ -12,7 +12,7 @@
 
 
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, Input, EventEmitter, Output, Inject, Optional, ViewChild } from '@angular/core';
-import { take, finalize, debounceTime } from 'rxjs/operators';
+import { take, takeUntil, finalize, debounceTime } from 'rxjs/operators';
 import { ProjectStructure, DatasetAttributes, Member } from '../../structures/editor-project';
 import { Angular2InjectionTokens, Angular2PluginWindowActions, ContextMenuItem } from '../../../pluginlib/inject-resources';
 import { DownloaderService } from '../../services/downloader.service';
@@ -321,7 +321,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     };
 
     let createMemberRef: MatDialogRef<CreateMemberModal> = this.dialog.open(CreateMemberModal, createMemberConfig);
-    createMemberRef.componentInstance.onCreate.subscribe(onCreateResponse => {
+    createMemberRef.componentInstance.onCreate.pipe(takeUntil(createMemberRef.afterClosed())).subscribe(onCreateResponse => {
       const memberName = onCreateResponse.get('memberName');
       const selectedDatasetName = onCreateResponse.get('datasetName');
       this.datasetService.createMember(selectedDatasetName, memberName)
@@ -343,8 +343,13 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
   }
 
   private isPartitionedDataset(node: any): boolean {
-    // A node with type 'folder' in the MVS tree is always a partitioned dataset
+    // A node with type 'folder' in the MVS tree is typically a partitioned dataset,
+    // but exclude VSAM clusters which may also appear as folders
     if (node?.type === 'folder') {
+      const dsorg = node?.data?.datasetAttrs?.dsorg;
+      if (dsorg?.isVSAM) {
+        return false;
+      }
       return true;
     }
 
