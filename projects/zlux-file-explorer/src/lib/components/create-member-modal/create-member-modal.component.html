@@ -48,7 +48,7 @@ Copyright Contributors to the Zowe Project.
   </mat-dialog-content>
 
   <mat-dialog-actions>
-    <button mat-button mat-dialog-close class="modal-mat-button create" 
+    <button mat-button class="modal-mat-button create" 
       (click)="createMember()" [disabled]="!isValid || creating">
       @if (creating) {
         <mat-icon class="spinning">sync</mat-icon> Creating...
