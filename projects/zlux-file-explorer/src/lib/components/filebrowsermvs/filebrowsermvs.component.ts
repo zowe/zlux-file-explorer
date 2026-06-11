@@ -337,7 +337,7 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
             createMemberRef.componentInstance.creating = false;
             const raw = error?.error;
             const errorMessage = (typeof raw === 'string') ? raw
-              : raw?.msg || raw?.message || JSON.stringify(raw) || `Status ${error?.status ?? 'unknown'}`;
+              : raw?.error || raw?.msg || raw?.message || JSON.stringify(raw) || `Status ${error?.status ?? 'unknown'}`;
             this.snackBar.open(`Failed to create member '${memberName}': ${errorMessage}`,
               'Dismiss', longSnackbarOptions);
           }
