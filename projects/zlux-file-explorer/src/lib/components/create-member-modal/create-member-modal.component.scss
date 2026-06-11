@@ -23,6 +23,18 @@
   padding-bottom: 0px !important;
 }
 
+mat-form-field {
+  overflow: visible;
+
+  .mat-mdc-form-field-subscript-wrapper {
+    overflow: visible;
+  }
+}
+
+.mat-error {
+  white-space: nowrap;
+}
+
 .spinning {
   animation: spin 1s linear infinite;
   font-size: 18px;
