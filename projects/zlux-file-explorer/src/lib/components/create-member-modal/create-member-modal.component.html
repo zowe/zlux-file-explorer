@@ -34,6 +34,7 @@ Copyright Contributors to the Zowe Project.
       <input id="create-member-input" name="memberName" [pattern]="memberPattern" 
         matInput type="text" [ngModel]="memberName" 
         (ngModelChange)="memberName = $event.trim().toUpperCase()"
+        (keydown.enter)="isValid && !creating && createMember()"
         [disabled]="creating">
       @if (memberName) {
       <button class="modal-clear-button" mat-button matSuffix mat-icon-button tabindex="-1" aria-label="Clear"
