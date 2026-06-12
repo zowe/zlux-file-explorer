@@ -12,7 +12,8 @@
   width: fit-content;
   min-width: 250px;
   margin-left: 5px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   height: 40px;
 }
 
@@ -66,21 +67,32 @@
   width: auto;
 }
 
-.filebrowseruss-pointer-logo {
-  content: url('../../../assets/explorer-uparrow.png');
-  width: 20px;
-  height: 20px;
-  filter: brightness(3);
+.filebrowser-nav-back {
   cursor: pointer;
+  font-size: 16px;
+  color: #d4d4d4;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+}
+
+.filebrowser-nav-back:hover {
+  color: #ffffff;
+}
+
+.filebrowser-tree-wrapper {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.filebrowser-tree-wrapper .p-tree-container {
+  overflow: visible !important;
+  height: auto !important;
 }
 
 .filebrowseruss-node-deleting {
   opacity: .5;
-}
-
-.filebrowseruss-loading-icon {
-  margin-left: 8px !important;
-  font-size: large !important;
 }
 
 .file-tree-utilities {
