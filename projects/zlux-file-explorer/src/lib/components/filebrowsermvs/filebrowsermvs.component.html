@@ -8,7 +8,7 @@ SPDX-License-Identifier: EPL-2.0
 Copyright Contributors to the Zowe Project.
 -->
 
-<div style="height: 100%">
+<div style="height: 100%; display: flex; flex-direction: column; overflow: hidden;">
 
   <!-- Tabs, searchbar, and loading indicator -->
   @if (showUpArrow) {
@@ -37,9 +37,9 @@ Copyright Contributors to the Zowe Project.
   </div>
 
   <div class="fa fa-spinner fa-spin filebrowsermvs-loading-icon" [hidden]="!isLoading"></div>
-  <div class="fa fa-refresh filebrowsermvs-loading-icon" title="Refresh dataset list" (click)="updateTreeView(path);"
-    [hidden]="isLoading" style="margin-left: 9px; cursor: pointer;"></div>
   <div class="file-tree-utilities">
+    <div class="fa fa-refresh filebrowser-icon" title="Refresh dataset list" (click)="updateTreeView(path);"
+      [hidden]="isLoading"></div>
     <div class="fa fa-minus-square-o filebrowser-icon" title="Collapse Folders in Explorer"
       (click)="collapseTree();"></div>
     <div class="fa fa-trash-o filebrowser-icon" title="Delete" (click)="showDeleteDialog(selectedNode);"></div>
@@ -48,7 +48,7 @@ Copyright Contributors to the Zowe Project.
       (click)="clearSearchHistory();"></div>
   </div>
   <!-- Main tree -->
-  <div [hidden]="hideExplorer" style="height: 100%;">
+  <div [hidden]="hideExplorer" style="flex: 1; overflow: hidden; min-height: 0;">
     <tree-root 
       [treeData]="data" 
       (clickEvent)="onNodeClick($event)" 
