@@ -10,11 +10,12 @@
 
 .filebrowseruss-search {
   width: auto;
-  min-width: 250px;
+  min-width: 0;
   margin-left: 5px;
   display: flex;
   align-items: center;
   height: 40px;
+  overflow: hidden;
 }
 
 .filebrowseruss-search-input {
@@ -89,6 +90,8 @@
 .filebrowser-tree-wrapper tree-root {
   position: absolute;
   inset: 0;
+  display: block;
+  overflow: hidden;
 }
 
 .filebrowseruss-node-deleting {
