@@ -37,7 +37,7 @@ Copyright Contributors to the Zowe Project.
       (click)="showCreateFolderDialog(!selectedNode || (!selectedNode.parent && !selectedNode.directory) ? { 'path' : path } : selectedNode.directory ? selectedNode : selectedNode.parent);">
     </div>
     <div class="fa fa-plus filebrowser-icon" title="New File"
-      (click)="newFileClick.emit(selectedNode || '')">
+      (click)="newFileClick.emit({ path: path, existingNames: data })">
     </div>
     <div class="fa fa-eraser filebrowser-icon special-utility" title="Clear Search History"
       (click)="clearSearchHistory();"></div>

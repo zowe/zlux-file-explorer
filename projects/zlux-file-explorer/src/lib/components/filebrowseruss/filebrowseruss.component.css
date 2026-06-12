@@ -9,7 +9,7 @@
 */
 
 .filebrowseruss-search {
-  width: fit-content;
+  width: auto;
   min-width: 250px;
   margin-left: 5px;
   display: flex;
@@ -69,9 +69,9 @@
 
 .filebrowser-nav-back {
   cursor: pointer;
-  font-size: 16px;
+  font-size: 20px;
   color: #d4d4d4;
-  padding: 0 6px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
 }
@@ -82,13 +82,13 @@
 
 .filebrowser-tree-wrapper {
   flex: 1;
-  overflow: auto;
   min-height: 0;
+  position: relative;
 }
 
-.filebrowser-tree-wrapper .p-tree-container {
-  overflow: visible !important;
-  height: auto !important;
+.filebrowser-tree-wrapper tree-root {
+  position: absolute;
+  inset: 0;
 }
 
 .filebrowseruss-node-deleting {
