@@ -8,6 +8,11 @@
   Copyright Contributors to the Zowe Project.
 */
 
+:host {
+  display: block;
+  height: 100%;
+}
+
 .filebrowseruss-search {
   width: auto;
   min-width: 0;
@@ -91,7 +96,8 @@
   position: absolute;
   inset: 0;
   display: block;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .filebrowseruss-node-deleting {

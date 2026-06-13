@@ -8,6 +8,11 @@
   Copyright Contributors to the Zowe Project.
 */
 
+:host {
+  display: block;
+  height: 100%;
+}
+
 .searchRowFlex {
   display: flex;
   flex-direction: row;
@@ -59,7 +64,8 @@
   position: absolute;
   inset: 0;
   display: block;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .p-tree-empty-message {

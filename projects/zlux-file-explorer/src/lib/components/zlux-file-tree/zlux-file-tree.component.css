@@ -14,6 +14,17 @@
   height: 100%;
 }
 
+:host {
+  display: block;
+  height: 100%;
+}
+
+:host > .mat-tab-group,
+:host .mat-mdc-tab-body-wrapper,
+:host .mat-mdc-tab-body-content {
+  height: 100%;
+}
+
 .fileexplorer-global {
   height: 100%;
 }
