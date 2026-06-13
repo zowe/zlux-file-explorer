@@ -15,7 +15,7 @@ declare var require: any;
 import {
   Component,
   Input, Output, ViewChild, ViewEncapsulation,
-  ElementRef, ChangeDetectorRef,
+  ElementRef, ChangeDetectorRef, HostBinding,
   EventEmitter, OnInit, OnDestroy, Inject
 } from '@angular/core';
 // import {FileContents} from '../../structures/filecontents';
@@ -51,6 +51,10 @@ import { Angular2InjectionTokens } from '../../../pluginlib/inject-resources';
 
 export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
+
+  @HostBinding('style.display') hostDisplay = 'block';
+  @HostBinding('style.height') hostHeight = '100%';
+
   public currentIndex: number;
   public tabs: Array<tab>;
   public showUpArrow: boolean;
