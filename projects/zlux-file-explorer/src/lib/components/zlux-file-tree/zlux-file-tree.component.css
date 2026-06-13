@@ -9,9 +9,11 @@
 */
 
 .fileexplorer-browser-module {
-  margin-left: 10px;
-  margin-top: 10px;
-  height: 100%;
+  margin: 0;
+  padding: 8px 0 0 0;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 :host {
@@ -26,7 +28,10 @@
 }
 
 .fileexplorer-global {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  overflow: hidden;
 }
 
 .fileexplorer-tabs {
