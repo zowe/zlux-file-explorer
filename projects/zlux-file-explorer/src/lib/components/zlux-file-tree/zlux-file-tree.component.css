@@ -9,13 +9,30 @@
 */
 
 .fileexplorer-browser-module {
-  margin-left: 10px;
-  margin-top: 10px;
+  margin: 0 !important;
+  padding: 8px 0 0 0 !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+
+:host {
+  display: block;
   height: 100%;
 }
 
+:host > .mat-tab-group,
+:host .mat-mdc-tab-body-wrapper,
+:host .mat-mdc-tab-body-content {
+  height: 100% !important;
+}
+
 .fileexplorer-global {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  overflow: hidden;
 }
 
 .fileexplorer-tabs {

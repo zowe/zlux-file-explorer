@@ -33,6 +33,7 @@ import { UploaderService } from "../../services/uploader.service";
 import { CreateDatasetModal } from "../create-dataset-modal/create-dataset-modal.component";
 import { CreateFileModal } from "../create-file-modal/create-file-modal.component";
 import { CreateFolderModal } from "../create-folder-modal/create-folder-modal.component";
+import { CreateMemberModal } from "../create-member-modal/create-member-modal.component";
 import { DatasetPropertiesModal } from "../dataset-properties-modal/dataset-properties-modal.component";
 import { DeleteFileModal } from "../delete-file-modal/delete-file-modal.component";
 import { FileOwnershipModal } from "../file-ownership-modal/file-ownership-modal.component";
@@ -65,6 +66,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
     DeleteFileModal,
     CreateFolderModal,
     CreateFileModal,
+    CreateMemberModal,
     UploadModal,
     TreeComponent,
     CreateDatasetModal

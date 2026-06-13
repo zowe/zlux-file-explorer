@@ -8,17 +8,26 @@
   Copyright Contributors to the Zowe Project.
 */
 
+:host {
+  display: block;
+  height: 100%;
+}
+
 .searchRowFlex {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 .filebrowsermvs-search {
-  width: fit-content;
-  min-width: 250px;
-  margin-left: 5px;
-  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 2px 0;
+  padding-left: 5px;
+  display: flex;
+  align-items: center;
   height: 40px;
+  overflow: hidden;
 }
 
 .filebrowsermvs-search-input {
@@ -34,12 +43,31 @@
   flex-grow: 2;
 }
 
-.filebrowsermvs-pointer-logo {
-  content: url('../../../assets/explorer-uparrow.png');
-  width: 20px;
-  height: 20px;
-  filter: brightness(3);
+.filebrowser-nav-back {
   cursor: pointer;
+  font-size: 20px;
+  color: #d4d4d4;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+}
+
+.filebrowser-nav-back:hover {
+  color: #ffffff;
+}
+
+.filebrowser-tree-wrapper {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.filebrowser-tree-wrapper tree-root {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .p-tree-empty-message {
@@ -64,22 +92,33 @@
 .file-tree-utilities {
   overflow: hidden;
   border: 1px solid #464646;
-}
-
-.filebrowsermvs-loading-icon {
-  margin-left: 8px !important;
-  font-size: large !important;
-
+  padding: 4px 6px;
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
 }
 
 .filebrowser-icon {
-  margin-right: 9px;
-  float: right;
   cursor: pointer;
+  font-size: 15px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.filebrowser-icon::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .special-utility {
-  margin-left: 9px;
+  margin-left: 0;
 }
 
 /*

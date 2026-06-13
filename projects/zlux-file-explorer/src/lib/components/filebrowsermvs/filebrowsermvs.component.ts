@@ -31,6 +31,7 @@ import { SearchHistoryService } from '../../services/searchHistoryService';
 import { UtilsService } from '../../services/utils.service';
 import { DatasetCrudService } from '../../services/dataset.crud.service';
 import { CreateDatasetModal } from '../create-dataset-modal/create-dataset-modal.component';
+import { CreateMemberModal } from '../create-member-modal/create-member-modal.component';
 import { TreeNode } from 'primeng/api';
 /* TODO: re-implement to add fetching of previously opened tree view data
 import { PersistentDataService } from '../../services/persistentData.service'; */
@@ -248,6 +249,11 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
         }
       },
       {
+        text: "Create Member", action: () => {
+          this.showCreateMemberDialog(this.rightClickedFile);
+        }
+      },
+      {
         text: "Properties", action: () => {
           this.showPropertiesDialog(this.rightClickedFile);
         }
@@ -287,6 +293,84 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
         this.deleteNonVsamDataset(rightClickedFile);
       }
     });
+  }
+
+  showCreateMemberDialog(rightClickedFile: any) {
+    const datasetName = rightClickedFile?.data?.path;
+    if (!datasetName) {
+      this.snackBar.open('Unable to determine dataset path for member creation.',
+        'Dismiss', defaultSnackbarOptions);
+      return;
+    }
+
+    if (!this.isPartitionedDataset(rightClickedFile)) {
+      this.snackBar.open(`Cannot create member in non-partitioned dataset '${datasetName}'.`,
+        'Dismiss', defaultSnackbarOptions);
+      return;
+    }
+
+    if (this.checkIfInDeletionQueueAndMessage(datasetName,
+      'Cannot create a member inside a dataset queued for deletion.') == true) {
+      return;
+    }
+
+    const createMemberConfig = new MatDialogConfig();
+    createMemberConfig.width = '600px';
+    createMemberConfig.data = {
+      datasetName
+    };
+
+    let createMemberRef: MatDialogRef<CreateMemberModal> = this.dialog.open(CreateMemberModal, createMemberConfig);
+    createMemberRef.componentInstance.onCreate.subscribe(onCreateResponse => {
+      const memberName = onCreateResponse.get('memberName');
+      const selectedDatasetName = onCreateResponse.get('datasetName');
+      this.datasetService.createMember(selectedDatasetName, memberName)
+        .pipe(take(1))
+        .subscribe({
+          next: _resp => {
+            this.snackBar.open(`Member '${memberName}' created successfully in '${selectedDatasetName}'.`,
+              'Dismiss', quickSnackbarOptions);
+            createMemberRef.close();
+            this.updateTreeView(this.path);
+          },
+          error: error => {
+            createMemberRef.componentInstance.creating = false;
+            const raw = error?.error;
+            const errorMessage = (typeof raw === 'string') ? raw
+              : raw?.error || raw?.msg || raw?.message || JSON.stringify(raw) || `Status ${error?.status ?? 'unknown'}`;
+            this.snackBar.open(`Failed to create member '${memberName}': ${errorMessage}`,
+              'Dismiss', longSnackbarOptions);
+          }
+        });
+    });
+  }
+
+  private isPartitionedDataset(node: any): boolean {
+    // Check dsorg metadata first — more reliable than tree node type
+    const dsorg = node?.data?.datasetAttrs?.dsorg;
+    if (dsorg) {
+      const organization = dsorg.organization;
+      if (typeof organization === 'string') {
+        const upper = organization.toUpperCase();
+        // Server returns 'partitioned' or formatted as 'PO'/'PO-E'
+        if (upper === 'PARTITIONED' || upper.startsWith('PO')) {
+          return true;
+        }
+      }
+      if (dsorg.isPDSDir || dsorg.isPDSE) {
+        return true;
+      }
+      // If dsorg exists but doesn't indicate PDS, it's not partitioned
+      return false;
+    }
+
+    // Only trust 'folder' type if we have no dsorg metadata (fallback)
+    // This avoids showing "Create Member" for migrated/unknown datasets
+    if (node?.type === 'folder') {
+      return true;
+    }
+
+    return false;
   }
 
   deleteNonVsamDataset(rightClickedFile: any): void {
@@ -599,7 +683,9 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
       rightClickProperties = this.rightClickPropertiesDatasetFile;
     }
     else {
-      rightClickProperties = this.rightClickPropertiesDatasetFolder;
+      rightClickProperties = this.rightClickPropertiesDatasetFolder.filter(item => {
+        return item.text !== 'Create Member' || this.isPartitionedDataset(node);
+      });
     }
     if (this.windowActions) {
       let didContextMenuSpawn = this.windowActions.spawnContextMenu(event.originalEvent.clientX, event.originalEvent.clientY, rightClickProperties, true);
@@ -830,42 +916,46 @@ export class FileBrowserMVSComponent implements OnInit, OnDestroy {
     let saveRef = this.dialog.open(CreateDatasetModal, dsCreateConfig);
 
     saveRef.afterClosed().subscribe(attributes => {
+      if (!attributes) {
+        return;
+      }
       if (attributes.datasetNameType == 'LIBRARY') {
         attributes.datasetNameType = 'PDSE';
       }
-      if (attributes) {
-        const datasetAttributes = {
-          ndisp: 'CATALOG',
-          status: 'NEW',
-          space: attributes.allocationUnit,
-          dsorg: attributes.organization,
-          lrecl: parseInt(attributes.recordLength),
-          recfm: attributes.recordFormat,
-          dir: parseInt(attributes.directoryBlocks),
-          prime: parseInt(attributes.primarySpace),
-          secnd: parseInt(attributes.secondarySpace),
-          dsnt: attributes.datasetNameType,
-          close: 'true'
-        }
+      const datasetAttributes = {
+        ndisp: 'CATALOG',
+        status: 'NEW',
+        space: attributes.allocationUnit,
+        dsorg: attributes.organization,
+        lrecl: parseInt(attributes.recordLength),
+        recfm: attributes.recordFormat,
+        dir: parseInt(attributes.directoryBlocks),
+        prime: parseInt(attributes.primarySpace),
+        secnd: parseInt(attributes.secondarySpace),
+        dsnt: attributes.datasetNameType,
+        close: 'true'
+      };
 
-        if (attributes.averageRecordUnit) {
-          datasetAttributes['avgr'] = attributes.averageRecordUnit;
-        }
-        if (attributes.blockSize) {
-          datasetAttributes['blksz'] = parseInt(attributes.blockSize);
-        }
-
-        this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe({
-          next: resp => {
-            this.snackBar.open(`Dataset: ${attributes.name} created successfully.`, 'Dismiss', quickSnackbarOptions);
-            this.createDataset.emit({ status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data });
-          },
-          error: error => {
-            this.snackBar.open(`Failed to create the dataset: ${error.error}`, 'Dismiss', longSnackbarOptions);
-            this.createDataset.emit({ status: 'error', error: error.error, name: attributes.name });
-          }
-        });
+      if (attributes.averageRecordUnit) {
+        datasetAttributes['avgr'] = attributes.averageRecordUnit;
       }
+      if (attributes.blockSize) {
+        datasetAttributes['blksz'] = parseInt(attributes.blockSize);
+      }
+
+      this.datasetService.createDataset(datasetAttributes, attributes.name).subscribe({
+        next: resp => {
+          this.snackBar.open(`Dataset: ${attributes.name} created successfully.`, 'Dismiss', quickSnackbarOptions);
+          this.createDataset.emit({ status: 'success', name: attributes.name, org: attributes.organization, initData: dsCreateConfig.data.data });
+        },
+        error: error => {
+          const raw = error?.error;
+          const errorMessage = (typeof raw === 'string') ? raw
+            : raw?.msg || raw?.message || JSON.stringify(raw) || `Status ${error?.status ?? 'unknown'}`;
+          this.snackBar.open(`Failed to create the dataset: ${errorMessage}`, 'Dismiss', longSnackbarOptions);
+          this.createDataset.emit({ status: 'error', error: errorMessage, name: attributes.name });
+        }
+      });
     });
   }
 

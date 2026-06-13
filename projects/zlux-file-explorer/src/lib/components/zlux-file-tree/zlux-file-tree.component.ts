@@ -15,7 +15,7 @@ declare var require: any;
 import {
   Component,
   Input, Output, ViewChild, ViewEncapsulation,
-  ElementRef, ChangeDetectorRef,
+  ElementRef, ChangeDetectorRef, HostBinding,
   EventEmitter, OnInit, OnDestroy, Inject
 } from '@angular/core';
 // import {FileContents} from '../../structures/filecontents';
@@ -51,6 +51,10 @@ import { Angular2InjectionTokens } from '../../../pluginlib/inject-resources';
 
 export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   //componentClass: ComponentClass;
+
+  @HostBinding('style.display') hostDisplay = 'block';
+  @HostBinding('style.height') hostHeight = '100%';
+
   public currentIndex: number;
   public tabs: Array<tab>;
   public showUpArrow: boolean;
@@ -147,7 +151,7 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
   @Output() nodeDblClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() newFolderClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() fileUploaded: EventEmitter<any> = new EventEmitter<any>();
-  // @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() newFileClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() copyClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() deleteClick: EventEmitter<any> = new EventEmitter<any>();
   @Output() ussRenameEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -291,9 +295,9 @@ export class ZluxFileTreeComponent implements OnInit, OnDestroy {
     this.ussRenameEvent.emit($event);
   }
 
-  // onNewFileClick($event:any){
-  //   this.newFileClick.emit($event);
-  // }
+  onNewFileClick($event:any){
+    this.newFileClick.emit($event);
+  }
 
   onNewFolderClick($event: any) {
     this.newFolderClick.emit($event);

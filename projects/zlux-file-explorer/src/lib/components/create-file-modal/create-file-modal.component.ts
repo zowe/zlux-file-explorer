@@ -10,9 +10,6 @@
 */
 import { Component, Inject, EventEmitter } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { HttpClient } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { defaultSnackbarOptions } from '../../shared/snackbar-options';
 
 @Component({
   selector: 'create-file-modal',
@@ -30,8 +27,6 @@ export class CreateFileModal {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) data: any,
-    private http: HttpClient,
-    private snackBar: MatSnackBar,
   ) {
     const node = data.event;
     if (node.path) {
@@ -45,9 +40,7 @@ export class CreateFileModal {
   }
 
   createFile() {
-    const directoryPath: string = this.dirPath;
-    const path = directoryPath + '/' + this.fileName;
-    let onFileCreateResponse = new Map();
+    const onFileCreateResponse = new Map();
     onFileCreateResponse.set("pathAndName", this.dirPath + "/" + this.fileName);
     if (this.dirPath != this.folderPathObtainedFromNode) {
       //If the user changed the path obtained from the node or the node has never been opened...
