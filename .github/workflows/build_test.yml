@@ -27,7 +27,7 @@ jobs:
     steps:
       # this action will fail the whole workflow if permission check fails
       - name: check permission
-        uses: zowe-actions/shared-actions/permission-check@main
+        uses: zowe-actions/shared-actions/permission-check@77d7d9b50e60fedc8132b5e5eb6d611c4e483416 # main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: '[Prep 1] Validate package.json'
-        uses: zowe-actions/shared-actions/validate-package-json@main
+        uses: zowe-actions/shared-actions/validate-package-json@77d7d9b50e60fedc8132b5e5eb6d611c4e483416 # main
 
       - name: '[Prep 2] Cache node modules'
         uses: actions/cache@v4
@@ -54,12 +54,12 @@ jobs:
             ${{ runner.os }}-build-cache-node-modules-
 
       - name: '[Prep 3] Setup jFrog CLI'
-        uses: jfrog/setup-jfrog-cli@v2
+        uses: jfrog/setup-jfrog-cli@11ee3f9bb82595485cb55670e4f93885080e183b # v2
         env:
           JF_ENV_1: ${{ secrets.JF_ARTIFACTORY_TOKEN }}
 
       - name: '[Prep 4] Prepare workflow'
-        uses: zowe-actions/shared-actions/prepare-workflow@main
+        uses: zowe-actions/shared-actions/prepare-workflow@77d7d9b50e60fedc8132b5e5eb6d611c4e483416 # main
 
       - name: '[Prep 5] Setup Node'
         uses: actions/setup-node@v4
@@ -67,7 +67,7 @@ jobs:
           node-version: 18
 
       - name: '[Setup] NodeJS project setup'
-        uses: zowe-actions/nodejs-actions/setup@main
+        uses: zowe-actions/nodejs-actions/setup@51d0830982b1ef6c0168fe0c288ed6b69bc892c1 # main
         with:
           package-name: 'org.zowe.zlux-angular-file-tree'
           install-registry-url: ${{ env.DEFAULT_NPM_PRIVATE_INSTALL_REGISTRY }}
@@ -98,7 +98,7 @@ jobs:
       # note: this step is not actually doing upload to artifactory because no artifact input is provided.
       # this is just to parse and create a PUBLISH_VERSION then export, later NPM publish step can use.
       - name: '[Publish 1] Publish'
-        uses: zowe-actions/shared-actions/publish@main
+        uses: zowe-actions/shared-actions/publish@77d7d9b50e60fedc8132b5e5eb6d611c4e483416 # main
         if: success()
         with:
           artifacts: dist/zlux-file-explorer/**
@@ -107,16 +107,16 @@ jobs:
 
       - name: '[Publish 2] NPM Publish'
         if: success()
-        uses: zowe-actions/nodejs-actions/publish@main
+        uses: zowe-actions/nodejs-actions/publish@51d0830982b1ef6c0168fe0c288ed6b69bc892c1 # main
         with:
           perform-release: ${{ github.event.inputs.PERFORM_RELEASE }}
 
       - name: '[Release 1] Release (if necessary)'
         if: ${{ success() && github.event.inputs.PERFORM_RELEASE == 'true' && env.IS_RELEASE_BRANCH == 'true' }}
-        uses: zowe-actions/shared-actions/release@main
+        uses: zowe-actions/shared-actions/release@77d7d9b50e60fedc8132b5e5eb6d611c4e483416 # main
 
       - name: '[Release 2] NPM bump version (if necessary)'
         if: ${{ success() && github.event.inputs.PERFORM_RELEASE == 'true' && env.IS_RELEASE_BRANCH == 'true' && env.IS_FORMAL_RELEASE_BRANCH == 'true' && env.PRE_RELEASE_STRING == ''}}
-        uses: zowe-actions/nodejs-actions/bump-version@main
+        uses: zowe-actions/nodejs-actions/bump-version@51d0830982b1ef6c0168fe0c288ed6b69bc892c1 # main
         env: 
           GITHUB_TOKEN: ${{ secrets.ZOWE_ROBOT_TOKEN }}
